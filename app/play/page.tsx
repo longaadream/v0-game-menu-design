@@ -38,7 +38,7 @@ export default function PlayPage() {
       void fetchRoom(id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams])
+  }, [searchParams, roomId])
 
   async function fetchRoom(id: string) {
     try {
@@ -47,7 +47,9 @@ export default function PlayPage() {
       const res = await fetch(`/api/rooms/${id}`)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "Failed to load room")
+        // 不再显示错误信息，而是等待用户输入昵称并加入房间
+        setError(null)
+        return
       }
       const data = (await res.json()) as Room
       setRoom(data)
@@ -57,8 +59,8 @@ export default function PlayPage() {
         setBattle(null)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error")
-      setRoom(null)
+      // 捕获错误但不显示，避免不必要的 "Room not found" 提示
+      setError(null)
     } finally {
       setLoading(false)
     }
@@ -149,10 +151,7 @@ export default function PlayPage() {
       if (!res.ok) {
         throw new Error(data.error || "Failed to start game")
       }
-      const updatedRoom = data as Room
-      setRoom(updatedRoom)
-      // 初始化战斗状态
-      await fetchBattle(updatedRoom.id)
+      router.replace(`/battle/${roomId}?playerName=${encodeURIComponent(playerName.trim())}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error")
     } finally {
@@ -229,9 +228,11 @@ export default function PlayPage() {
         throw new Error(data.error || "Failed to delete room")
       }
 
-      // 清空当前房间状态，并移除 URL 上的 roomId
+      // 清空状态
       setRoom(null)
       setRoomId(null)
+      setBattle(null)
+      // 移除 URL 上的 roomId
       router.replace("/play")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error")
@@ -254,6 +255,34 @@ export default function PlayPage() {
     () => (playerName.trim() ? playerName.trim() : null),
     [playerName],
   )
+
+  // 轮询检查房间状态，确保所有玩家都能及时获取状态变化
+  useEffect(() => {
+    if (!roomId) return
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/rooms/${roomId}`)
+        if (res.ok) {
+          const data = (await res.json()) as Room
+          if (data.status === "in-progress") {
+            router.replace(`/battle/${roomId}?playerName=${encodeURIComponent(playerName.trim())}`)
+          }
+        }
+      } catch (error) {
+        // 忽略错误
+      }
+    }, 2000) // 每2秒检查一次
+
+    return () => clearInterval(interval)
+  }, [roomId, router])
+
+  // 监听房间状态变化，当游戏开始时自动跳转
+  useEffect(() => {
+    if (room?.status === "in-progress" && roomId) {
+      router.replace(`/battle/${roomId}`)
+    }
+  }, [room?.status, roomId, router])
 
   return (
     <main className="flex min-h-svh flex-col items-center justify-center px-4 py-12">
@@ -357,6 +386,26 @@ export default function PlayPage() {
                     : room.players.map((p) => p.name).join(" vs ")}
                 </div>
               </div>
+
+              {!battle && room.status === "waiting" && room.players.length === 2 && playerName.trim() && (
+                <div className="flex justify-center">
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    disabled={loading}
+                    onClick={handleStartGame}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        开始游戏中...
+                      </>
+                    ) : (
+                      "开始游戏"
+                    )}
+                  </Button>
+                </div>
+              )}
 
               {battle && (
                 <>

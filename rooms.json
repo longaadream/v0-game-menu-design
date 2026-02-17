@@ -1,0 +1,5654 @@
+[
+  {
+    "id": "e997212b-22fc-46f7-b8eb-b3ac67752fde",
+    "name": "File Store Test Room",
+    "status": "waiting",
+    "createdAt": 1771343839053,
+    "maxPlayers": 2,
+    "players": [],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "198f266a-54e9-4789-9545-0679922022c1",
+    "name": "Frontend Test Room",
+    "status": "waiting",
+    "createdAt": 1771344143900,
+    "maxPlayers": 2,
+    "players": [],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "NVsBG",
+    "name": "Short ID Test 2",
+    "status": "waiting",
+    "createdAt": 1771344300452,
+    "maxPlayers": 2,
+    "players": [],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "aeVlM",
+    "name": "Cross Device Test Room",
+    "status": "waiting",
+    "createdAt": 1771344428098,
+    "maxPlayers": 2,
+    "players": [],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "KgWGm",
+    "name": "Case Sensitivity Test",
+    "status": "waiting",
+    "createdAt": 1771344641857,
+    "maxPlayers": 2,
+    "players": [],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "mxvka",
+    "name": "Case Insensitive Test",
+    "status": "waiting",
+    "createdAt": 1771344698821,
+    "maxPlayers": 2,
+    "players": [],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "zzvtk",
+    "name": "Complete Test Room",
+    "status": "waiting",
+    "createdAt": 1771344772295,
+    "maxPlayers": 2,
+    "players": [],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "poabv",
+    "name": "Debug Test Room",
+    "status": "waiting",
+    "createdAt": 1771344897348,
+    "maxPlayers": 2,
+    "players": [],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "virlz",
+    "name": "Global Store Test Room",
+    "status": "waiting",
+    "createdAt": 1771344976619,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "2c7f045e-30ee-46c6-b263-d42b864f26ad",
+        "name": "GlobalPlayer",
+        "joinedAt": 1771344977713
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "yqtrs",
+    "name": "Final Test Room",
+    "status": "waiting",
+    "createdAt": 1771345139643,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "ebfd8601-e77a-405a-8c7c-b8ff7446f09c",
+        "name": "Player1",
+        "joinedAt": 1771345139694
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "1upwq",
+    "name": "Two Player Test Room",
+    "status": "in-progress",
+    "createdAt": 1771345161173,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "054ca7c6-412a-4a4f-aacd-f92a3b288ae3",
+        "name": "Player1",
+        "joinedAt": 1771345161206
+      },
+      {
+        "id": "baa1520a-f42c-41a6-995d-68253d14bd14",
+        "name": "Player2",
+        "joinedAt": 1771345161227
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": {
+      "map": {
+        "id": "arena-8x6",
+        "name": "小型竞技场",
+        "width": 8,
+        "height": 6,
+        "tiles": [
+          {
+            "id": "arena-8x6-0-0",
+            "x": 0,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-0",
+            "x": 1,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-0",
+            "x": 2,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-0",
+            "x": 3,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-0",
+            "x": 4,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-0",
+            "x": 5,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-0",
+            "x": 6,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-0",
+            "x": 7,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-1",
+            "x": 0,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-1",
+            "x": 1,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-1",
+            "x": 2,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-1",
+            "x": 3,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-1",
+            "x": 4,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-1",
+            "x": 5,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-1",
+            "x": 6,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-7-1",
+            "x": 7,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-2",
+            "x": 0,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-2",
+            "x": 1,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-2",
+            "x": 2,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-2",
+            "x": 3,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-2",
+            "x": 4,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-2",
+            "x": 5,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-2",
+            "x": 6,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-2",
+            "x": 7,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-3",
+            "x": 0,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-3",
+            "x": 1,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-2-3",
+            "x": 2,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-3",
+            "x": 3,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-3",
+            "x": 4,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-3",
+            "x": 5,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-3",
+            "x": 6,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": true,
+              "type": "hole"
+            }
+          },
+          {
+            "id": "arena-8x6-7-3",
+            "x": 7,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-4",
+            "x": 0,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-4",
+            "x": 1,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-4",
+            "x": 2,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-4",
+            "x": 3,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-4-4",
+            "x": 4,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-4",
+            "x": 5,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-4",
+            "x": 6,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-4",
+            "x": 7,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-5",
+            "x": 0,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-5",
+            "x": 1,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-5",
+            "x": 2,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-5",
+            "x": 3,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-5",
+            "x": 4,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-5",
+            "x": 5,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-5",
+            "x": 6,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-5",
+            "x": 7,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          }
+        ]
+      },
+      "pieces": [
+        {
+          "instanceId": "Player1-1",
+          "templateId": "red-soldier",
+          "ownerPlayerId": "Player1",
+          "faction": "red",
+          "currentHp": 100,
+          "x": 1,
+          "y": 1,
+          "skills": []
+        },
+        {
+          "instanceId": "Player2-1",
+          "templateId": "blue-soldier",
+          "ownerPlayerId": "Player2",
+          "faction": "blue",
+          "currentHp": 100,
+          "x": 6,
+          "y": 4,
+          "skills": []
+        }
+      ],
+      "pieceStatsByTemplateId": {
+        "red-soldier": {
+          "maxHp": 100,
+          "attack": 20,
+          "defense": 5,
+          "moveRange": 3
+        },
+        "blue-soldier": {
+          "maxHp": 100,
+          "attack": 18,
+          "defense": 6,
+          "moveRange": 3
+        }
+      },
+      "skillsById": {
+        "basic-shot": {
+          "id": "basic-shot",
+          "name": "Basic Shot",
+          "description": "Simple attack used as 普通技能。",
+          "kind": "active",
+          "cooldownTurns": 0,
+          "maxCharges": 0,
+          "isChargeSkill": false,
+          "chargeCost": 0,
+          "powerMultiplier": 1
+        },
+        "charge-burst": {
+          "id": "charge-burst",
+          "name": "Charge Burst",
+          "description": "Consumes charge points to deal high damage.",
+          "kind": "active",
+          "cooldownTurns": 1,
+          "maxCharges": 3,
+          "isChargeSkill": true,
+          "chargeCost": 1,
+          "powerMultiplier": 2
+        }
+      },
+      "players": [
+        {
+          "playerId": "Player1",
+          "chargePoints": 0
+        },
+        {
+          "playerId": "Player2",
+          "chargePoints": 0
+        }
+      ],
+      "turn": {
+        "currentPlayerId": "Player1",
+        "turnNumber": 1,
+        "phase": "start",
+        "actions": {
+          "hasMoved": false,
+          "hasUsedBasicSkill": false,
+          "hasUsedChargeSkill": false
+        }
+      }
+    }
+  },
+  {
+    "id": "phmir",
+    "name": "1 的 1v1 房间",
+    "status": "waiting",
+    "createdAt": 1771345245123,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "3153b16c-64ad-4d55-aa2c-4a6a67ea6740",
+        "name": "1",
+        "joinedAt": 1771345245164
+      },
+      {
+        "id": "f9e17648-43db-4036-b9bb-c4cfde3deacd",
+        "name": "2",
+        "joinedAt": 1771345252402
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "bwmex",
+    "name": "1 的 1v1 房间",
+    "status": "waiting",
+    "createdAt": 1771346038152,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "19af6fd4-6da7-4cfa-a9c8-9c39760e51d9",
+        "name": "1",
+        "joinedAt": 1771346038775
+      },
+      {
+        "id": "75f1a9e1-9d4a-4a54-aa90-d71f7cd49a91",
+        "name": "2",
+        "joinedAt": 1771346052161
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "zmlr6",
+    "name": "1 的 1v1 房间",
+    "status": "in-progress",
+    "createdAt": 1771346262301,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "9ce39e5c-134a-4859-b534-a7e4864ce905",
+        "name": "1",
+        "joinedAt": 1771346262358
+      },
+      {
+        "id": "48f145ff-863e-4ee9-bfaf-beec048a5253",
+        "name": "2",
+        "joinedAt": 1771346273356
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": {
+      "map": {
+        "id": "arena-8x6",
+        "name": "小型竞技场",
+        "width": 8,
+        "height": 6,
+        "tiles": [
+          {
+            "id": "arena-8x6-0-0",
+            "x": 0,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-0",
+            "x": 1,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-0",
+            "x": 2,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-0",
+            "x": 3,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-0",
+            "x": 4,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-0",
+            "x": 5,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-0",
+            "x": 6,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-0",
+            "x": 7,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-1",
+            "x": 0,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-1",
+            "x": 1,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-1",
+            "x": 2,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-1",
+            "x": 3,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-1",
+            "x": 4,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-1",
+            "x": 5,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-1",
+            "x": 6,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-7-1",
+            "x": 7,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-2",
+            "x": 0,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-2",
+            "x": 1,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-2",
+            "x": 2,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-2",
+            "x": 3,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-2",
+            "x": 4,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-2",
+            "x": 5,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-2",
+            "x": 6,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-2",
+            "x": 7,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-3",
+            "x": 0,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-3",
+            "x": 1,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-2-3",
+            "x": 2,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-3",
+            "x": 3,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-3",
+            "x": 4,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-3",
+            "x": 5,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-3",
+            "x": 6,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": true,
+              "type": "hole"
+            }
+          },
+          {
+            "id": "arena-8x6-7-3",
+            "x": 7,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-4",
+            "x": 0,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-4",
+            "x": 1,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-4",
+            "x": 2,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-4",
+            "x": 3,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-4-4",
+            "x": 4,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-4",
+            "x": 5,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-4",
+            "x": 6,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-4",
+            "x": 7,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-5",
+            "x": 0,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-5",
+            "x": 1,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-5",
+            "x": 2,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-5",
+            "x": 3,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-5",
+            "x": 4,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-5",
+            "x": 5,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-5",
+            "x": 6,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-5",
+            "x": 7,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          }
+        ]
+      },
+      "pieces": [
+        {
+          "instanceId": "1-1",
+          "templateId": "red-soldier",
+          "ownerPlayerId": "1",
+          "faction": "red",
+          "currentHp": 100,
+          "x": 1,
+          "y": 1,
+          "skills": []
+        },
+        {
+          "instanceId": "2-1",
+          "templateId": "blue-soldier",
+          "ownerPlayerId": "2",
+          "faction": "blue",
+          "currentHp": 100,
+          "x": 6,
+          "y": 4,
+          "skills": []
+        }
+      ],
+      "pieceStatsByTemplateId": {
+        "red-soldier": {
+          "maxHp": 100,
+          "attack": 20,
+          "defense": 5,
+          "moveRange": 3
+        },
+        "blue-soldier": {
+          "maxHp": 100,
+          "attack": 18,
+          "defense": 6,
+          "moveRange": 3
+        }
+      },
+      "skillsById": {
+        "basic-shot": {
+          "id": "basic-shot",
+          "name": "Basic Shot",
+          "description": "Simple attack used as 普通技能。",
+          "kind": "active",
+          "cooldownTurns": 0,
+          "maxCharges": 0,
+          "isChargeSkill": false,
+          "chargeCost": 0,
+          "powerMultiplier": 1
+        },
+        "charge-burst": {
+          "id": "charge-burst",
+          "name": "Charge Burst",
+          "description": "Consumes charge points to deal high damage.",
+          "kind": "active",
+          "cooldownTurns": 1,
+          "maxCharges": 3,
+          "isChargeSkill": true,
+          "chargeCost": 1,
+          "powerMultiplier": 2
+        }
+      },
+      "players": [
+        {
+          "playerId": "1",
+          "chargePoints": 0
+        },
+        {
+          "playerId": "2",
+          "chargePoints": 0
+        }
+      ],
+      "turn": {
+        "currentPlayerId": "1",
+        "turnNumber": 1,
+        "phase": "start",
+        "actions": {
+          "hasMoved": false,
+          "hasUsedBasicSkill": false,
+          "hasUsedChargeSkill": false
+        }
+      }
+    }
+  },
+  {
+    "id": "39djf",
+    "name": "1 的 1v1 房间",
+    "status": "in-progress",
+    "createdAt": 1771347017541,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "661b23d5-7d2f-4287-89c7-ae994c80f735",
+        "name": "1",
+        "joinedAt": 1771347017601
+      },
+      {
+        "id": "35b27bb9-87b4-4b10-b143-bd6931a5201f",
+        "name": "2",
+        "joinedAt": 1771347022089
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": {
+      "map": {
+        "id": "arena-8x6",
+        "name": "小型竞技场",
+        "width": 8,
+        "height": 6,
+        "tiles": [
+          {
+            "id": "arena-8x6-0-0",
+            "x": 0,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-0",
+            "x": 1,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-0",
+            "x": 2,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-0",
+            "x": 3,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-0",
+            "x": 4,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-0",
+            "x": 5,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-0",
+            "x": 6,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-0",
+            "x": 7,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-1",
+            "x": 0,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-1",
+            "x": 1,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-1",
+            "x": 2,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-1",
+            "x": 3,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-1",
+            "x": 4,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-1",
+            "x": 5,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-1",
+            "x": 6,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-7-1",
+            "x": 7,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-2",
+            "x": 0,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-2",
+            "x": 1,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-2",
+            "x": 2,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-2",
+            "x": 3,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-2",
+            "x": 4,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-2",
+            "x": 5,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-2",
+            "x": 6,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-2",
+            "x": 7,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-3",
+            "x": 0,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-3",
+            "x": 1,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-2-3",
+            "x": 2,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-3",
+            "x": 3,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-3",
+            "x": 4,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-3",
+            "x": 5,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-3",
+            "x": 6,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": true,
+              "type": "hole"
+            }
+          },
+          {
+            "id": "arena-8x6-7-3",
+            "x": 7,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-4",
+            "x": 0,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-4",
+            "x": 1,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-4",
+            "x": 2,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-4",
+            "x": 3,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-4-4",
+            "x": 4,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-4",
+            "x": 5,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-4",
+            "x": 6,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-4",
+            "x": 7,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-5",
+            "x": 0,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-5",
+            "x": 1,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-5",
+            "x": 2,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-5",
+            "x": 3,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-5",
+            "x": 4,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-5",
+            "x": 5,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-5",
+            "x": 6,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-5",
+            "x": 7,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          }
+        ]
+      },
+      "pieces": [
+        {
+          "instanceId": "1-1",
+          "templateId": "red-soldier",
+          "ownerPlayerId": "1",
+          "faction": "red",
+          "currentHp": 100,
+          "x": 1,
+          "y": 1,
+          "skills": []
+        },
+        {
+          "instanceId": "2-1",
+          "templateId": "blue-soldier",
+          "ownerPlayerId": "2",
+          "faction": "blue",
+          "currentHp": 100,
+          "x": 6,
+          "y": 4,
+          "skills": []
+        }
+      ],
+      "pieceStatsByTemplateId": {
+        "red-soldier": {
+          "maxHp": 100,
+          "attack": 20,
+          "defense": 5,
+          "moveRange": 3
+        },
+        "blue-soldier": {
+          "maxHp": 100,
+          "attack": 18,
+          "defense": 6,
+          "moveRange": 3
+        }
+      },
+      "skillsById": {
+        "basic-shot": {
+          "id": "basic-shot",
+          "name": "Basic Shot",
+          "description": "Simple attack used as 普通技能。",
+          "kind": "active",
+          "cooldownTurns": 0,
+          "maxCharges": 0,
+          "isChargeSkill": false,
+          "chargeCost": 0,
+          "powerMultiplier": 1
+        },
+        "charge-burst": {
+          "id": "charge-burst",
+          "name": "Charge Burst",
+          "description": "Consumes charge points to deal high damage.",
+          "kind": "active",
+          "cooldownTurns": 1,
+          "maxCharges": 3,
+          "isChargeSkill": true,
+          "chargeCost": 1,
+          "powerMultiplier": 2
+        }
+      },
+      "players": [
+        {
+          "playerId": "1",
+          "chargePoints": 0
+        },
+        {
+          "playerId": "2",
+          "chargePoints": 0
+        }
+      ],
+      "turn": {
+        "currentPlayerId": "1",
+        "turnNumber": 1,
+        "phase": "start",
+        "actions": {
+          "hasMoved": false,
+          "hasUsedBasicSkill": false,
+          "hasUsedChargeSkill": false
+        }
+      }
+    }
+  },
+  {
+    "id": "bxh5k",
+    "name": "1 的 1v1 房间",
+    "status": "in-progress",
+    "createdAt": 1771347160363,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "759c954c-89c4-46df-b2f1-2c6f05eda4c5",
+        "name": "1",
+        "joinedAt": 1771347160411
+      },
+      {
+        "id": "a9c71a7c-6f33-47e8-b1cc-f2e571d16287",
+        "name": "2",
+        "joinedAt": 1771347165034
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": {
+      "map": {
+        "id": "arena-8x6",
+        "name": "小型竞技场",
+        "width": 8,
+        "height": 6,
+        "tiles": [
+          {
+            "id": "arena-8x6-0-0",
+            "x": 0,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-0",
+            "x": 1,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-0",
+            "x": 2,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-0",
+            "x": 3,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-0",
+            "x": 4,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-0",
+            "x": 5,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-0",
+            "x": 6,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-0",
+            "x": 7,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-1",
+            "x": 0,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-1",
+            "x": 1,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-1",
+            "x": 2,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-1",
+            "x": 3,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-1",
+            "x": 4,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-1",
+            "x": 5,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-1",
+            "x": 6,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-7-1",
+            "x": 7,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-2",
+            "x": 0,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-2",
+            "x": 1,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-2",
+            "x": 2,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-2",
+            "x": 3,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-2",
+            "x": 4,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-2",
+            "x": 5,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-2",
+            "x": 6,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-2",
+            "x": 7,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-3",
+            "x": 0,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-3",
+            "x": 1,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-2-3",
+            "x": 2,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-3",
+            "x": 3,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-3",
+            "x": 4,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-3",
+            "x": 5,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-3",
+            "x": 6,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": true,
+              "type": "hole"
+            }
+          },
+          {
+            "id": "arena-8x6-7-3",
+            "x": 7,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-4",
+            "x": 0,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-4",
+            "x": 1,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-4",
+            "x": 2,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-4",
+            "x": 3,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-4-4",
+            "x": 4,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-4",
+            "x": 5,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-4",
+            "x": 6,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-4",
+            "x": 7,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-5",
+            "x": 0,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-5",
+            "x": 1,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-5",
+            "x": 2,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-5",
+            "x": 3,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-5",
+            "x": 4,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-5",
+            "x": 5,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-5",
+            "x": 6,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-5",
+            "x": 7,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          }
+        ]
+      },
+      "pieces": [
+        {
+          "instanceId": "1-1",
+          "templateId": "red-soldier",
+          "ownerPlayerId": "1",
+          "faction": "red",
+          "currentHp": 100,
+          "x": 2,
+          "y": 1,
+          "skills": []
+        },
+        {
+          "instanceId": "2-1",
+          "templateId": "blue-soldier",
+          "ownerPlayerId": "2",
+          "faction": "blue",
+          "currentHp": 100,
+          "x": 6,
+          "y": 4,
+          "skills": []
+        }
+      ],
+      "pieceStatsByTemplateId": {
+        "red-soldier": {
+          "maxHp": 100,
+          "attack": 20,
+          "defense": 5,
+          "moveRange": 3
+        },
+        "blue-soldier": {
+          "maxHp": 100,
+          "attack": 18,
+          "defense": 6,
+          "moveRange": 3
+        }
+      },
+      "skillsById": {
+        "basic-shot": {
+          "id": "basic-shot",
+          "name": "Basic Shot",
+          "description": "Simple attack used as 普通技能。",
+          "kind": "active",
+          "cooldownTurns": 0,
+          "maxCharges": 0,
+          "isChargeSkill": false,
+          "chargeCost": 0,
+          "powerMultiplier": 1
+        },
+        "charge-burst": {
+          "id": "charge-burst",
+          "name": "Charge Burst",
+          "description": "Consumes charge points to deal high damage.",
+          "kind": "active",
+          "cooldownTurns": 1,
+          "maxCharges": 3,
+          "isChargeSkill": true,
+          "chargeCost": 1,
+          "powerMultiplier": 2
+        }
+      },
+      "players": [
+        {
+          "playerId": "1",
+          "chargePoints": 0
+        },
+        {
+          "playerId": "2",
+          "chargePoints": 0
+        }
+      ],
+      "turn": {
+        "currentPlayerId": "2",
+        "turnNumber": 2,
+        "phase": "start",
+        "actions": {
+          "hasMoved": false,
+          "hasUsedBasicSkill": false,
+          "hasUsedChargeSkill": false
+        }
+      }
+    }
+  },
+  {
+    "id": "aaa7e",
+    "name": "1 的 1v1 房间",
+    "status": "in-progress",
+    "createdAt": 1771347788960,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "edd25c42-7989-4d6f-aa34-9b6b642a1bbc",
+        "name": "1",
+        "joinedAt": 1771347789004
+      },
+      {
+        "id": "d40a423c-c3f2-4cd0-b539-3a28ac039777",
+        "name": "2",
+        "joinedAt": 1771347794064
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": {
+      "map": {
+        "id": "arena-8x6",
+        "name": "小型竞技场",
+        "width": 8,
+        "height": 6,
+        "tiles": [
+          {
+            "id": "arena-8x6-0-0",
+            "x": 0,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-0",
+            "x": 1,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-0",
+            "x": 2,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-0",
+            "x": 3,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-0",
+            "x": 4,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-0",
+            "x": 5,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-0",
+            "x": 6,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-0",
+            "x": 7,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-1",
+            "x": 0,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-1",
+            "x": 1,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-1",
+            "x": 2,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-1",
+            "x": 3,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-1",
+            "x": 4,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-1",
+            "x": 5,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-1",
+            "x": 6,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-7-1",
+            "x": 7,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-2",
+            "x": 0,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-2",
+            "x": 1,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-2",
+            "x": 2,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-2",
+            "x": 3,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-2",
+            "x": 4,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-2",
+            "x": 5,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-2",
+            "x": 6,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-2",
+            "x": 7,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-3",
+            "x": 0,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-3",
+            "x": 1,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-2-3",
+            "x": 2,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-3",
+            "x": 3,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-3",
+            "x": 4,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-3",
+            "x": 5,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-3",
+            "x": 6,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": true,
+              "type": "hole"
+            }
+          },
+          {
+            "id": "arena-8x6-7-3",
+            "x": 7,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-4",
+            "x": 0,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-4",
+            "x": 1,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-4",
+            "x": 2,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-4",
+            "x": 3,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-4-4",
+            "x": 4,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-4",
+            "x": 5,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-4",
+            "x": 6,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-4",
+            "x": 7,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-5",
+            "x": 0,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-5",
+            "x": 1,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-5",
+            "x": 2,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-5",
+            "x": 3,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-5",
+            "x": 4,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-5",
+            "x": 5,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-5",
+            "x": 6,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-5",
+            "x": 7,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          }
+        ]
+      },
+      "pieces": [
+        {
+          "instanceId": "1-1",
+          "templateId": "red-soldier",
+          "ownerPlayerId": "1",
+          "faction": "red",
+          "currentHp": 100,
+          "x": 1,
+          "y": 1,
+          "skills": []
+        },
+        {
+          "instanceId": "2-1",
+          "templateId": "blue-soldier",
+          "ownerPlayerId": "2",
+          "faction": "blue",
+          "currentHp": 100,
+          "x": 6,
+          "y": 4,
+          "skills": []
+        }
+      ],
+      "pieceStatsByTemplateId": {
+        "red-soldier": {
+          "maxHp": 100,
+          "attack": 20,
+          "defense": 5,
+          "moveRange": 3
+        },
+        "blue-soldier": {
+          "maxHp": 100,
+          "attack": 18,
+          "defense": 6,
+          "moveRange": 3
+        }
+      },
+      "skillsById": {
+        "basic-shot": {
+          "id": "basic-shot",
+          "name": "Basic Shot",
+          "description": "Simple attack used as 普通技能。",
+          "kind": "active",
+          "cooldownTurns": 0,
+          "maxCharges": 0,
+          "isChargeSkill": false,
+          "chargeCost": 0,
+          "powerMultiplier": 1
+        },
+        "charge-burst": {
+          "id": "charge-burst",
+          "name": "Charge Burst",
+          "description": "Consumes charge points to deal high damage.",
+          "kind": "active",
+          "cooldownTurns": 1,
+          "maxCharges": 3,
+          "isChargeSkill": true,
+          "chargeCost": 1,
+          "powerMultiplier": 2
+        }
+      },
+      "players": [
+        {
+          "playerId": "1",
+          "chargePoints": 0
+        },
+        {
+          "playerId": "2",
+          "chargePoints": 0
+        }
+      ],
+      "turn": {
+        "currentPlayerId": "2",
+        "turnNumber": 2,
+        "phase": "start",
+        "actions": {
+          "hasMoved": false,
+          "hasUsedBasicSkill": false,
+          "hasUsedChargeSkill": false
+        }
+      }
+    }
+  },
+  {
+    "id": "urvel",
+    "name": "1 的 1v1 房间",
+    "status": "in-progress",
+    "createdAt": 1771347965137,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "a7051bf5-9f47-41e7-bbf9-3eb99845570e",
+        "name": "1",
+        "joinedAt": 1771347965172
+      },
+      {
+        "id": "f9d13b6d-82c1-4236-b525-7100022fa110",
+        "name": "2",
+        "joinedAt": 1771347970114
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": {
+      "map": {
+        "id": "arena-8x6",
+        "name": "小型竞技场",
+        "width": 8,
+        "height": 6,
+        "tiles": [
+          {
+            "id": "arena-8x6-0-0",
+            "x": 0,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-0",
+            "x": 1,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-0",
+            "x": 2,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-0",
+            "x": 3,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-0",
+            "x": 4,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-0",
+            "x": 5,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-0",
+            "x": 6,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-0",
+            "x": 7,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-1",
+            "x": 0,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-1",
+            "x": 1,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-1",
+            "x": 2,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-1",
+            "x": 3,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-1",
+            "x": 4,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-1",
+            "x": 5,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-1",
+            "x": 6,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-7-1",
+            "x": 7,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-2",
+            "x": 0,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-2",
+            "x": 1,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-2",
+            "x": 2,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-2",
+            "x": 3,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-2",
+            "x": 4,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-2",
+            "x": 5,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-2",
+            "x": 6,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-2",
+            "x": 7,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-3",
+            "x": 0,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-3",
+            "x": 1,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-2-3",
+            "x": 2,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-3",
+            "x": 3,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-3",
+            "x": 4,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-3",
+            "x": 5,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-3",
+            "x": 6,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": true,
+              "type": "hole"
+            }
+          },
+          {
+            "id": "arena-8x6-7-3",
+            "x": 7,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-4",
+            "x": 0,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-4",
+            "x": 1,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-4",
+            "x": 2,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-4",
+            "x": 3,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-4-4",
+            "x": 4,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-4",
+            "x": 5,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-4",
+            "x": 6,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-4",
+            "x": 7,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-5",
+            "x": 0,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-5",
+            "x": 1,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-5",
+            "x": 2,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-5",
+            "x": 3,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-5",
+            "x": 4,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-5",
+            "x": 5,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-5",
+            "x": 6,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-5",
+            "x": 7,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          }
+        ]
+      },
+      "pieces": [
+        {
+          "instanceId": "1-1",
+          "templateId": "red-soldier",
+          "ownerPlayerId": "1",
+          "faction": "red",
+          "currentHp": 100,
+          "x": 1,
+          "y": 1,
+          "skills": []
+        },
+        {
+          "instanceId": "2-1",
+          "templateId": "blue-soldier",
+          "ownerPlayerId": "2",
+          "faction": "blue",
+          "currentHp": 100,
+          "x": 6,
+          "y": 4,
+          "skills": []
+        }
+      ],
+      "pieceStatsByTemplateId": {
+        "red-soldier": {
+          "maxHp": 100,
+          "attack": 20,
+          "defense": 5,
+          "moveRange": 3
+        },
+        "blue-soldier": {
+          "maxHp": 100,
+          "attack": 18,
+          "defense": 6,
+          "moveRange": 3
+        }
+      },
+      "skillsById": {
+        "basic-shot": {
+          "id": "basic-shot",
+          "name": "Basic Shot",
+          "description": "Simple attack used as 普通技能。",
+          "kind": "active",
+          "cooldownTurns": 0,
+          "maxCharges": 0,
+          "isChargeSkill": false,
+          "chargeCost": 0,
+          "powerMultiplier": 1
+        },
+        "charge-burst": {
+          "id": "charge-burst",
+          "name": "Charge Burst",
+          "description": "Consumes charge points to deal high damage.",
+          "kind": "active",
+          "cooldownTurns": 1,
+          "maxCharges": 3,
+          "isChargeSkill": true,
+          "chargeCost": 1,
+          "powerMultiplier": 2
+        }
+      },
+      "players": [
+        {
+          "playerId": "1",
+          "chargePoints": 0
+        },
+        {
+          "playerId": "2",
+          "chargePoints": 0
+        }
+      ],
+      "turn": {
+        "currentPlayerId": "2",
+        "turnNumber": 4,
+        "phase": "start",
+        "actions": {
+          "hasMoved": false,
+          "hasUsedBasicSkill": false,
+          "hasUsedChargeSkill": false
+        }
+      }
+    }
+  },
+  {
+    "id": "jmo59",
+    "name": "1 的 1v1 房间",
+    "status": "in-progress",
+    "createdAt": 1771348391871,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "882f551d-de72-4341-9e8f-21664450f15e",
+        "name": "1",
+        "joinedAt": 1771348391915
+      },
+      {
+        "id": "1e4c9586-c0c1-4af5-8d95-9f290ed77a8c",
+        "name": "2",
+        "joinedAt": 1771348398042
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": {
+      "map": {
+        "id": "arena-8x6",
+        "name": "小型竞技场",
+        "width": 8,
+        "height": 6,
+        "tiles": [
+          {
+            "id": "arena-8x6-0-0",
+            "x": 0,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-0",
+            "x": 1,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-0",
+            "x": 2,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-0",
+            "x": 3,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-0",
+            "x": 4,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-0",
+            "x": 5,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-0",
+            "x": 6,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-0",
+            "x": 7,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-1",
+            "x": 0,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-1",
+            "x": 1,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-1",
+            "x": 2,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-1",
+            "x": 3,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-1",
+            "x": 4,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-1",
+            "x": 5,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-1",
+            "x": 6,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-7-1",
+            "x": 7,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-2",
+            "x": 0,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-2",
+            "x": 1,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-2",
+            "x": 2,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-2",
+            "x": 3,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-2",
+            "x": 4,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-2",
+            "x": 5,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-2",
+            "x": 6,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-2",
+            "x": 7,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-3",
+            "x": 0,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-3",
+            "x": 1,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-2-3",
+            "x": 2,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-3",
+            "x": 3,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-3",
+            "x": 4,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-3",
+            "x": 5,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-3",
+            "x": 6,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": true,
+              "type": "hole"
+            }
+          },
+          {
+            "id": "arena-8x6-7-3",
+            "x": 7,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-4",
+            "x": 0,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-4",
+            "x": 1,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-4",
+            "x": 2,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-4",
+            "x": 3,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-4-4",
+            "x": 4,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-4",
+            "x": 5,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-4",
+            "x": 6,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-4",
+            "x": 7,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-5",
+            "x": 0,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-5",
+            "x": 1,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-5",
+            "x": 2,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-5",
+            "x": 3,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-5",
+            "x": 4,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-5",
+            "x": 5,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-5",
+            "x": 6,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-5",
+            "x": 7,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          }
+        ]
+      },
+      "pieces": [
+        {
+          "instanceId": "1-1",
+          "templateId": "red-soldier",
+          "ownerPlayerId": "1",
+          "faction": "red",
+          "currentHp": 100,
+          "x": 1,
+          "y": 1,
+          "skills": []
+        },
+        {
+          "instanceId": "2-1",
+          "templateId": "blue-soldier",
+          "ownerPlayerId": "2",
+          "faction": "blue",
+          "currentHp": 100,
+          "x": 6,
+          "y": 4,
+          "skills": []
+        }
+      ],
+      "pieceStatsByTemplateId": {
+        "red-soldier": {
+          "maxHp": 100,
+          "attack": 20,
+          "defense": 5,
+          "moveRange": 3
+        },
+        "blue-soldier": {
+          "maxHp": 100,
+          "attack": 18,
+          "defense": 6,
+          "moveRange": 3
+        }
+      },
+      "skillsById": {
+        "basic-shot": {
+          "id": "basic-shot",
+          "name": "Basic Shot",
+          "description": "Simple attack used as 普通技能。",
+          "kind": "active",
+          "cooldownTurns": 0,
+          "maxCharges": 0,
+          "isChargeSkill": false,
+          "chargeCost": 0,
+          "powerMultiplier": 1
+        },
+        "charge-burst": {
+          "id": "charge-burst",
+          "name": "Charge Burst",
+          "description": "Consumes charge points to deal high damage.",
+          "kind": "active",
+          "cooldownTurns": 1,
+          "maxCharges": 3,
+          "isChargeSkill": true,
+          "chargeCost": 1,
+          "powerMultiplier": 2
+        }
+      },
+      "players": [
+        {
+          "playerId": "1",
+          "chargePoints": 0
+        },
+        {
+          "playerId": "2",
+          "chargePoints": 0
+        }
+      ],
+      "turn": {
+        "currentPlayerId": "1",
+        "turnNumber": 5,
+        "phase": "start",
+        "actions": {
+          "hasMoved": false,
+          "hasUsedBasicSkill": false,
+          "hasUsedChargeSkill": false
+        }
+      }
+    }
+  },
+  {
+    "id": "kovpo",
+    "name": "1 的 1v1 房间",
+    "status": "in-progress",
+    "createdAt": 1771348847044,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "e2888757-a839-4c85-b27e-62440acd3740",
+        "name": "1",
+        "joinedAt": 1771348847085
+      },
+      {
+        "id": "bd4b917e-2879-4c10-93c7-d4a542d7e753",
+        "name": "2",
+        "joinedAt": 1771348851572
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": {
+      "map": {
+        "id": "arena-8x6",
+        "name": "小型竞技场",
+        "width": 8,
+        "height": 6,
+        "tiles": [
+          {
+            "id": "arena-8x6-0-0",
+            "x": 0,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-0",
+            "x": 1,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-0",
+            "x": 2,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-0",
+            "x": 3,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-0",
+            "x": 4,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-0",
+            "x": 5,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-0",
+            "x": 6,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-0",
+            "x": 7,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-1",
+            "x": 0,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-1",
+            "x": 1,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-1",
+            "x": 2,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-1",
+            "x": 3,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-1",
+            "x": 4,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-1",
+            "x": 5,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-1",
+            "x": 6,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-7-1",
+            "x": 7,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-2",
+            "x": 0,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-2",
+            "x": 1,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-2",
+            "x": 2,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-2",
+            "x": 3,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-2",
+            "x": 4,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-2",
+            "x": 5,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-2",
+            "x": 6,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-2",
+            "x": 7,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-3",
+            "x": 0,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-3",
+            "x": 1,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-2-3",
+            "x": 2,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-3",
+            "x": 3,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-3",
+            "x": 4,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-3",
+            "x": 5,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-3",
+            "x": 6,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": true,
+              "type": "hole"
+            }
+          },
+          {
+            "id": "arena-8x6-7-3",
+            "x": 7,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-4",
+            "x": 0,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-4",
+            "x": 1,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-4",
+            "x": 2,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-4",
+            "x": 3,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-4-4",
+            "x": 4,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-4",
+            "x": 5,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-4",
+            "x": 6,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-4",
+            "x": 7,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-5",
+            "x": 0,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-5",
+            "x": 1,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-5",
+            "x": 2,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-5",
+            "x": 3,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-5",
+            "x": 4,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-5",
+            "x": 5,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-5",
+            "x": 6,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-5",
+            "x": 7,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          }
+        ]
+      },
+      "pieces": [
+        {
+          "instanceId": "1-1",
+          "templateId": "red-soldier",
+          "ownerPlayerId": "1",
+          "faction": "red",
+          "currentHp": 100,
+          "x": 1,
+          "y": 1,
+          "skills": []
+        },
+        {
+          "instanceId": "2-1",
+          "templateId": "blue-soldier",
+          "ownerPlayerId": "2",
+          "faction": "blue",
+          "currentHp": 100,
+          "x": 6,
+          "y": 4,
+          "skills": []
+        }
+      ],
+      "pieceStatsByTemplateId": {
+        "red-soldier": {
+          "maxHp": 100,
+          "attack": 20,
+          "defense": 5,
+          "moveRange": 3
+        },
+        "blue-soldier": {
+          "maxHp": 100,
+          "attack": 18,
+          "defense": 6,
+          "moveRange": 3
+        }
+      },
+      "skillsById": {
+        "basic-shot": {
+          "id": "basic-shot",
+          "name": "Basic Shot",
+          "description": "Simple attack used as 普通技能。",
+          "kind": "active",
+          "cooldownTurns": 0,
+          "maxCharges": 0,
+          "isChargeSkill": false,
+          "chargeCost": 0,
+          "powerMultiplier": 1
+        },
+        "charge-burst": {
+          "id": "charge-burst",
+          "name": "Charge Burst",
+          "description": "Consumes charge points to deal high damage.",
+          "kind": "active",
+          "cooldownTurns": 1,
+          "maxCharges": 3,
+          "isChargeSkill": true,
+          "chargeCost": 1,
+          "powerMultiplier": 2
+        }
+      },
+      "players": [
+        {
+          "playerId": "1",
+          "chargePoints": 0
+        },
+        {
+          "playerId": "2",
+          "chargePoints": 0
+        }
+      ],
+      "turn": {
+        "currentPlayerId": "2",
+        "turnNumber": 4,
+        "phase": "start",
+        "actions": {
+          "hasMoved": false,
+          "hasUsedBasicSkill": false,
+          "hasUsedChargeSkill": false
+        }
+      }
+    }
+  },
+  {
+    "id": "vzmck",
+    "name": "1 的 1v1 房间",
+    "status": "in-progress",
+    "createdAt": 1771352234373,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "0c861491-dafd-43dd-91e7-d2df4812abd6",
+        "name": "1",
+        "joinedAt": 1771352234482
+      },
+      {
+        "id": "48b57c28-a5b5-49e8-b1bc-80623d5ca6db",
+        "name": "2",
+        "joinedAt": 1771352248264
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": {
+      "map": {
+        "id": "arena-8x6",
+        "name": "小型竞技场",
+        "width": 8,
+        "height": 6,
+        "tiles": [
+          {
+            "id": "arena-8x6-0-0",
+            "x": 0,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-0",
+            "x": 1,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-0",
+            "x": 2,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-0",
+            "x": 3,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-0",
+            "x": 4,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-0",
+            "x": 5,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-0",
+            "x": 6,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-0",
+            "x": 7,
+            "y": 0,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-1",
+            "x": 0,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-1",
+            "x": 1,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-1",
+            "x": 2,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-1",
+            "x": 3,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-1",
+            "x": 4,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-1",
+            "x": 5,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-1",
+            "x": 6,
+            "y": 1,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-7-1",
+            "x": 7,
+            "y": 1,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-2",
+            "x": 0,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-2",
+            "x": 1,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-2",
+            "x": 2,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-2",
+            "x": 3,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-2",
+            "x": 4,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-2",
+            "x": 5,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-2",
+            "x": 6,
+            "y": 2,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-2",
+            "x": 7,
+            "y": 2,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-3",
+            "x": 0,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-3",
+            "x": 1,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "spawn"
+            }
+          },
+          {
+            "id": "arena-8x6-2-3",
+            "x": 2,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-3",
+            "x": 3,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": false,
+              "type": "cover"
+            }
+          },
+          {
+            "id": "arena-8x6-4-3",
+            "x": 4,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-3",
+            "x": 5,
+            "y": 3,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-3",
+            "x": 6,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": true,
+              "type": "hole"
+            }
+          },
+          {
+            "id": "arena-8x6-7-3",
+            "x": 7,
+            "y": 3,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-4",
+            "x": 0,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-4",
+            "x": 1,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-2-4",
+            "x": 2,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-3-4",
+            "x": 3,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-4-4",
+            "x": 4,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-5-4",
+            "x": 5,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-6-4",
+            "x": 6,
+            "y": 4,
+            "props": {
+              "walkable": true,
+              "bulletPassable": true,
+              "type": "floor"
+            }
+          },
+          {
+            "id": "arena-8x6-7-4",
+            "x": 7,
+            "y": 4,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-0-5",
+            "x": 0,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-1-5",
+            "x": 1,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-2-5",
+            "x": 2,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-3-5",
+            "x": 3,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-4-5",
+            "x": 4,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-5-5",
+            "x": 5,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-6-5",
+            "x": 6,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          },
+          {
+            "id": "arena-8x6-7-5",
+            "x": 7,
+            "y": 5,
+            "props": {
+              "walkable": false,
+              "bulletPassable": false,
+              "type": "wall"
+            }
+          }
+        ]
+      },
+      "pieces": [
+        {
+          "instanceId": "1-1",
+          "templateId": "red-soldier",
+          "ownerPlayerId": "1",
+          "faction": "red",
+          "currentHp": 100,
+          "x": 1,
+          "y": 1,
+          "skills": []
+        },
+        {
+          "instanceId": "2-1",
+          "templateId": "blue-soldier",
+          "ownerPlayerId": "2",
+          "faction": "blue",
+          "currentHp": 100,
+          "x": 6,
+          "y": 4,
+          "skills": []
+        }
+      ],
+      "pieceStatsByTemplateId": {
+        "red-soldier": {
+          "maxHp": 100,
+          "attack": 20,
+          "defense": 5,
+          "moveRange": 3
+        },
+        "blue-soldier": {
+          "maxHp": 100,
+          "attack": 18,
+          "defense": 6,
+          "moveRange": 3
+        },
+        "red-mage": {
+          "maxHp": 80,
+          "attack": 25,
+          "defense": 3,
+          "moveRange": 2
+        },
+        "blue-mage": {
+          "maxHp": 80,
+          "attack": 22,
+          "defense": 4,
+          "moveRange": 2
+        }
+      },
+      "skillsById": {
+        "basic-attack": {
+          "id": "basic-attack",
+          "name": "基础攻击",
+          "description": "对目标造成基础伤害",
+          "kind": "active",
+          "type": "normal",
+          "cooldownTurns": 0,
+          "maxCharges": 0,
+          "powerMultiplier": 1,
+          "code": "function executeSkill(context) {\n  const damage = context.piece.attack * context.skill.powerMultiplier\n  return {\n    damage: damage,\n    message: \"造成 \" + damage + \" 点伤害\",\n    success: true\n  }\n}",
+          "effects": [
+            {
+              "type": "damage",
+              "value": 1,
+              "target": "enemy",
+              "description": "造成100%攻击力的伤害"
+            }
+          ],
+          "range": "single",
+          "requiresTarget": true
+        },
+        "fireball": {
+          "id": "fireball",
+          "name": "火球术",
+          "description": "发射火球对敌人造成范围伤害",
+          "kind": "active",
+          "type": "super",
+          "cooldownTurns": 2,
+          "maxCharges": 3,
+          "chargeCost": 1,
+          "powerMultiplier": 1.5,
+          "code": "function executeSkill(context) {\n  const damage = context.piece.attack * context.skill.powerMultiplier\n  const targets = getAllEnemiesInRange(context, context.skill.areaSize || 3)\n  return {\n    damage: damage,\n    effects: targets.map(t => ({\n      type: \"damage\",\n      value: damage,\n      target: \"enemy\",\n      description: \"对 \" + t.templateId + \" 造成 \" + damage + \" 点伤害\"\n    })),\n    message: \"火球爆炸，对范围内敌人造成伤害\",\n    success: true\n  }\n}",
+          "effects": [
+            {
+              "type": "damage",
+              "value": 1.5,
+              "target": "all-enemies",
+              "description": "对范围内所有敌人造成150%攻击力的伤害"
+            }
+          ],
+          "range": "area",
+          "areaSize": 3,
+          "requiresTarget": false
+        },
+        "heal": {
+          "id": "heal",
+          "name": "治疗术",
+          "description": "恢复自身或盟友的生命值",
+          "kind": "active",
+          "type": "normal",
+          "cooldownTurns": 3,
+          "maxCharges": 0,
+          "powerMultiplier": 1,
+          "code": "function executeSkill(context) {\n  const allies = getAllAlliesInRange(context, context.skill.areaSize || 2)\n  return {\n    heal: 30,\n    effects: allies.map(a => ({\n      type: \"heal\",\n      value: 30,\n      target: \"allies\",\n      description: \"恢复30点生命值\"\n    })),\n    message: \"治疗术生效，恢复生命值\",\n    success: true\n  }\n}",
+          "effects": [
+            {
+              "type": "heal",
+              "value": 30,
+              "target": "allies",
+              "description": "恢复30点生命值"
+            }
+          ],
+          "range": "area",
+          "areaSize": 2,
+          "requiresTarget": false
+        },
+        "shield": {
+          "id": "shield",
+          "name": "护盾术",
+          "description": "为自身提供护盾，吸收伤害",
+          "kind": "active",
+          "type": "super",
+          "cooldownTurns": 4,
+          "maxCharges": 2,
+          "chargeCost": 1,
+          "powerMultiplier": 1,
+          "code": "function executeSkill(context) {\n  return {\n    effects: [{\n      type: \"shield\",\n      value: 50,\n      target: \"self\",\n      duration: 3,\n      description: \"获得50点护盾，持续3回合\"\n    }],\n    message: \"护盾术生效，获得护盾\",\n    success: true\n  }\n}",
+          "effects": [
+            {
+              "type": "shield",
+              "value": 50,
+              "target": "self",
+              "duration": 3,
+              "description": "获得50点护盾，持续3回合"
+            }
+          ],
+          "range": "self",
+          "requiresTarget": false
+        },
+        "teleport": {
+          "id": "teleport",
+          "name": "传送术",
+          "description": "瞬间移动到指定位置",
+          "kind": "active",
+          "type": "normal",
+          "cooldownTurns": 2,
+          "maxCharges": 0,
+          "powerMultiplier": 1,
+          "code": "function executeSkill(context) {\n  return {\n    effects: [{\n      type: \"teleport\",\n      value: 5,\n      target: \"self\",\n      description: \"传送到5格范围内\"\n    }],\n    message: \"传送术生效，瞬间移动\",\n    success: true\n  }\n}",
+          "effects": [
+            {
+              "type": "teleport",
+              "value": 5,
+              "target": "self",
+              "description": "传送到5格范围内"
+            }
+          ],
+          "range": "area",
+          "areaSize": 5,
+          "requiresTarget": false
+        },
+        "buff-attack": {
+          "id": "buff-attack",
+          "name": "攻击强化",
+          "description": "提升自身攻击力",
+          "kind": "active",
+          "type": "normal",
+          "cooldownTurns": 4,
+          "maxCharges": 0,
+          "powerMultiplier": 1,
+          "code": "function executeSkill(context) {\n  return {\n    effects: [{\n      type: \"buff\",\n      value: 10,\n      target: \"self\",\n      duration: 3,\n      description: \"攻击力提升10点，持续3回合\"\n    }],\n    message: \"攻击强化生效，攻击力提升\",\n    success: true\n  }\n}",
+          "effects": [
+            {
+              "type": "buff",
+              "value": 10,
+              "target": "self",
+              "duration": 3,
+              "description": "攻击力提升10点，持续3回合"
+            }
+          ],
+          "range": "self",
+          "requiresTarget": false
+        },
+        "debuff-defense": {
+          "id": "debuff-defense",
+          "name": "防御削弱",
+          "description": "降低目标防御力",
+          "kind": "active",
+          "type": "normal",
+          "cooldownTurns": 3,
+          "maxCharges": 0,
+          "powerMultiplier": 1,
+          "code": "function executeSkill(context) {\n  if (!context.target) {\n    return {\n      message: \"没有目标\",\n      success: false\n    }\n  }\n  return {\n    effects: [{\n      type: \"debuff\",\n      value: 5,\n      target: \"enemy\",\n      duration: 2,\n      description: \"防御力降低5点，持续2回合\"\n    }],\n    message: \"防御削弱生效，降低目标防御力\",\n    success: true\n  }\n}",
+          "effects": [
+            {
+              "type": "debuff",
+              "value": 5,
+              "target": "enemy",
+              "duration": 2,
+              "description": "防御力降低5点，持续2回合"
+            }
+          ],
+          "range": "single",
+          "requiresTarget": true
+        }
+      },
+      "players": [
+        {
+          "playerId": "1",
+          "chargePoints": 0
+        },
+        {
+          "playerId": "2",
+          "chargePoints": 0
+        }
+      ],
+      "turn": {
+        "currentPlayerId": "1",
+        "turnNumber": 3,
+        "phase": "start",
+        "actions": {
+          "hasMoved": false,
+          "hasUsedBasicSkill": false,
+          "hasUsedChargeSkill": false
+        }
+      }
+    }
+  },
+  {
+    "id": "w953m",
+    "name": "1 的 1v1 房间",
+    "status": "waiting",
+    "createdAt": 1771352976299,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "38b0619f-a3ce-442d-9efd-4f79559926e2",
+        "name": "1",
+        "joinedAt": 1771352976351
+      },
+      {
+        "id": "c7cf4c8b-cf23-4a58-9cf8-5d85b5142748",
+        "name": "2",
+        "joinedAt": 1771352986381
+      }
+    ],
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  }
+]

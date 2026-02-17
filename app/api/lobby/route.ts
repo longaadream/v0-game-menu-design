@@ -1,56 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import type { BattleState } from "@/lib/game/turn"
+import roomStore, { type Room } from "@/lib/game/room-store"
 
-type Player = {
-  id: string
-  name: string
-  joinedAt: number
-}
+// 导出 Room 类型供其他文件使用
+export type { Room }
 
-type RoomStatus = "waiting" | "in-progress" | "finished"
-
-type GameAction = {
-  id: string
-  playerId: string
-  type: string
-  payload: unknown
-  createdAt: number
-  turn: number
-}
-
-type Room = {
-  id: string
-  name: string
-  status: RoomStatus
-  createdAt: number
-  maxPlayers: number
-  players: Player[]
-  currentTurnIndex: number
-  actions: GameAction[]
-  battleState: BattleState | null
-}
-
-// In-memory "database".
-// 在 dev 模式下使用 globalThis 保持热重载时的房间数据不丢失。
-declare global {
-  // eslint-disable-next-line no-var
-  var __red_vs_blue_rooms: Map<string, Room> | undefined
-}
-
-const rooms: Map<string, Room> =
-  globalThis.__red_vs_blue_rooms ?? new Map<string, Room>()
-
-if (!globalThis.__red_vs_blue_rooms) {
-  globalThis.__red_vs_blue_rooms = rooms
-}
-
-// Small helper so other route files can import the same store if needed.
+// 导出存储实例供其他路由使用
 export function getRoomsStore() {
-  return rooms
+  return roomStore
 }
 
 export async function GET() {
-  const allRooms = Array.from(rooms.values()).map((room) => ({
+  const allRooms = Array.from(roomStore.getRooms().values()).map((room) => ({
     id: room.id,
     name: room.name,
     status: room.status,
@@ -72,12 +33,17 @@ export async function POST(req: NextRequest) {
 
   const { name } = (body as { name?: string; maxPlayers?: number }) ?? {}
 
-  const roomId = crypto.randomUUID()
+  // 生成5位的数字和字母组合作为房间ID
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let roomId = ''
+  for (let i = 0; i < 5; i++) {
+    roomId += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
   const now = Date.now()
 
   const room: Room = {
     id: roomId,
-    name: name?.trim() || `Room ${roomId.slice(0, 6)}`,
+    name: name?.trim() || `Room ${roomId}`,
     status: "waiting",
     createdAt: now,
     // 1v1 对战房间，固定 2 人
@@ -88,7 +54,10 @@ export async function POST(req: NextRequest) {
     battleState: null,
   }
 
-  rooms.set(roomId, room)
+  // 确保房间被正确保存
+  console.log('Creating room with ID:', roomId)
+  roomStore.setRoom(roomId, room)
+  console.log('Room created successfully')
 
   return NextResponse.json(room, { status: 201 })
 }

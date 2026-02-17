@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getRoomsStore } from "../../lobby/route"
+import roomStore, { type Room } from "@/lib/game/room-store"
 import { createInitialBattleForPlayers } from "@/lib/game/battle-setup"
-
-const rooms = getRoomsStore()
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { roomId: string } },
+  { params }: { params: Promise<{ roomId: string }> },
 ) {
-  const room = rooms.get(params.roomId)
+  const { roomId } = await params
+  const room = roomStore.getRoom(roomId)
 
   if (!room) {
     return NextResponse.json({ error: "Room not found" }, { status: 404 })
@@ -30,9 +29,10 @@ type RoomPostBody = JoinBody | StartBody
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { roomId: string } },
+  { params }: { params: Promise<{ roomId: string }> },
 ) {
-  const room = rooms.get(params.roomId)
+  const { roomId } = await params
+  const room = roomStore.getRoom(roomId)
 
   if (!room) {
     return NextResponse.json({ error: "Room not found" }, { status: 404 })
@@ -75,7 +75,7 @@ export async function POST(
       room.players.push(player)
     }
 
-    rooms.set(room.id, room)
+    roomStore.setRoom(room.id, room)
     return NextResponse.json(room)
   }
 
@@ -107,7 +107,7 @@ export async function POST(
     room.status = "in-progress"
     room.currentTurnIndex = 0
     room.battleState = battle
-    rooms.set(room.id, room)
+    roomStore.setRoom(room.id, room)
 
     return NextResponse.json(room)
   }
@@ -117,9 +117,10 @@ export async function POST(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { roomId: string } },
+  { params }: { params: Promise<{ roomId: string }> },
 ) {
-  const existed = rooms.delete(params.roomId)
+  const { roomId } = await params
+  const existed = roomStore.deleteRoom(roomId)
 
   if (!existed) {
     return NextResponse.json({ error: "Room not found" }, { status: 404 })

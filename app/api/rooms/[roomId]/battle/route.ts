@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getRoomsStore } from "../../lobby/route"
+import { getRoomsStore } from "../../../lobby/route"
 import {
   type BattleAction,
   applyBattleAction,
@@ -10,9 +10,10 @@ const rooms = getRoomsStore()
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { roomId: string } },
+  { params }: { params: Promise<{ roomId: string }> },
 ) {
-  const room = rooms.get(params.roomId)
+  const { roomId } = await params
+  const room = rooms.getRoom(roomId)
 
   if (!room) {
     return NextResponse.json({ error: "Room not found" }, { status: 404 })
@@ -30,9 +31,10 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { roomId: string } },
+  { params }: { params: Promise<{ roomId: string }> },
 ) {
-  const room = rooms.get(params.roomId)
+  const { roomId } = await params
+  const room = rooms.getRoom(roomId)
 
   if (!room) {
     return NextResponse.json({ error: "Room not found" }, { status: 404 })
@@ -55,7 +57,7 @@ export async function POST(
   try {
     const nextState = applyBattleAction(room.battleState, body)
     room.battleState = nextState
-    rooms.set(room.id, room)
+    rooms.setRoom(room.id, room)
 
     return NextResponse.json(nextState)
   } catch (e) {

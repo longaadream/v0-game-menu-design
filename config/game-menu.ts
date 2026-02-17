@@ -5,6 +5,7 @@ import {
   Trophy,
   Users,
   LogOut,
+  Code,
   type LucideIcon,
 } from "lucide-react"
 
@@ -52,6 +53,15 @@ export const MENU_ITEMS: MenuItem[] = [
     icon: Target,
     href: "/practice",
     variant: "primary",
+    enabled: true,
+  },
+  {
+    id: "skill-diy",
+    label: "Skill & Piece DIY",
+    description: "Create custom skills and pieces",
+    icon: Code,
+    href: "/skill-diy",
+    variant: "default",
     enabled: true,
   },
   {
