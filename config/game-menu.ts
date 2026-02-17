@@ -15,9 +15,9 @@ import {
 
 /** Game branding */
 export const GAME_BRAND = {
-  title: "NEXUS",
-  subtitle: "ARENA",
-  tagline: "Dominate the battlefield",
+  title: "Red",
+  subtitle: "VS Blue",
+  tagline: "Red vs Blue tactical duel",
   version: "v1.0.2",
 }
 
@@ -38,8 +38,8 @@ export interface MenuItem {
 export const MENU_ITEMS: MenuItem[] = [
   {
     id: "play",
-    label: "Play",
-    description: "Join a match",
+    label: "1v1 Duel",
+    description: "Online 1v1 match",
     icon: Swords,
     href: "/play",
     variant: "primary",

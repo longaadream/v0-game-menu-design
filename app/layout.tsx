@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'NEXUS ARENA',
-  description: 'Dominate the battlefield — NEXUS ARENA game menu',
+  title: 'Red VS Blue',
+  description: 'Red VS Blue — tactical 1v1 board game',
   generator: 'v0.app',
   icons: {
     icon: [
