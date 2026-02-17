@@ -142,16 +142,8 @@ export default function PlayPage() {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch(`/api/rooms/${roomId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "start" }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to start game")
-      }
-      router.replace(`/battle/${roomId}?playerName=${encodeURIComponent(playerName.trim())}`)
+      // 重定向到棋子选择页面，而不是直接开始游戏
+      router.replace(`/piece-selection?roomId=${roomId}&playerName=${encodeURIComponent(playerName.trim())}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error")
     } finally {
@@ -166,15 +158,51 @@ export default function PlayPage() {
     const myPiece = battle.pieces.find((p) => p.ownerPlayerId === me)
     if (!myPiece || myPiece.x == null || myPiece.y == null) return
 
-    // 简化：尝试向右移动一格
-    const action: BattleAction = {
-      type: "move",
-      playerId: me,
-      pieceId: myPiece.instanceId,
-      toX: myPiece.x + 1,
-      toY: myPiece.y,
+    // 尝试多个移动方向，直到找到一个可用的格子
+    const directions = [
+      { dx: 1, dy: 0 },   // 右
+      { dx: -1, dy: 0 },  // 左
+      { dx: 0, dy: 1 },   // 下
+      { dx: 0, dy: -1 },  // 上
+    ]
+    
+    let moveToX = myPiece.x
+    let moveToY = myPiece.y
+    let foundValidMove = false
+    
+    for (const dir of directions) {
+      const newX = myPiece.x + dir.dx
+      const newY = myPiece.y + dir.dy
+      
+      // 检查是否在地图范围内
+      if (newX >= 0 && newX < battle.map.width && newY >= 0 && newY < battle.map.height) {
+        // 检查目标格子是否可走
+        const targetTile = battle.map.tiles.find(t => t.x === newX && t.y === newY)
+        if (targetTile && targetTile.props.walkable) {
+          // 检查目标格子是否被占用
+          const isOccupied = battle.pieces.some(p => 
+            p.x === newX && p.y === newY && p.currentHp > 0
+          )
+          if (!isOccupied) {
+            moveToX = newX
+            moveToY = newY
+            foundValidMove = true
+            break
+          }
+        }
+      }
     }
-    await sendBattleAction(action)
+    
+    if (foundValidMove) {
+      const action: BattleAction = {
+        type: "move",
+        playerId: me,
+        pieceId: myPiece.instanceId,
+        toX: moveToX,
+        toY: moveToY,
+      }
+      await sendBattleAction(action)
+    }
   }
 
   async function fetchBattle(id: string) {
@@ -387,7 +415,7 @@ export default function PlayPage() {
                 </div>
               </div>
 
-              {!battle && room.status === "waiting" && room.players.length === 2 && playerName.trim() && (
+              {!battle && room.status === "waiting" && playerName.trim() && (
                 <div className="flex justify-center">
                   <Button
                     size="sm"
@@ -401,7 +429,7 @@ export default function PlayPage() {
                         开始游戏中...
                       </>
                     ) : (
-                      "开始游戏"
+                      room.players.length === 1 ? "进入棋子选择" : "开始游戏"
                     )}
                   </Button>
                 </div>
@@ -432,7 +460,7 @@ export default function PlayPage() {
                       棋盘（服务器同步）
                     </div>
                     <div className="flex justify-center">
-                      <GameBoard map={battle.map} />
+                      <GameBoard map={battle.map} pieces={battle.pieces} />
                     </div>
                   </div>
 
@@ -479,7 +507,7 @@ export default function PlayPage() {
                               battle.pieces.find(
                                 (p) => p.ownerPlayerId === currentPlayerId,
                               )?.instanceId ?? "",
-                            skillId: "basic-shot",
+                            skillId: "basic-attack",
                           })
                         }
                       >
@@ -502,7 +530,7 @@ export default function PlayPage() {
                               battle.pieces.find(
                                 (p) => p.ownerPlayerId === currentPlayerId,
                               )?.instanceId ?? "",
-                            skillId: "charge-burst",
+                            skillId: "fireball",
                           })
                         }
                       >

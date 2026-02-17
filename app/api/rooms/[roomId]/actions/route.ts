@@ -1,91 +1,119 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getRoomsStore } from "../../../lobby/route"
+import { createInitialBattleForPlayers } from "@/lib/game/battle-setup"
+import { getPieceById } from "@/lib/game/piece-repository"
+import type { BattleState } from "@/lib/game/turn"
+import roomStore, { type Room } from "@/lib/game/room-store"
 
-const rooms = getRoomsStore()
-
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { roomId: string } },
-) {
-  const room = rooms.get(params.roomId)
-
-  if (!room) {
-    return NextResponse.json({ error: "Room not found" }, { status: 404 })
-  }
-
-  return NextResponse.json({ actions: room.actions })
-}
-
-type ActionPostBody = {
-  playerName: string
-  type: string
-  payload?: unknown
-}
-
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { roomId: string } },
-) {
-  const room = rooms.get(params.roomId)
-
-  if (!room) {
-    return NextResponse.json({ error: "Room not found" }, { status: 404 })
-  }
-
-  if (room.status !== "in-progress") {
-    return NextResponse.json(
-      { error: "Game is not in progress" },
-      { status: 400 },
-    )
-  }
-
-  let body: ActionPostBody
+export async function POST(req: NextRequest, { params }: { params: Promise<{ roomId: string }> }) {
+  let body: unknown
   try {
-    body = (await req.json()) as ActionPostBody
+    body = await req.json()
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+    body = {}
   }
 
-  const name = body.playerName?.trim()
-  if (!name) {
+  const { roomId } = await params
+  const { playerName, action, pieces } = (body as { 
+    playerName?: string
+    action?: "select-pieces" | "start-game"
+    pieces?: Array<{ templateId: string; faction: string }>
+  }) ?? {}
+
+  if (!playerName?.trim()) {
     return NextResponse.json({ error: "playerName is required" }, { status: 400 })
   }
 
-  const player = room.players.find(
-    (p) => p.name.toLowerCase() === name.toLowerCase(),
-  )
+  const room = roomStore.getRoom(roomId)
+  if (!room) {
+    return NextResponse.json({ error: "Room not found" }, { status: 404 })
+  }
 
-  if (!player) {
-    return NextResponse.json(
-      { error: "Player not found in this room" },
-      { status: 400 },
+  if (action === "select-pieces") {
+    if (!pieces || pieces.length === 0) {
+      return NextResponse.json({ error: "Please select at least 1 piece" }, { status: 400 })
+    }
+
+    const existingPlayer = room.players.find(
+      (p) => p.name.toLowerCase() === playerName.toLowerCase()
     )
+
+    if (existingPlayer) {
+      existingPlayer.selectedPieces = pieces
+      existingPlayer.hasSelectedPieces = true
+      roomStore.setRoom(roomId, room)
+      return NextResponse.json({ success: true, message: "Pieces selected successfully" })
+    }
+
+    const newPlayer = {
+      id: crypto.randomUUID(),
+      name: playerName.trim(),
+      joinedAt: Date.now(),
+      selectedPieces: pieces,
+      hasSelectedPieces: true,
+    }
+
+    room.players.push(newPlayer)
+    roomStore.setRoom(roomId, room)
+
+    return NextResponse.json({ success: true, message: "Player joined and pieces selected" })
   }
 
-  const currentPlayer = room.players[room.currentTurnIndex]
-  if (currentPlayer.id !== player.id) {
-    return NextResponse.json(
-      {
-        error: "It is not this player's turn",
-        currentPlayer: currentPlayer.name,
-      },
-      { status: 400 },
-    )
+  if (action === "start-game") {
+    if (room.status !== "waiting" && room.status !== "ready") {
+      return NextResponse.json(
+        { error: "Game is already in progress or finished" },
+        { status: 400 },
+      )
+    }
+
+    if (room.players.length < 2) {
+      return NextResponse.json(
+        { error: "At least 2 players are required to start game" },
+        { status: 400 },
+      )
+    }
+
+    // 总是使用房间中所有玩家的selectedPieces，确保包含所有玩家选择的棋子
+    // 这样可以确保双方都有棋子进入游戏
+    let pieceTemplates = room.players
+      .flatMap(p => p.selectedPieces || [])
+      .map(piece => getPieceById(piece.templateId))
+      .filter(Boolean)
+    
+    console.log('All piece templates from players:', pieceTemplates.length)
+    console.log('Players in room:', room.players.map(p => ({
+      name: p.name,
+      hasSelectedPieces: !!p.hasSelectedPieces,
+      selectedPiecesCount: p.selectedPieces?.length || 0
+    })))
+
+    if (pieceTemplates.length < 2) {
+      return NextResponse.json(
+        { error: "Each player must select at least 1 piece" },
+        { status: 400 },
+      )
+    }
+
+    // 确保只使用前两个玩家，因为这是1v1游戏
+    const playerIds = room.players.slice(0, 2).map(p => p.name)
+    console.log('Creating battle for players:', playerIds)
+    console.log('With piece templates:', pieceTemplates.length)
+    const battle = createInitialBattleForPlayers(playerIds, pieceTemplates)
+
+    if (!battle) {
+      return NextResponse.json(
+        { error: "Failed to initialize battle state" },
+        { status: 500 },
+      )
+    }
+
+    room.status = "in-progress"
+    room.currentTurnIndex = 0
+    room.battleState = battle
+    roomStore.setRoom(roomId, room)
+
+    return NextResponse.json({ success: true, message: "Game started" })
   }
 
-  const action = {
-    id: crypto.randomUUID(),
-    playerId: player.id,
-    type: body.type || "move",
-    payload: body.payload ?? null,
-    createdAt: Date.now(),
-    turn: room.actions.length + 1,
-  }
-
-  room.actions.push(action)
-  room.currentTurnIndex = (room.currentTurnIndex + 1) % room.players.length
-  rooms.set(room.id, room)
-
-  return NextResponse.json({ action, room })
+  return NextResponse.json({ error: "Unsupported action" }, { status: 400 })
 }
-

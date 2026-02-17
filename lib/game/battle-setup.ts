@@ -276,53 +276,139 @@ export function buildInitialPiecesForPlayers(
   players: PlayerId[],
   selectedPieces: PieceTemplate[],
 ): PieceInstance[] {
+  if (players.length !== 2) return []
+  
   const [p1, p2] = players
-  const redPieces = selectedPieces.filter(p => p.faction === "red")
-  const bluePieces = selectedPieces.filter(p => p.faction === "blue")
-
-  const redPiece = redPieces[0] || DEFAULT_PIECES["red-warrior"]
-  const bluePiece = bluePieces[0] || DEFAULT_PIECES["blue-warrior"]
-
-  return [
-    {
-      instanceId: `${p1}-1`,
-      templateId: redPiece.id,
-      ownerPlayerId: p1,
+  
+  // 随机分配玩家到红方和蓝方
+  const redPlayer = Math.random() > 0.5 ? p1 : p2
+  const bluePlayer = redPlayer === p1 ? p2 : p1
+  
+  // 为每个玩家创建棋子
+  const pieces: PieceInstance[] = []
+  
+  // 找到所有可走的地板方格（F方格）
+  const floorTiles = map.tiles.filter(tile => 
+    tile.props.walkable && tile.props.type === "floor"
+  )
+  
+  // 如果没有地板方格，使用所有可走的方格
+  const availableTiles = floorTiles.length > 0 ? floorTiles : map.tiles.filter(tile => tile.props.walkable)
+  
+  // 随机选择位置的函数
+  const getRandomPosition = () => {
+    if (availableTiles.length === 0) {
+      // 如果没有可走的方格，返回默认位置
+      return { x: Math.floor(map.width / 2), y: Math.floor(map.height / 2) }
+    }
+    const randomIndex = Math.floor(Math.random() * availableTiles.length)
+    return { x: availableTiles[randomIndex].x, y: availableTiles[randomIndex].y }
+  }
+  
+  // 为红方玩家添加棋子
+  let redPieceIndex = 0
+  for (const pieceTemplate of selectedPieces) {
+    if (pieceTemplate.faction === "red" || pieceTemplate.faction === "neutral") {
+      const position = getRandomPosition()
+      pieces.push({
+        instanceId: `${redPlayer}-${redPieceIndex + 1}`,
+        templateId: pieceTemplate.id,
+        ownerPlayerId: redPlayer,
+        faction: "red",
+        currentHp: pieceTemplate.stats.maxHp,
+        maxHp: pieceTemplate.stats.maxHp,
+        attack: pieceTemplate.stats.attack,
+        defense: pieceTemplate.stats.defense,
+        moveRange: pieceTemplate.stats.moveRange,
+        x: position.x,
+        y: position.y,
+        skills: pieceTemplate.skills.map(s => ({
+          skillId: s.skillId,
+          currentCooldown: 0,
+          currentCharges: 0,
+          unlocked: true,
+        })),
+      })
+      redPieceIndex++
+    }
+  }
+  
+  // 为蓝方玩家添加棋子
+  let bluePieceIndex = 0
+  for (const pieceTemplate of selectedPieces) {
+    if (pieceTemplate.faction === "blue" || pieceTemplate.faction === "neutral") {
+      const position = getRandomPosition()
+      pieces.push({
+        instanceId: `${bluePlayer}-${bluePieceIndex + 1}`,
+        templateId: pieceTemplate.id,
+        ownerPlayerId: bluePlayer,
+        faction: "blue",
+        currentHp: pieceTemplate.stats.maxHp,
+        maxHp: pieceTemplate.stats.maxHp,
+        attack: pieceTemplate.stats.attack,
+        defense: pieceTemplate.stats.defense,
+        moveRange: pieceTemplate.stats.moveRange,
+        x: position.x,
+        y: position.y,
+        skills: pieceTemplate.skills.map(s => ({
+          skillId: s.skillId,
+          currentCooldown: 0,
+          currentCharges: 0,
+          unlocked: true,
+        })),
+      })
+      bluePieceIndex++
+    }
+  }
+  
+  // 确保至少有一个棋子
+  if (pieces.length === 0) {
+    // 添加默认红方棋子
+    const defaultRedPiece = DEFAULT_PIECES["red-warrior"]
+    pieces.push({
+      instanceId: `${redPlayer}-1`,
+      templateId: defaultRedPiece.id,
+      ownerPlayerId: redPlayer,
       faction: "red",
-      currentHp: redPiece.stats.maxHp,
-      maxHp: redPiece.stats.maxHp,
-      attack: redPiece.stats.attack,
-      defense: redPiece.stats.defense,
-      moveRange: redPiece.stats.moveRange,
-      x: 1,
-      y: 1,
-      skills: redPiece.skills.map(s => ({
+      currentHp: defaultRedPiece.stats.maxHp,
+      maxHp: defaultRedPiece.stats.maxHp,
+      attack: defaultRedPiece.stats.attack,
+      defense: defaultRedPiece.stats.defense,
+      moveRange: defaultRedPiece.stats.moveRange,
+      x: getRandomPosition().x,
+      y: getRandomPosition().y,
+      skills: defaultRedPiece.skills.map(s => ({
         skillId: s.skillId,
         currentCooldown: 0,
         currentCharges: 0,
         unlocked: true,
       })),
-    },
-    {
-      instanceId: `${p2}-1`,
-      templateId: bluePiece.id,
-      ownerPlayerId: p2,
+    })
+    
+    // 添加默认蓝方棋子
+    const defaultBluePiece = DEFAULT_PIECES["blue-warrior"]
+    pieces.push({
+      instanceId: `${bluePlayer}-1`,
+      templateId: defaultBluePiece.id,
+      ownerPlayerId: bluePlayer,
       faction: "blue",
-      currentHp: bluePiece.stats.maxHp,
-      maxHp: bluePiece.stats.maxHp,
-      attack: bluePiece.stats.attack,
-      defense: bluePiece.stats.defense,
-      moveRange: bluePiece.stats.moveRange,
-      x: map.width - 2,
-      y: map.height - 2,
-      skills: bluePiece.skills.map(s => ({
+      currentHp: defaultBluePiece.stats.maxHp,
+      maxHp: defaultBluePiece.stats.maxHp,
+      attack: defaultBluePiece.stats.attack,
+      defense: defaultBluePiece.stats.defense,
+      moveRange: defaultBluePiece.stats.moveRange,
+      x: getRandomPosition().x,
+      y: getRandomPosition().y,
+      skills: defaultBluePiece.skills.map(s => ({
         skillId: s.skillId,
         currentCooldown: 0,
         currentCharges: 0,
         unlocked: true,
       })),
-    },
-  ]
+    })
+  }
+  
+  return pieces
 }
 
 export function createInitialBattleForPlayers(

@@ -1,11 +1,15 @@
 "use client"
 
 import type { BoardMap, Tile } from "@/lib/game/map"
-import type { PieceInstance } from "@/lib/game/piece"
+import type { PieceInstance, PieceTemplate } from "@/lib/game/piece"
+import { getPieceById } from "@/lib/game/piece-repository"
 
 type GameBoardProps = {
   map: BoardMap
   pieces?: PieceInstance[]
+  onTileClick?: (x: number, y: number) => void
+  selectedPieceId?: string
+  isSelectingMoveTarget?: boolean
 }
 
 function tileColor(tile: Tile): string {
@@ -24,7 +28,7 @@ function tileColor(tile: Tile): string {
   }
 }
 
-export function GameBoard({ map, pieces = [] }: GameBoardProps) {
+export function GameBoard({ map, pieces = [], onTileClick, selectedPieceId, isSelectingMoveTarget }: GameBoardProps) {
   const size = Math.max(map.width, map.height)
   
   // 方块类型图例
@@ -35,6 +39,103 @@ export function GameBoard({ map, pieces = [] }: GameBoardProps) {
     { type: "cover", name: "掩体", color: "bg-amber-500" },
     { type: "hole", name: "陷阱", color: "bg-sky-900" },
   ]
+
+  // 获取选中的棋子
+  const selectedPiece = pieces.find(p => p.instanceId === selectedPieceId)
+
+  // 计算可移动的格子
+  const getValidMoveTargets = (): { x: number, y: number }[] => {
+    if (!selectedPiece || !isSelectingMoveTarget) return []
+    
+    const targets: { x: number, y: number }[] = []
+    const { x: startX, y: startY } = selectedPiece
+    
+    // 检查同一行（左右）
+    for (let x = 0; x < map.width; x++) {
+      if (x === startX) continue
+      if (isValidMoveTarget(startX, startY, x, startY)) {
+        targets.push({ x, y: startY })
+      }
+    }
+    
+    // 检查同一列（上下）
+    for (let y = 0; y < map.height; y++) {
+      if (y === startY) continue
+      if (isValidMoveTarget(startX, startY, startX, y)) {
+        targets.push({ x: startX, y })
+      }
+    }
+    
+    return targets
+  }
+
+  // 检查移动目标是否有效
+  const isValidMoveTarget = (startX: number, startY: number, targetX: number, targetY: number): boolean => {
+    // 检查是否在同一行或同一列
+    if (startX !== targetX && startY !== targetY) return false
+    
+    // 检查目标格子是否存在且可走
+    const targetTile = map.tiles.find(t => t.x === targetX && t.y === targetY)
+    if (!targetTile || !targetTile.props.walkable) return false
+    
+    // 检查目标格子是否被占用
+    if (pieces.some(p => p.x === targetX && p.y === targetY && p.currentHp > 0)) return false
+    
+    // 检查路径是否被阻挡
+    return !isPathBlocked(startX, startY, targetX, targetY)
+  }
+
+  // 检查路径是否被阻挡
+  const isPathBlocked = (startX: number, startY: number, targetX: number, targetY: number): boolean => {
+    // 水平移动
+    if (startY === targetY) {
+      const minX = Math.min(startX, targetX)
+      const maxX = Math.max(startX, targetX)
+      for (let x = minX + 1; x < maxX; x++) {
+        // 检查中间格子是否有棋子
+        if (pieces.some(p => p.x === x && p.y === startY && p.currentHp > 0)) {
+          return true
+        }
+        // 检查中间格子是否可走
+        const tile = map.tiles.find(t => t.x === x && t.y === startY)
+        if (!tile || !tile.props.walkable) {
+          return true
+        }
+      }
+    }
+    // 垂直移动
+    else if (startX === targetX) {
+      const minY = Math.min(startY, targetY)
+      const maxY = Math.max(startY, targetY)
+      for (let y = minY + 1; y < maxY; y++) {
+        // 检查中间格子是否有棋子
+        if (pieces.some(p => p.x === startX && p.y === y && p.currentHp > 0)) {
+          return true
+        }
+        // 检查中间格子是否可走
+        const tile = map.tiles.find(t => t.x === startX && t.y === y)
+        if (!tile || !tile.props.walkable) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  // 获取格子的额外类名
+  const getTileClassName = (tile: typeof map.tiles[0]) => {
+    const baseClass = tileColor(tile)
+    
+    // 检查是否是可移动目标
+    if (isSelectingMoveTarget) {
+      const validTargets = getValidMoveTargets()
+      if (validTargets.some(t => t.x === tile.x && t.y === tile.y)) {
+        return `${baseClass} cursor-pointer hover:bg-green-500/30`
+      }
+    }
+    
+    return baseClass
+  }
 
   return (
     <div className="inline-flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
@@ -64,12 +165,17 @@ export function GameBoard({ map, pieces = [] }: GameBoardProps) {
         {map.tiles.map((tile) => (
           <div
             key={tile.id}
-            className={`relative aspect-square ${tileColor(
+            className={`relative aspect-square ${getTileClassName(
               tile,
             )} flex items-center justify-center text-[14px] text-white/70`}
             title={`(${tile.x}, ${tile.y}) ${tile.props.type}  walkable=${
               tile.props.walkable
             }  bullet=${tile.props.bulletPassable}`}
+            onClick={() => {
+              if (isSelectingMoveTarget && onTileClick) {
+                onTileClick(tile.x, tile.y)
+              }
+            }}
           >
             {/* 棋子显示 */}
             {pieces && pieces.some(p => p.x === tile.x && p.y === tile.y) && (
@@ -78,20 +184,24 @@ export function GameBoard({ map, pieces = [] }: GameBoardProps) {
                   const piece = pieces.find(p => p.x === tile.x && p.y === tile.y)
                   if (!piece) return null
                   
-                  if (piece.image && piece.image.startsWith("http")) {
+                  // 通过templateId获取棋子模板
+                  const pieceTemplate = getPieceById(piece.templateId)
+                  const image = pieceTemplate?.image
+                  
+                  if (image && image.startsWith("http")) {
                     return (
                       <img
-                        src={piece.image}
-                        alt={piece.name}
-                        className="w-8 h-8 object-contain"
+                        src={image}
+                        alt={pieceTemplate?.name || "Piece"}
+                      className="w-8 h-8 object-contain"
                       />
                     )
-                  } else if (piece.image) {
+                  } else if (image) {
                     return (
                       <div className={`text-2xl font-bold ${
                         piece.faction === "red" ? "text-red-500" : "text-blue-500"
                       }`}>
-                        {piece.image}
+                        {image}
                       </div>
                     )
                   } else {

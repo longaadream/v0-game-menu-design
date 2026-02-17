@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import roomStore, { type Room } from "@/lib/game/room-store"
 import { createInitialBattleForPlayers } from "@/lib/game/battle-setup"
+import { getAllPieces } from "@/lib/game/piece-repository"
 
 export async function GET(
   _req: NextRequest,
@@ -96,11 +97,12 @@ export async function POST(
     }
 
     const playerIds = room.players.map((p) => p.name)
-    const battle = createInitialBattleForPlayers(playerIds)
+    const defaultPieces = getAllPieces()
+    const battle = createInitialBattleForPlayers(playerIds, defaultPieces)
     if (!battle) {
       return NextResponse.json(
         { error: "Failed to initialize battle state" },
-        { status: 500 },
+        { status: 500 }
       )
     }
 

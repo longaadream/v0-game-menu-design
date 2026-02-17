@@ -6,6 +6,9 @@ type Player = {
   id: string
   name: string
   joinedAt: number
+  faction?: "red" | "blue"
+  selectedPieces?: Array<{ templateId: string; faction: string }>
+  hasSelectedPieces?: boolean
 }
 
 type RoomStatus = "waiting" | "in-progress" | "finished"
@@ -29,6 +32,7 @@ export type Room = {
   currentTurnIndex: number
   actions: GameAction[]
   battleState: BattleState | null
+  selectedPieces?: Array<{ templateId: string; faction: string }>
 }
 
 // 存储文件路径

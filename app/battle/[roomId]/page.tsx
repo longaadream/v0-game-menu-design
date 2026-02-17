@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GameBoard } from "@/components/game-board"
 import type { BattleState, BattleAction } from "@/lib/game/turn"
+import { getPieceById } from "@/lib/game/piece-repository"
 
 type Room = {
   id: string
@@ -157,10 +158,18 @@ export default function BattlePage() {
     return battle.turn.currentPlayerId.toLowerCase() === currentPlayerId.toLowerCase()
   }, [room, battle, currentPlayerId])
 
-  const myPiece = useMemo(() => {
-    if (!battle || !currentPlayerId) return null
-    return battle.pieces.find((p) => p.ownerPlayerId.toLowerCase() === currentPlayerId.toLowerCase())
+  const myPieces = useMemo(() => {
+    if (!battle || !currentPlayerId) return []
+    return battle.pieces.filter((p) => p.ownerPlayerId.toLowerCase() === currentPlayerId.toLowerCase() && p.currentHp > 0)
   }, [battle, currentPlayerId])
+
+  const [selectedPieceId, setSelectedPieceId] = useState<string | null>(null)
+  const [isSelectingMoveTarget, setIsSelectingMoveTarget] = useState(false)
+
+  const selectedPiece = useMemo(() => {
+    if (!selectedPieceId || !battle) return null
+    return battle.pieces.find(p => p.instanceId === selectedPieceId)
+  }, [selectedPieceId, battle])
 
   if (loading) {
     return (
@@ -282,54 +291,175 @@ export default function BattlePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex justify-center">
-                <GameBoard map={battle.map} />
-              </CardContent>
+                  <GameBoard 
+                    map={battle.map} 
+                    pieces={battle.pieces}
+                    onTileClick={(x, y) => {
+                      if (isSelectingMoveTarget && selectedPiece) {
+                        // 检查移动是否有效（这里也可以在客户端做一次验证）
+                        sendBattleAction({
+                          type: "move",
+                          playerId: currentPlayerId!,
+                          pieceId: selectedPiece.instanceId,
+                          toX: x,
+                          toY: y,
+                        })
+                        setIsSelectingMoveTarget(false)
+                      }
+                    }}
+                    selectedPieceId={selectedPieceId}
+                    isSelectingMoveTarget={isSelectingMoveTarget}
+                  />
+                </CardContent>
             </Card>
 
-            {myPiece && (
+            {myPieces.length > 0 && (
               <Card className="bg-zinc-900/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm">我的棋子</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-4">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${
-                      myPiece.faction === "red" ? "bg-red-600" : "bg-blue-600"
-                    }`}>
-                      <Swords className="h-6 w-6 text-white" />
+                <CardContent className="space-y-4">
+                  {myPieces.map((piece) => (
+                    <div 
+                      key={piece.instanceId} 
+                      className={`flex items-center gap-4 cursor-pointer rounded-md p-2 transition-colors ${
+                        selectedPieceId === piece.instanceId 
+                          ? 'bg-zinc-800/80 border-l-4 border-green-500' 
+                          : 'hover:bg-zinc-800/50'
+                      }`}
+                      onClick={() => setSelectedPieceId(piece.instanceId)}
+                    >
+                      {(() => {
+                        const pieceTemplate = getPieceById(piece.templateId)
+                        const image = pieceTemplate?.image
+                        return (
+                          <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${
+                            piece.faction === "red" ? "bg-red-600" : "bg-blue-600"
+                          }`}>
+                            {image && image.startsWith("http") ? (
+                              <img 
+                                src={image} 
+                                alt={pieceTemplate?.name || "Piece"} 
+                                className="h-8 w-8 object-contain"
+                              />
+                            ) : image ? (
+                              <span className="text-2xl">{image}</span>
+                            ) : (
+                              <Swords className="h-6 w-6 text-white" />
+                            )}
+                          </div>
+                        )
+                      })()}
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-zinc-200">
+                            {(() => {
+                              const pieceTemplate = getPieceById(piece.templateId)
+                              return pieceTemplate?.name || piece.templateId
+                            })()}
+                          </span>
+                          <span className={`text-sm ${
+                            piece.faction === "red" ? "text-red-400" : "text-blue-400"
+                          }`}>
+                            {piece.faction === "red" ? "红方" : "蓝方"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-zinc-400">
+                          <span className="flex items-center gap-1">
+                            <Shield className="h-3 w-3" />
+                            HP: {piece.currentHp}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Footprints className="h-3 w-3" />
+                            位置: ({piece.x}, {piece.y})
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-zinc-200">
-                          {myPiece.templateId}
-                        </span>
-                        <span className={`text-sm ${
-                          myPiece.faction === "red" ? "text-red-400" : "text-blue-400"
-                        }`}>
-                          {myPiece.faction === "red" ? "红方" : "蓝方"}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-zinc-400">
-                        <span className="flex items-center gap-1">
-                          <Shield className="h-3 w-3" />
-                          HP: {myPiece.currentHp}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Footprints className="h-3 w-3" />
-                          位置: ({myPiece.x}, {myPiece.y})
-                        </span>
-                      </div>
-                      <div className="text-xs text-zinc-400">
-                        <span className="flex items-center gap-1">
-                          <Swords className="h-3 w-3" />
-                          剩余棋子: {battle.pieces.filter(p => p.ownerPlayerId === currentPlayerId && p.currentHp > 0).length}
-                        </span>
-                      </div>
-                    </div>
+                  ))}
+                  <div className="text-xs text-zinc-400 border-t border-zinc-800 pt-2">
+                    <span className="flex items-center gap-1">
+                      <Swords className="h-3 w-3" />
+                      剩余棋子: {myPieces.length}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
             )}
+
+            {(() => {
+              const opponentPieces = battle.pieces.filter(p => 
+                p.ownerPlayerId !== currentPlayerId && p.currentHp > 0
+              )
+              return opponentPieces.length > 0 ? (
+                <Card className="bg-zinc-900/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">对方棋子</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {opponentPieces.map((piece) => (
+                      <div 
+                        key={piece.instanceId} 
+                        className="flex items-center gap-4 rounded-md p-2 hover:bg-zinc-800/30"
+                      >
+                        {(() => {
+                          const pieceTemplate = getPieceById(piece.templateId)
+                          const image = pieceTemplate?.image
+                          return (
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${
+                              piece.faction === "red" ? "bg-red-600" : "bg-blue-600"
+                            }`}>
+                              {image && image.startsWith("http") ? (
+                                <img 
+                                  src={image} 
+                                  alt={pieceTemplate?.name || "Piece"} 
+                                  className="h-8 w-8 object-contain"
+                                />
+                              ) : image ? (
+                                <span className="text-2xl">{image}</span>
+                              ) : (
+                                <Swords className="h-6 w-6 text-white" />
+                              )}
+                            </div>
+                          )
+                        })()}
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-zinc-200">
+                              {(() => {
+                                const pieceTemplate = getPieceById(piece.templateId)
+                                return pieceTemplate?.name || piece.templateId
+                              })()}
+                            </span>
+                            <span className={`text-sm ${
+                              piece.faction === "red" ? "text-red-400" : "text-blue-400"
+                            }`}>
+                              {piece.faction === "red" ? "红方" : "蓝方"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-zinc-400">
+                            <span className="flex items-center gap-1">
+                              <Shield className="h-3 w-3" />
+                              HP: {piece.currentHp}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Footprints className="h-3 w-3" />
+                              位置: ({piece.x}, {piece.y})
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="text-xs text-zinc-400 border-t border-zinc-800 pt-2">
+                      <span className="flex items-center gap-1">
+                        <Swords className="h-3 w-3" />
+                        剩余棋子: {opponentPieces.length}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null
+            })()}
           </div>
 
           <div className="space-y-4">
@@ -403,37 +533,55 @@ export default function BattlePage() {
 
                 {battle.turn.phase === "action" && isMyTurn && (
                   <div className="space-y-2">
-                    <Button
-                      className="w-full"
-                      size="sm"
-                      disabled={loading || battle.turn.actions.hasMoved}
-                      onClick={() => {
-                        if (myPiece) {
-                          sendBattleAction({
-                            type: "move",
-                            playerId: currentPlayerId!,
-                            pieceId: myPiece.instanceId,
-                            toX: Math.min(myPiece.x + 1, battle.map.width - 1),
-                            toY: myPiece.y,
-                          })
-                        }
-                      }}
-                    >
-                      <Footprints className="mr-2 h-4 w-4" />
-                      移动
-                    </Button>
+                    {!selectedPiece && (
+                      <p className="text-xs text-muted-foreground text-center">
+                        请从左侧选择一个棋子进行操作
+                      </p>
+                    )}
+                    
+                    {isSelectingMoveTarget ? (
+                      <>
+                        <p className="text-xs text-muted-foreground text-center">
+                          请点击棋盘上的格子选择移动目标（像国际象棋的车一样移动）
+                        </p>
+                        <Button
+                          className="w-full"
+                          size="sm"
+                          variant="outline"
+                          disabled={loading}
+                          onClick={() => {
+                            setIsSelectingMoveTarget(false)
+                          }}
+                        >
+                          取消移动
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        className="w-full"
+                        size="sm"
+                        disabled={loading || battle.turn.actions.hasMoved || !selectedPiece}
+                        onClick={() => {
+                          setIsSelectingMoveTarget(true)
+                        }}
+                      >
+                        <Footprints className="mr-2 h-4 w-4" />
+                        移动
+                      </Button>
+                    )}
+                    
                     <Button
                       className="w-full"
                       variant="outline"
                       size="sm"
-                      disabled={loading || battle.turn.actions.hasUsedBasicSkill || !myPiece}
+                      disabled={loading || battle.turn.actions.hasUsedBasicSkill || !selectedPiece || isSelectingMoveTarget}
                       onClick={() => {
-                        if (myPiece) {
+                        if (selectedPiece) {
                           sendBattleAction({
                             type: "useBasicSkill",
                             playerId: currentPlayerId!,
-                            pieceId: myPiece.instanceId,
-                            skillId: "basic-shot",
+                            pieceId: selectedPiece.instanceId,
+                            skillId: "basic-attack",
                           })
                         }
                       }}
@@ -445,14 +593,14 @@ export default function BattlePage() {
                       className="w-full"
                       variant="outline"
                       size="sm"
-                      disabled={loading || battle.turn.actions.hasUsedChargeSkill || !myPiece}
+                      disabled={loading || battle.turn.actions.hasUsedChargeSkill || !selectedPiece || isSelectingMoveTarget}
                       onClick={() => {
-                        if (myPiece) {
+                        if (selectedPiece) {
                           sendBattleAction({
                             type: "useChargeSkill",
                             playerId: currentPlayerId!,
-                            pieceId: myPiece.instanceId,
-                            skillId: "charge-burst",
+                            pieceId: selectedPiece.instanceId,
+                            skillId: "fireball",
                           })
                         }
                       }}
@@ -464,7 +612,7 @@ export default function BattlePage() {
                       className="w-full"
                       variant="secondary"
                       size="sm"
-                      disabled={loading}
+                      disabled={loading || isSelectingMoveTarget}
                       onClick={() => {
                         sendBattleAction({
                           type: "endTurn",
