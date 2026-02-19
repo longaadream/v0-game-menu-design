@@ -11,6 +11,10 @@ export interface PlayerTurnMeta {
   playerId: PlayerId
   /** 当前累计的充能点数（用于释放充能技能） */
   chargePoints: number
+  /** 当前行动点 */
+  actionPoints: number
+  /** 最大行动点 */
+  maxActionPoints: number
 }
 
 export interface PerTurnActionFlags {
@@ -199,6 +203,15 @@ export function applyBattleAction(
         // 更新冷却
         globalTriggerSystem.updateCooldowns();
         
+        // 刷新当前玩家的行动点：比上回合+1，上限10点
+        const currentPlayerMeta = next.players.find(p => p.playerId === next.turn.currentPlayerId)
+        if (currentPlayerMeta) {
+          // 计算新的行动点：比上回合+1，上限10点
+          const newActionPoints = Math.min(currentPlayerMeta.actionPoints + 1, 10)
+          currentPlayerMeta.actionPoints = newActionPoints
+          console.log(`Player ${currentPlayerMeta.playerId} now has ${newActionPoints} action points (max 10)`)
+        }
+
         // 更新所有棋子技能的冷却时间
         next.pieces.forEach(piece => {
           if (piece.skills) {
@@ -231,6 +244,16 @@ export function applyBattleAction(
           hasUsedBasicSkill: false,
           hasUsedChargeSkill: false,
         }
+        
+        // 确保新回合的玩家有初始行动点
+        const nextPlayerMeta = next.players[nextIndex]
+        if (nextPlayerMeta) {
+          // 如果玩家没有行动点属性，初始化它们为1点
+          if (nextPlayerMeta.actionPoints === undefined) {
+            nextPlayerMeta.actionPoints = 1 // 初始1点行动点
+          }
+        }
+        
         return next
       }
       return next
@@ -252,6 +275,12 @@ export function applyBattleAction(
         throw new BattleRuleError("Move action already used this turn")
       }
 
+      // 检查行动点是否足够
+      const playerMetaCheck = getPlayerMeta(state, action.playerId)
+      if (playerMetaCheck.actionPoints < 1) {
+        throw new BattleRuleError("Not enough action points to move")
+      }
+
       const next = structuredClone(state) as BattleState
       const piece = next.pieces.find(
         (p) =>
@@ -269,6 +298,11 @@ export function applyBattleAction(
 
       piece.x = action.toX
       piece.y = action.toY
+      
+      // 消耗行动点
+      const playerMeta = getPlayerMeta(next, action.playerId)
+      playerMeta.actionPoints -= 1
+      
       next.turn.actions.hasMoved = true
 
       // 触发移动后的规则
@@ -320,16 +354,6 @@ export function applyBattleAction(
         )
       }
 
-      // 检查技能是否在冷却中
-      if (piece.skills) {
-        const skillState = piece.skills.find(s => s.skillId === action.skillId)
-        if (skillState && skillState.currentCooldown && skillState.currentCooldown > 0) {
-          throw new BattleRuleError(
-            `Skill ${action.skillId} is on cooldown for ${skillState.currentCooldown} more turns`,
-          )
-        }
-      }
-
       console.log('Executing skill with ID:', action.skillId)
       console.log('Available skills:', Object.keys(next.skillsById))
       
@@ -348,9 +372,30 @@ export function applyBattleAction(
           maxCharges: 0,
           powerMultiplier: 1,
           code: "function executeSkill(context) { return { message: 'Skill executed', success: true } }",
-          effects: [],
           range: "self",
-          requiresTarget: false
+          requiresTarget: false,
+          actionPointCost: 1
+        }
+      }
+      
+      // 检查行动点是否足够
+      const playerMeta = getPlayerMeta(state, action.playerId)
+      if (playerMeta.actionPoints < skillDef.actionPointCost) {
+        throw new BattleRuleError(`Not enough action points to use ${skillDef.name}`)
+      }
+
+      // 检查技能是否在冷却中
+      if (piece.skills) {
+        const skillState = piece.skills.find(s => s.skillId === action.skillId)
+        if (skillState && skillState.currentCooldown && skillState.currentCooldown > 0) {
+          throw new BattleRuleError(
+            `Skill ${action.skillId} is on cooldown for ${skillState.currentCooldown} more turns`,
+          )
+        }
+        
+        // 检查限定技的使用次数
+        if (skillState && skillDef.type === "ultimate" && skillState.usesRemaining <= 0) {
+          throw new BattleRuleError(`Ultimate skill ${action.skillId} has already been used`)
         }
       }
       
@@ -394,31 +439,48 @@ export function applyBattleAction(
         const updatedPiece = next.pieces.find(p => p.instanceId === piece.instanceId)
         console.log('Updated piece after skill:', updatedPiece);
         
+        // 消耗行动点
+        const playerMeta = getPlayerMeta(next, action.playerId)
+        playerMeta.actionPoints -= skillDef.actionPointCost
+        
         // 设置技能冷却
-        if (skillDef.cooldownTurns > 0) {
+        if (skillDef.cooldownTurns > 0 || skillDef.type === "ultimate") {
           // 找到棋子的技能状态并设置冷却
           if (piece.skills) {
             const skillIndex = piece.skills.findIndex(s => s.skillId === action.skillId)
             if (skillIndex !== -1) {
-              piece.skills[skillIndex].currentCooldown = skillDef.cooldownTurns
-              console.log(`Set cooldown for skill ${action.skillId}: ${skillDef.cooldownTurns} turns`)
+              // 设置冷却
+              if (skillDef.cooldownTurns > 0) {
+                piece.skills[skillIndex].currentCooldown = skillDef.cooldownTurns
+                console.log(`Set cooldown for skill ${action.skillId}: ${skillDef.cooldownTurns} turns`)
+              }
+              
+              // 减少限定技使用次数
+              if (skillDef.type === "ultimate") {
+                piece.skills[skillIndex].usesRemaining -= 1
+                console.log(`Used ultimate skill ${action.skillId}, ${piece.skills[skillIndex].usesRemaining} uses remaining`)
+              }
             } else {
               // 如果技能不在棋子的技能列表中，添加它
+              const usesRemaining = skillDef.type === "ultimate" ? 0 : -1 // 限定技使用后剩余0次，其他技能无限制
               piece.skills.push({ 
                 skillId: action.skillId, 
                 level: 1, 
-                currentCooldown: skillDef.cooldownTurns 
+                currentCooldown: skillDef.cooldownTurns, 
+                usesRemaining: usesRemaining
               })
-              console.log(`Added skill ${action.skillId} to piece with cooldown: ${skillDef.cooldownTurns} turns`)
+              console.log(`Added skill ${action.skillId} to piece with cooldown: ${skillDef.cooldownTurns} turns, uses remaining: ${usesRemaining}`)
             }
           } else {
             // 如果棋子没有skills属性，初始化它
+            const usesRemaining = skillDef.type === "ultimate" ? 0 : -1 // 限定技使用后剩余0次，其他技能无限制
             piece.skills = [{ 
               skillId: action.skillId, 
               level: 1, 
-              currentCooldown: skillDef.cooldownTurns 
+              currentCooldown: skillDef.cooldownTurns,
+              usesRemaining: usesRemaining
             }]
-            console.log(`Initialized skills for piece and added cooldown for ${action.skillId}: ${skillDef.cooldownTurns} turns`)
+            console.log(`Initialized skills for piece and added cooldown for ${action.skillId}: ${skillDef.cooldownTurns} turns, uses remaining: ${usesRemaining}`)
           }
         }
       }
@@ -485,16 +547,6 @@ export function applyBattleAction(
         )
       }
 
-      // 检查技能是否在冷却中
-      if (piece.skills) {
-        const skillState = piece.skills.find(s => s.skillId === action.skillId)
-        if (skillState && skillState.currentCooldown && skillState.currentCooldown > 0) {
-          throw new BattleRuleError(
-            `Skill ${action.skillId} is on cooldown for ${skillState.currentCooldown} more turns`,
-          )
-        }
-      }
-
       console.log('Executing skill with ID:', action.skillId)
       console.log('Available skills:', Object.keys(next.skillsById))
       
@@ -508,20 +560,41 @@ export function applyBattleAction(
           name: action.skillId,
           description: "Default skill",
           kind: "active",
-          type: "normal",
+          type: "super",
           cooldownTurns: 0,
           maxCharges: 0,
+          chargeCost: 1,
           powerMultiplier: 1,
           code: "function executeSkill(context) { return { message: 'Skill executed', success: true } }",
-          effects: [],
           range: "self",
-          requiresTarget: false
+          requiresTarget: false,
+          actionPointCost: 2
+        }
+      }
+      
+      // 检查行动点是否足够
+      const playerMeta = getPlayerMeta(state, action.playerId)
+      if (playerMeta.actionPoints < skillDef.actionPointCost) {
+        throw new BattleRuleError(`Not enough action points to use ${skillDef.name}`)
+      }
+
+      // 检查技能是否在冷却中
+      if (piece.skills) {
+        const skillState = piece.skills.find(s => s.skillId === action.skillId)
+        if (skillState && skillState.currentCooldown && skillState.currentCooldown > 0) {
+          throw new BattleRuleError(
+            `Skill ${action.skillId} is on cooldown for ${skillState.currentCooldown} more turns`,
+          )
+        }
+        
+        // 检查限定技的使用次数
+        if (skillState && skillDef.type === "ultimate" && skillState.usesRemaining <= 0) {
+          throw new BattleRuleError(`Ultimate skill ${action.skillId} has already been used`)
         }
       }
       
       console.log('Skill definition used:', skillDef)
 
-      const playerMeta = getPlayerMeta(next, action.playerId)
       const cost = skillDef.chargeCost ?? 0
       if (cost > 0 && playerMeta.chargePoints < cost) {
         throw new BattleRuleError("Not enough charge points to use this skill")
@@ -566,31 +639,48 @@ export function applyBattleAction(
         // 效果已经在技能执行时直接应用，这里只需要处理返回的消息
         console.log('Skill executed:', result.message)
         
+        // 消耗行动点
+        const playerMeta = getPlayerMeta(next, action.playerId)
+        playerMeta.actionPoints -= skillDef.actionPointCost
+        
         // 设置技能冷却
-        if (skillDef.cooldownTurns > 0) {
+        if (skillDef.cooldownTurns > 0 || skillDef.type === "ultimate") {
           // 找到棋子的技能状态并设置冷却
           if (piece.skills) {
             const skillIndex = piece.skills.findIndex(s => s.skillId === action.skillId)
             if (skillIndex !== -1) {
-              piece.skills[skillIndex].currentCooldown = skillDef.cooldownTurns
-              console.log(`Set cooldown for skill ${action.skillId}: ${skillDef.cooldownTurns} turns`)
+              // 设置冷却
+              if (skillDef.cooldownTurns > 0) {
+                piece.skills[skillIndex].currentCooldown = skillDef.cooldownTurns
+                console.log(`Set cooldown for skill ${action.skillId}: ${skillDef.cooldownTurns} turns`)
+              }
+              
+              // 减少限定技使用次数
+              if (skillDef.type === "ultimate") {
+                piece.skills[skillIndex].usesRemaining -= 1
+                console.log(`Used ultimate skill ${action.skillId}, ${piece.skills[skillIndex].usesRemaining} uses remaining`)
+              }
             } else {
               // 如果技能不在棋子的技能列表中，添加它
+              const usesRemaining = skillDef.type === "ultimate" ? 0 : -1 // 限定技使用后剩余0次，其他技能无限制
               piece.skills.push({ 
                 skillId: action.skillId, 
                 level: 1, 
-                currentCooldown: skillDef.cooldownTurns 
+                currentCooldown: skillDef.cooldownTurns, 
+                usesRemaining: usesRemaining
               })
-              console.log(`Added skill ${action.skillId} to piece with cooldown: ${skillDef.cooldownTurns} turns`)
+              console.log(`Added skill ${action.skillId} to piece with cooldown: ${skillDef.cooldownTurns} turns, uses remaining: ${usesRemaining}`)
             }
           } else {
             // 如果棋子没有skills属性，初始化它
+            const usesRemaining = skillDef.type === "ultimate" ? 0 : -1 // 限定技使用后剩余0次，其他技能无限制
             piece.skills = [{ 
               skillId: action.skillId, 
               level: 1, 
-              currentCooldown: skillDef.cooldownTurns 
+              currentCooldown: skillDef.cooldownTurns,
+              usesRemaining: usesRemaining
             }]
-            console.log(`Initialized skills for piece and added cooldown for ${action.skillId}: ${skillDef.cooldownTurns} turns`)
+            console.log(`Initialized skills for piece and added cooldown for ${action.skillId}: ${skillDef.cooldownTurns} turns, uses remaining: ${usesRemaining}`)
           }
         }
       }

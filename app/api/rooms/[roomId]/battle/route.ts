@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import roomStore from "@/lib/game/room-store"
+import { roomStore } from "@/lib/game/room-store"
 import {
   type BattleAction,
   applyBattleAction,
@@ -57,7 +57,7 @@ export async function POST(
   try {
     const nextState = applyBattleAction(room.battleState, body)
     room.battleState = nextState
-    rooms.setRoom(room.id, room)
+    rooms.updateBattleState(room.id, nextState)
 
     return NextResponse.json(nextState)
   } catch (e) {

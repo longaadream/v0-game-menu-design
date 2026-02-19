@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import type { BattleState } from "@/lib/game/turn"
-import roomStore, { type Room } from "@/lib/game/room-store"
+import { roomStore, type Room } from "@/lib/game/room-store"
 
 // 导出 Room 类型供其他文件使用
 export type { Room }

@@ -3,7 +3,7 @@ import { createInitialBattleForPlayers } from "@/lib/game/battle-setup"
 import { getPieceById } from "@/lib/game/piece-repository"
 import type { BattleState } from "@/lib/game/turn"
 import type { PieceTemplate } from "@/lib/game/piece"
-import roomStore, { type Room } from "@/lib/game/room-store"
+import { roomStore, type Room } from "@/lib/game/room-store"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ roomId: string }> }) {
   let body: unknown
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
   const { playerId, playerName, action, pieces } = (body as { 
     playerId?: string
     playerName?: string
-    action?: "select-pieces" | "start-game" | "claim-faction"
+    action?: "select-pieces" | "start-game" | "claim-faction" | "join"
     pieces?: Array<{ templateId: string; faction: string }>
   }) ?? {}
 
@@ -28,6 +28,46 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
   const room = roomStore.getRoom(roomId)
   if (!room) {
     return NextResponse.json({ error: "Room not found" }, { status: 404 })
+  }
+
+  if (action === "join") {
+    const trimmedPlayerId = playerId?.trim()
+    const trimmedPlayerName = playerName?.trim()
+    if (!trimmedPlayerId) {
+      return NextResponse.json({ error: "playerId is required" }, { status: 400 })
+    }
+
+    if (room.status !== "waiting") {
+      return NextResponse.json(
+        { error: "Cannot join a game that has already started or finished" },
+        { status: 400 }
+      )
+    }
+
+    if (room.players.length >= room.maxPlayers) {
+      return NextResponse.json({ error: "Room is full" }, { status: 400 })
+    }
+
+    const existing = room.players.find(
+      (p) => p.id === trimmedPlayerId,
+    )
+
+    if (!existing) {
+      const player = {
+        id: trimmedPlayerId,
+        name: trimmedPlayerName || `Player ${trimmedPlayerId.slice(0, 8)}`,
+        joinedAt: Date.now(),
+      }
+      room.players.push(player)
+      
+      // 如果房间还没有房主，将当前加入的玩家设置为房主
+      if (!room.hostId) {
+        room.hostId = trimmedPlayerId
+      }
+    }
+
+    roomStore.setRoom(room.id, room)
+    return NextResponse.json(room)
   }
 
   if (action === "claim-faction") {
@@ -198,7 +238,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
     
     console.log('Player selected pieces info:', playerSelectedPieces)
     
-    const battle = createInitialBattleForPlayers(playerIds, pieceTemplates, playerSelectedPieces)
+    // 尝试获取地图 ID，如果没有则使用默认地图
+    const mapId = latestRoom.mapId || "arena-8x6"
+    
+    const battle = await createInitialBattleForPlayers(playerIds, pieceTemplates, playerSelectedPieces, mapId)
 
     if (!battle) {
       return NextResponse.json(
@@ -206,6 +249,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
         { status: 500 },
       )
     }
+    
+    console.log('Battle created successfully:', battle)
 
     latestRoom.status = "in-progress"
     latestRoom.currentTurnIndex = 0

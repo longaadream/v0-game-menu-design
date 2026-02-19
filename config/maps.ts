@@ -8,11 +8,25 @@ loadMaps().catch(error => {
 export const DEFAULT_MAP_ID = "arena-8x6"
 
 // 获取地图
+export async function getMapAsync(id: string): Promise<BoardMap | undefined> {
+  // 确保地图数据已经加载
+  await loadMaps()
+  return getMapById(id)
+}
+
+// 同步获取地图（用于不需要等待加载完成的场景）
 export function getMap(id: string): BoardMap | undefined {
   return getMapById(id)
 }
 
 // 获取所有地图
+export async function listMapsAsync(): Promise<BoardMap[]> {
+  // 确保地图数据已经加载
+  await loadMaps()
+  return getAllMaps()
+}
+
+// 同步获取所有地图（用于不需要等待加载完成的场景）
 export function listMaps(): BoardMap[] {
   return getAllMaps()
 }

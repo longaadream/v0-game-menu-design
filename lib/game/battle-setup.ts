@@ -1,4 +1,4 @@
-import { getMap, DEFAULT_MAP_ID } from "@/config/maps"
+import { getMapAsync, getMap, DEFAULT_MAP_ID, loadMaps } from "@/config/maps"
 import type { BoardMap } from "./map"
 import type { PieceInstance, PieceTemplate, PieceStats } from "./piece"
 import type { SkillDefinition, SkillState } from "./skills"
@@ -6,6 +6,11 @@ import type { BattleState, PlayerId } from "./turn"
 import { loadJsonFilesServer } from "./file-loader"
 import { DEFAULT_PIECES } from "./piece-repository"
 import { globalTriggerSystem } from "./triggers"
+
+// 确保地图数据在模块加载时就被加载
+loadMaps().catch(error => {
+  console.error('Error loading maps in battle-setup:', error)
+})
 
 export function buildDefaultSkills(): Record<string, SkillDefinition> {
   // 从文件系统加载技能数据
@@ -133,12 +138,17 @@ export function buildInitialPiecesForPlayers(
           moveRange: pieceTemplate.stats.moveRange,
           x: position.x,
           y: position.y,
-          skills: pieceTemplate.skills.map(s => ({
-            skillId: s.skillId,
-            currentCooldown: 0,
-            currentCharges: 0,
-            unlocked: true,
-          } as SkillState)),
+          skills: pieceTemplate.skills.map(s => {
+            // 检查技能是否为限定技
+            const isUltimate = s.skillId.includes('ultimate') || s.skillId.includes('ult');
+            return {
+              skillId: s.skillId,
+              currentCooldown: 0,
+              currentCharges: 0,
+              unlocked: true,
+              usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
+            } as SkillState;
+          }),
         })
         pieceIndex++
         
@@ -178,12 +188,17 @@ export function buildInitialPiecesForPlayers(
           moveRange: pieceTemplate.stats.moveRange,
           x: position.x,
           y: position.y,
-          skills: pieceTemplate.skills.map(s => ({
-            skillId: s.skillId,
-            currentCooldown: 0,
-            currentCharges: 0,
-            unlocked: true,
-          } as SkillState)),
+          skills: pieceTemplate.skills.map(s => {
+            // 检查技能是否为限定技
+            const isUltimate = s.skillId.includes('ultimate') || s.skillId.includes('ult');
+            return {
+              skillId: s.skillId,
+              currentCooldown: 0,
+              currentCharges: 0,
+              unlocked: true,
+              usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
+            } as SkillState;
+          }),
         })
         redPieceIndex++
       })
@@ -205,12 +220,17 @@ export function buildInitialPiecesForPlayers(
           moveRange: pieceTemplate.stats.moveRange,
           x: position.x,
           y: position.y,
-          skills: pieceTemplate.skills.map(s => ({
-            skillId: s.skillId,
-            currentCooldown: 0,
-            currentCharges: 0,
-            unlocked: true,
-          } as SkillState)),
+          skills: pieceTemplate.skills.map(s => {
+            // 检查技能是否为限定技
+            const isUltimate = s.skillId.includes('ultimate') || s.skillId.includes('ult');
+            return {
+              skillId: s.skillId,
+              currentCooldown: 0,
+              currentCharges: 0,
+              unlocked: true,
+              usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
+            } as SkillState;
+          }),
         })
         bluePieceIndex++
       })
@@ -244,12 +264,17 @@ export function buildInitialPiecesForPlayers(
           moveRange: pieceTemplate.stats.moveRange,
           x: position.x,
           y: position.y,
-          skills: pieceTemplate.skills.map(s => ({
-            skillId: s.skillId,
-            currentCooldown: 0,
-            currentCharges: 0,
-            unlocked: true,
-          } as SkillState)),
+          skills: pieceTemplate.skills.map(s => {
+            // 检查技能是否为限定技
+            const isUltimate = s.skillId.includes('ultimate') || s.skillId.includes('ult');
+            return {
+              skillId: s.skillId,
+              currentCooldown: 0,
+              currentCharges: 0,
+              unlocked: true,
+              usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
+            } as SkillState;
+          }),
         })
         
         if (isRedPlayer) {
@@ -291,12 +316,17 @@ export function buildInitialPiecesForPlayers(
       moveRange: defaultRedPiece.stats.moveRange,
       x: redPosition.x,
       y: redPosition.y,
-      skills: defaultRedPiece.skills.map(s => ({
-        skillId: s.skillId,
-        currentCooldown: 0,
-        currentCharges: 0,
-        unlocked: true,
-      })),
+      skills: defaultRedPiece.skills.map(s => {
+        // 检查技能是否为限定技
+        const isUltimate = s.skillId.includes('ultimate') || s.skillId.includes('ult');
+        return {
+          skillId: s.skillId,
+          currentCooldown: 0,
+          currentCharges: 0,
+          unlocked: true,
+          usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
+        };
+      }),
     })
     
     // 添加默认蓝方棋子
@@ -313,12 +343,17 @@ export function buildInitialPiecesForPlayers(
       moveRange: defaultBluePiece.stats.moveRange,
       x: bluePosition.x,
       y: bluePosition.y,
-      skills: defaultBluePiece.skills.map(s => ({
-        skillId: s.skillId,
-        currentCooldown: 0,
-        currentCharges: 0,
-        unlocked: true,
-      })),
+      skills: defaultBluePiece.skills.map(s => {
+        // 检查技能是否为限定技
+        const isUltimate = s.skillId.includes('ultimate') || s.skillId.includes('ult');
+        return {
+          skillId: s.skillId,
+          currentCooldown: 0,
+          currentCharges: 0,
+          unlocked: true,
+          usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
+        };
+      }),
     })
   } else {
     // 检查是否每个玩家至少有一个棋子
@@ -345,12 +380,17 @@ export function buildInitialPiecesForPlayers(
         moveRange: defaultRedPiece.stats.moveRange,
         x: position.x,
         y: position.y,
-        skills: defaultRedPiece.skills.map(s => ({
-          skillId: s.skillId,
-          currentCooldown: 0,
-          currentCharges: 0,
-          unlocked: true,
-        })),
+        skills: defaultRedPiece.skills.map(s => {
+          // 检查技能是否为限定技
+          const isUltimate = s.skillId.includes('ultimate') || s.skillId.includes('ult');
+          return {
+            skillId: s.skillId,
+            currentCooldown: 0,
+            currentCharges: 0,
+            unlocked: true,
+            usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
+          };
+        }),
       })
     }
     
@@ -371,12 +411,17 @@ export function buildInitialPiecesForPlayers(
         moveRange: defaultBluePiece.stats.moveRange,
         x: position.x,
         y: position.y,
-        skills: defaultBluePiece.skills.map(s => ({
-          skillId: s.skillId,
-          currentCooldown: 0,
-          currentCharges: 0,
-          unlocked: true,
-        })),
+        skills: defaultBluePiece.skills.map(s => {
+          // 检查技能是否为限定技
+          const isUltimate = s.skillId.includes('ultimate') || s.skillId.includes('ult');
+          return {
+            skillId: s.skillId,
+            currentCooldown: 0,
+            currentCharges: 0,
+            unlocked: true,
+            usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
+          };
+        }),
       })
     }
   }
@@ -387,22 +432,29 @@ export function buildInitialPiecesForPlayers(
   return pieces
 }
 
-export function createInitialBattleForPlayers(
+export async function createInitialBattleForPlayers(
   playerIds: PlayerId[],
   selectedPieces: PieceTemplate[],
   playerSelectedPieces?: Array<{ playerId: string; pieces: PieceTemplate[] }>,
   mapId?: string,
-): BattleState | null {
+): Promise<BattleState | null> {
   if (playerIds.length !== 2) return null
 
   const [p1, p2] = playerIds
   
   // 尝试获取指定地图或默认地图
-  const map = getMap(mapId || DEFAULT_MAP_ID)
+  let map = getMap(mapId || DEFAULT_MAP_ID)
   
-  // 如果地图没有加载成功，使用默认地图
+  // 如果地图没有加载成功，尝试异步加载
   if (!map) {
-    console.warn(`Map ${DEFAULT_MAP_ID} not found, using default map`)
+    console.warn(`Map ${mapId || DEFAULT_MAP_ID} not found in cache, trying to load...`)
+    await loadMaps()
+    map = getMap(mapId || DEFAULT_MAP_ID)
+  }
+  
+  // 如果地图仍然没有加载成功，使用默认地图
+  if (!map) {
+    console.warn(`Map ${mapId || DEFAULT_MAP_ID} not found, using default map`)
     
     // 创建一个更真实的默认地图，包含墙壁和不同类型的格子
     const defaultMap: BoardMap = {
@@ -446,39 +498,7 @@ export function createInitialBattleForPlayers(
       }
     }
     
-    const pieces = buildInitialPiecesForPlayers(defaultMap, playerIds, selectedPieces, playerSelectedPieces)
-    // 玩家数组已按红方在前、蓝方在后的顺序排序，所以第一个玩家是红方
-    const redPlayer = playerIds[0]
-    
-    const skills = buildDefaultSkills()
-    console.log('Skills for battle:', Object.keys(skills))
-    console.log('Teleport in skills:', 'teleport' in skills)
-    
-    // 收集所有规则ID
-    const ruleIds = collectRuleIds(selectedPieces, defaultMap as any)
-    // 加载指定的规则
-    globalTriggerSystem.loadSpecificRules(ruleIds)
-    
-    return {
-      map: defaultMap,
-      pieces,
-      pieceStatsByTemplateId: buildDefaultPieceStats(),
-      skillsById: skills,
-      players: [
-        { playerId: p1, chargePoints: 0 },
-        { playerId: p2, chargePoints: 0 },
-      ],
-      turn: {
-        currentPlayerId: redPlayer,
-        turnNumber: 1,
-        phase: "start",
-        actions: {
-          hasMoved: false,
-          hasUsedBasicSkill: false,
-          hasUsedChargeSkill: false,
-        },
-      },
-    }
+    map = defaultMap
   }
 
   const pieces = buildInitialPiecesForPlayers(map, playerIds, selectedPieces, playerSelectedPieces)
@@ -500,8 +520,8 @@ export function createInitialBattleForPlayers(
     pieceStatsByTemplateId: buildDefaultPieceStats(),
     skillsById: skills,
     players: [
-      { playerId: p1, chargePoints: 0 },
-      { playerId: p2, chargePoints: 0 },
+      { playerId: p1, chargePoints: 0, actionPoints: 1, maxActionPoints: 10 },
+      { playerId: p2, chargePoints: 0, actionPoints: 1, maxActionPoints: 10 },
     ],
     turn: {
       currentPlayerId: redPlayer,

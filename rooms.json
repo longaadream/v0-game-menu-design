@@ -26574,20 +26574,56 @@
     }
   },
   {
-    "id": "5hyvc",
+    "id": "dbvvq",
+    "name": "yogdizewa 的 1v1 房间",
+    "status": "waiting",
+    "createdAt": 1771492390648,
+    "maxPlayers": 2,
+    "players": [
+      {
+        "id": "user_1771484840385_7362",
+        "name": "yogdizewa",
+        "joinedAt": 1771492390718,
+        "faction": "red",
+        "selectedPieces": [
+          {
+            "templateId": "red-mage",
+            "faction": "red"
+          },
+          {
+            "templateId": "red-warrior",
+            "faction": "red"
+          },
+          {
+            "templateId": "red-archer",
+            "faction": "red"
+          }
+        ],
+        "hasSelectedPieces": true
+      }
+    ],
+    "hostId": "user_1771484840385_7362",
+    "mapId": "arena-8x6",
+    "visibility": "private",
+    "currentTurnIndex": 0,
+    "actions": [],
+    "battleState": null
+  },
+  {
+    "id": "ti3ao",
     "name": "admin 的 1v1 房间",
     "status": "in-progress",
-    "createdAt": 1771484264076,
+    "createdAt": 1771493287921,
     "maxPlayers": 2,
     "players": [
       {
         "id": "user_1771360858632_9522",
         "name": "admin",
-        "joinedAt": 1771484264115,
+        "joinedAt": 1771493287961,
         "faction": "red",
         "selectedPieces": [
           {
-            "templateId": "red-warrior",
+            "templateId": "red-mage",
             "faction": "red"
           },
           {
@@ -26600,7 +26636,7 @@
       {
         "id": "user_1771361118594_8536",
         "name": "Longaadream",
-        "joinedAt": 1771484270963,
+        "joinedAt": 1771493294476,
         "faction": "blue",
         "selectedPieces": [
           {
@@ -27113,28 +27149,30 @@
       "pieces": [
         {
           "instanceId": "user_1771360858632_9522-1",
-          "templateId": "red-warrior",
+          "templateId": "red-mage",
           "ownerPlayerId": "user_1771360858632_9522",
           "faction": "red",
-          "currentHp": 6,
-          "maxHp": 6,
-          "attack": 1,
+          "currentHp": 3,
+          "maxHp": 3,
+          "attack": 2,
           "defense": 0,
-          "moveRange": 3,
-          "x": 4,
-          "y": 2,
+          "moveRange": 2,
+          "x": 6,
+          "y": 1,
           "skills": [
             {
-              "skillId": "basic-attack",
-              "currentCooldown": 0,
+              "skillId": "teleport",
+              "currentCooldown": 2,
               "currentCharges": 0,
-              "unlocked": true
+              "unlocked": true,
+              "usesRemaining": -1
             },
             {
-              "skillId": "shield",
+              "skillId": "fireball",
               "currentCooldown": 0,
               "currentCharges": 0,
-              "unlocked": true
+              "unlocked": true,
+              "usesRemaining": -1
             }
           ]
         },
@@ -27148,20 +27186,22 @@
           "attack": 2,
           "defense": 0,
           "moveRange": 4,
-          "x": 1,
+          "x": 2,
           "y": 4,
           "skills": [
             {
               "skillId": "basic-attack",
               "currentCooldown": 0,
               "currentCharges": 0,
-              "unlocked": true
+              "unlocked": true,
+              "usesRemaining": -1
             },
             {
               "skillId": "buff-attack",
               "currentCooldown": 0,
               "currentCharges": 0,
-              "unlocked": true
+              "unlocked": true,
+              "usesRemaining": -1
             }
           ]
         },
@@ -27175,20 +27215,22 @@
           "attack": 2,
           "defense": 0,
           "moveRange": 2,
-          "x": 6,
-          "y": 1,
+          "x": 1,
+          "y": 3,
           "skills": [
             {
               "skillId": "teleport",
-              "currentCooldown": 1,
+              "currentCooldown": 0,
               "currentCharges": 0,
-              "unlocked": true
+              "unlocked": true,
+              "usesRemaining": -1
             },
             {
               "skillId": "fireball",
               "currentCooldown": 0,
               "currentCharges": 0,
-              "unlocked": true
+              "unlocked": true,
+              "usesRemaining": -1
             }
           ]
         },
@@ -27197,25 +27239,27 @@
           "templateId": "blue-archer",
           "ownerPlayerId": "user_1771361118594_8536",
           "faction": "blue",
-          "currentHp": 3,
+          "currentHp": 4,
           "maxHp": 4,
           "attack": 2,
           "defense": 0,
           "moveRange": 4,
-          "x": 2,
+          "x": 3,
           "y": 2,
           "skills": [
             {
               "skillId": "basic-attack",
               "currentCooldown": 0,
               "currentCharges": 0,
-              "unlocked": true
+              "unlocked": true,
+              "usesRemaining": -1
             },
             {
               "skillId": "buff-attack",
               "currentCooldown": 0,
               "currentCharges": 0,
-              "unlocked": true
+              "unlocked": true,
+              "usesRemaining": -1
             }
           ]
         }
@@ -27283,6 +27327,21 @@
           "previewCode": "function calculatePreview(piece, skillDef) {\n  // 计算预期伤害值\n  const damageValue = Math.round(piece.attack * skillDef.powerMultiplier);\n  \n  return {\n    description: \"选择最近的敌人，造成\" + damageValue + \"点伤害（相当于攻击力100%）\",\n    expectedValues: {\n      damage: damageValue\n    }\n  };\n}",
           "range": "single",
           "requiresTarget": true
+        },
+        "buff-attack": {
+          "id": "buff-attack",
+          "name": "攻击强化",
+          "description": "提升自身攻击力1点，增强后续攻击效果",
+          "icon": "💪",
+          "kind": "active",
+          "type": "normal",
+          "cooldownTurns": 4,
+          "maxCharges": 0,
+          "powerMultiplier": 1,
+          "code": "function executeSkill(context) {\n  // 直接修改自身的攻击力\nsourcePiece.attack = sourcePiece.attack + 1;\n  \n  return {\n    message: sourcePiece.templateId + '的攻击力提升至' + sourcePiece.attack + '点',\n    success: true\n  };\n}",
+          "previewCode": "function calculatePreview(piece, skillDef) {\n  // 固定增益值\n  const buffValue = 1;\n  \n  return {\n    description: \"提升自身攻击力\" + buffValue + \"点，增强后续攻击效果\",\n    expectedValues: {\n      buff: buffValue\n    }\n  };\n}",
+          "range": "self",
+          "requiresTarget": false
         },
         "fireball": {
           "id": "fireball",
@@ -27365,20 +27424,24 @@
       "players": [
         {
           "playerId": "user_1771360858632_9522",
-          "chargePoints": 0
+          "chargePoints": 0,
+          "actionPoints": null,
+          "maxActionPoints": 10
         },
         {
           "playerId": "user_1771361118594_8536",
-          "chargePoints": 0
+          "chargePoints": 0,
+          "actionPoints": 1,
+          "maxActionPoints": 10
         }
       ],
       "turn": {
-        "currentPlayerId": "user_1771361118594_8536",
-        "turnNumber": 6,
-        "phase": "start",
+        "currentPlayerId": "user_1771360858632_9522",
+        "turnNumber": 1,
+        "phase": "end",
         "actions": {
           "hasMoved": false,
-          "hasUsedBasicSkill": false,
+          "hasUsedBasicSkill": true,
           "hasUsedChargeSkill": false
         }
       },
@@ -27388,29 +27451,9 @@
           "playerId": "user_1771360858632_9522",
           "turn": 1,
           "payload": {
-            "message": "red-warrior 造成 1 点伤害",
-            "skillId": "basic-attack",
+            "message": "red-mage使用了传送技能",
+            "skillId": "teleport",
             "pieceId": "user_1771360858632_9522-1"
-          }
-        },
-        {
-          "type": "useBasicSkill",
-          "playerId": "user_1771361118594_8536",
-          "turn": 2,
-          "payload": {
-            "message": "blue-mage使用了传送技能",
-            "skillId": "teleport",
-            "pieceId": "user_1771361118594_8536-1"
-          }
-        },
-        {
-          "type": "useBasicSkill",
-          "playerId": "user_1771361118594_8536",
-          "turn": 4,
-          "payload": {
-            "message": "blue-mage使用了传送技能",
-            "skillId": "teleport",
-            "pieceId": "user_1771361118594_8536-1"
           }
         }
       ]

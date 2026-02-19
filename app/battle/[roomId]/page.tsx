@@ -643,6 +643,14 @@ export default function BattlePage() {
                                             </span>
                                           </div>
                                         )}
+                                        {skillDef.actionPointCost && (
+                                          <div className="flex items-center justify-between text-xs">
+                                            <span className="text-zinc-500">行动点数:</span>
+                                            <span className="text-blue-400">
+                                              {skillDef.actionPointCost} 点
+                                            </span>
+                                          </div>
+                                        )}
                                       </div>
                                     )
                                   })}
@@ -793,6 +801,14 @@ export default function BattlePage() {
                                             <span className="text-zinc-500">充能点数:</span>
                                             <span className="text-yellow-400">
                                               {skillPreview.chargeCost} 点
+                                            </span>
+                                          </div>
+                                        )}
+                                        {skillDef.actionPointCost && (
+                                          <div className="flex items-center justify-between text-xs">
+                                            <span className="text-zinc-500">行动点数:</span>
+                                            <span className="text-blue-400">
+                                              {skillDef.actionPointCost} 点
                                             </span>
                                           </div>
                                         )}
@@ -1001,7 +1017,7 @@ export default function BattlePage() {
                               }}
                             >
                               <Zap className="mr-2 h-4 w-4" />
-                              {skill.name} ({skill.type === "super" ? `充能 ${skill.chargeCost || 0}点` : "普通"})
+                              {skill.name} ({skill.type === "super" ? `充能 ${skill.chargeCost || 0}点` : "普通"}) - {skill.actionPointCost || 0}AP
                             </Button>
                           ))
                         })()}
@@ -1077,6 +1093,10 @@ export default function BattlePage() {
                         <span className="flex items-center gap-1 text-yellow-400">
                           <Zap className="h-3 w-3" />
                           {player.chargePoints}
+                        </span>
+                        <span className="flex items-center gap-1 text-blue-400">
+                          <Footprints className="h-3 w-3" />
+                          {player.actionPoints}/{player.maxActionPoints}
                         </span>
                       </div>
                     </div>

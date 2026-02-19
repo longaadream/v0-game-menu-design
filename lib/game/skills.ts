@@ -6,7 +6,7 @@ export type SkillId = string
 
 export type SkillKind = "active" | "passive"
 
-export type SkillType = "normal" | "super"
+export type SkillType = "normal" | "super" | "ultimate"
 
 
 
@@ -87,6 +87,8 @@ export interface SkillDefinition {
   areaSize?: number
   /** 是否需要目标 */
   requiresTarget: boolean
+  /** 行动点消耗 */
+  actionPointCost: number
   /** 技能图标 */
   icon?: string
 }
@@ -102,6 +104,8 @@ export interface SkillState {
   currentCharges: number
   /** 是否已解锁 / 学会 */
   unlocked: boolean
+  /** 剩余使用次数，限定技为1，其他技能为-1（无限制） */
+  usesRemaining: number
 }
 
 // 索敌模块 - 用于获取范围内的目标

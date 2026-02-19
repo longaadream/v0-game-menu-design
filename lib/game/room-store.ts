@@ -1,160 +1,132 @@
-import type { BattleState } from "./turn"
-import { readFileSync, writeFileSync, existsSync } from "fs"
-import { join } from "path"
+import type { BattleState } from './turn'
 
-type Player = {
+// 玩家类型
+export interface Player {
   id: string
   name: string
-  joinedAt: number
+  joinedAt?: number
   faction?: "red" | "blue"
   selectedPieces?: Array<{ templateId: string; faction: string }>
   hasSelectedPieces?: boolean
 }
 
-type RoomStatus = "waiting" | "in-progress" | "finished"
+// 房间状态类型
+export type RoomStatus = 'waiting' | 'ready' | 'in-progress' | 'finished'
 
-type GameAction = {
-  id: string
-  playerId: string
+// 游戏动作类型
+export interface GameAction {
   type: string
-  payload: unknown
-  createdAt: number
-  turn: number
+  playerId: string
+  payload?: any
 }
 
-export type Room = {
+// 房间类型
+export interface Room {
   id: string
   name: string
   status: RoomStatus
-  createdAt: number
-  maxPlayers: number
   players: Player[]
-  hostId: string
-  mapId: string
-  visibility: "private" | "public"
   currentTurnIndex: number
+  battleState?: BattleState
   actions: GameAction[]
-  battleState: BattleState | null
-  selectedPieces?: Array<{ templateId: string; faction: string }>
+  maxPlayers?: number
+  hostId?: string
+  mapId?: string
+  createdAt?: number
+  visibility?: "private" | "public"
 }
 
-// 存储文件路径
-const STORAGE_FILE = join(process.cwd(), "rooms.json")
-
 // 房间存储类
-class RoomStore {
-  private rooms: Map<string, Room>
+export class RoomStore {
+  private rooms: Map<string, Room> = new Map()
 
-  constructor() {
-    // 从文件加载数据
-    this.rooms = this.loadFromFile()
+  // 创建新房间
+  createRoom(roomId: string, roomName: string): Room {
+    const newRoom: Room = {
+      id: roomId,
+      name: roomName,
+      status: 'waiting',
+      players: [],
+      currentTurnIndex: 0,
+      actions: []
+    }
+    this.rooms.set(roomId, newRoom)
+    return newRoom
   }
 
-  // 从文件加载
-  private loadFromFile(): Map<string, Room> {
-    try {
-      if (existsSync(STORAGE_FILE)) {
-        const data = readFileSync(STORAGE_FILE, "utf8")
-        const roomsArray = JSON.parse(data)
-        const map = new Map<string, Room>()
-        roomsArray.forEach((room: Room) => map.set(room.id, room))
-        return map
-      }
-    } catch (error) {
-      console.error("Failed to load rooms from file:", error)
-    }
-    return new Map<string, Room>()
-  }
-
-  // 保存到文件
-  private saveToFile(): void {
-    try {
-      const roomsArray = Array.from(this.rooms.values())
-      writeFileSync(STORAGE_FILE, JSON.stringify(roomsArray, null, 2))
-    } catch (error) {
-      console.error("Failed to save rooms to file:", error)
-    }
+  // 获取房间
+  getRoom(roomId: string): Room | undefined {
+    return this.rooms.get(roomId)
   }
 
   // 获取所有房间
+  getAllRooms(): Room[] {
+    return Array.from(this.rooms.values())
+  }
+
+  // 获取所有房间（返回 Map 实例）
   getRooms(): Map<string, Room> {
     return this.rooms
   }
 
-  // 标准化房间ID（转换为小写，确保大小写不敏感）
-  private normalizeId(id: string): string {
-    return id.toLowerCase()
+  // 添加玩家到房间
+  addPlayer(roomId: string, player: Player): boolean {
+    const room = this.rooms.get(roomId)
+    if (!room || room.status !== 'waiting') {
+      return false
+    }
+    if (room.players.some(p => p.id === player.id)) {
+      return false
+    }
+    room.players.push(player)
+    return true
   }
 
-  // 获取单个房间（大小写不敏感）
-  getRoom(id: string): Room | undefined {
-    const normalizedId = this.normalizeId(id)
-    return this.rooms.get(normalizedId)
+  // 更新房间状态
+  updateRoomStatus(roomId: string, status: RoomStatus): boolean {
+    const room = this.rooms.get(roomId)
+    if (!room) {
+      return false
+    }
+    room.status = status
+    return true
   }
 
-  // 分配玩家身份
-  assignFaction(room: Room, playerId: string): "red" | "blue" | null {
-    // 检查玩家是否已经有身份
-    const existingPlayer = room.players.find(p => p.id === playerId)
-    if (existingPlayer && existingPlayer.faction) {
-      return existingPlayer.faction
+  // 更新房间的战斗状态
+  updateBattleState(roomId: string, battleState: BattleState): boolean {
+    const room = this.rooms.get(roomId)
+    if (!room) {
+      return false
     }
-
-    // 检查已分配的身份
-    const assignedFactions = room.players.map(p => p.faction).filter(Boolean) as Array<"red" | "blue">
-    
-    // 如果两个身份都已分配，返回null
-    if (assignedFactions.length >= 2) {
-      return null
-    }
-
-    // 如果还没有分配身份，随机分配一个
-    if (assignedFactions.length === 0) {
-      const randomFaction = Math.random() > 0.5 ? "red" : "blue"
-      if (existingPlayer) {
-        existingPlayer.faction = randomFaction
-      }
-      return randomFaction
-    }
-
-    // 如果已经分配了一个身份，分配剩下的那个
-    const remainingFaction = assignedFactions[0] === "red" ? "blue" : "red"
-    if (existingPlayer) {
-      existingPlayer.faction = remainingFaction
-    }
-    return remainingFaction
+    room.battleState = battleState
+    return true
   }
 
-  // 添加房间
-  setRoom(id: string, room: Room): void {
-    const normalizedId = this.normalizeId(id)
-    // 更新房间对象的ID为标准化后的ID
-    const normalizedRoom = { ...room, id: normalizedId }
-    console.log('Saving room:', normalizedId, room.name)
-    this.rooms.set(normalizedId, normalizedRoom)
-    this.saveToFile()
-    console.log('Rooms in store:', Array.from(this.rooms.keys()))
+  // 添加游戏动作到房间
+  addAction(roomId: string, action: GameAction): boolean {
+    const room = this.rooms.get(roomId)
+    if (!room) {
+      return false
+    }
+    room.actions.push(action)
+    return true
   }
 
-  // 删除房间（大小写不敏感）
-  deleteRoom(id: string): boolean {
-    const normalizedId = this.normalizeId(id)
-    const result = this.rooms.delete(normalizedId)
-    this.saveToFile()
-    return result
+  // 移除房间
+  removeRoom(roomId: string): boolean {
+    return this.rooms.delete(roomId)
+  }
+
+  // 设置房间
+  setRoom(roomId: string, room: Room): void {
+    this.rooms.set(roomId, room)
+  }
+
+  // 删除房间
+  deleteRoom(roomId: string): boolean {
+    return this.rooms.delete(roomId)
   }
 }
 
-// 导出单例实例（使用 globalThis 确保跨模块共享）
-declare global {
-  // eslint-disable-next-line no-var
-  var __roomStore: RoomStore | undefined
-}
-
-const roomStore = globalThis.__roomStore ?? new RoomStore()
-
-if (!globalThis.__roomStore) {
-  globalThis.__roomStore = roomStore
-}
-
-export default roomStore
+// 导出单例实例
+export const roomStore = new RoomStore()

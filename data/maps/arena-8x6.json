@@ -27,6 +27,18 @@
       "type": "cover",
       "walkable": true,
       "bulletPassable": false
+    },
+    {
+      "char": "S",
+      "type": "spawn",
+      "walkable": true,
+      "bulletPassable": true
+    },
+    {
+      "char": "H",
+      "type": "hole",
+      "walkable": false,
+      "bulletPassable": true
     }
   ],
   "rules": []
