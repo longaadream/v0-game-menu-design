@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { toast } from "sonner"
 import { getPiecesByFaction, loadPieces, type PieceTemplate } from "@/lib/game/piece-repository"
 
 type User = {
@@ -74,9 +75,12 @@ export default function PieceSelectionPage() {
 
     const interval = setInterval(async () => {
       try {
+        console.log('Polling room status:', { roomId, timestamp: Date.now() })
         const res = await fetch(`/api/rooms/${encodeURIComponent(roomId)}`)
+        console.log('Fetch response status:', { status: res.status, statusText: res.statusText })
         if (res.ok) {
           const data = await res.json()
+          console.log('Room data received:', data)
           // 检查房间状态是否已经是"in-progress"，如果是，直接跳转到战斗页面
           if (data.status === "in-progress") {
             console.log('Room is already in progress, redirecting to battle')
@@ -86,6 +90,7 @@ export default function PieceSelectionPage() {
           
           // 更新房间状态
           if (data.players) {
+            console.log('Updating room status with players:', data.players)
             setRoomStatus(data.players.length === 2 ? "ready" : "waiting")
             
             // 更新玩家列表和棋子选择状态
@@ -99,6 +104,16 @@ export default function PieceSelectionPage() {
             const allSelected = data.players.length >= 2 && data.players.every((p: any) => p.hasSelectedPieces)
             setAllPlayersSelected(allSelected)
             
+            // 输出详细的房间状态以便调试
+            console.log('Room status update:', {
+              roomId,
+              playersCount: data.players.length,
+              players: data.players.map((p: any) => ({ id: p.id, name: p.name, hasSelectedPieces: p.hasSelectedPieces, faction: p.faction })),
+              allSelected,
+              isPiecesSelected,
+              roomStatus: data.status
+            })
+            
             // 如果所有玩家都选择了棋子，并且当前玩家也选择了棋子，自动开始游戏
             if (allSelected && isPiecesSelected) {
               console.log('All players have selected pieces, auto-starting game')
@@ -107,7 +122,11 @@ export default function PieceSelectionPage() {
                 void handleStartGame()
               }, 1000)
             }
+          } else {
+            console.log('No players data in room response:', data)
           }
+        } else {
+          console.log('Failed to fetch room status:', { status: res.status, statusText: res.statusText })
         }
       } catch (error) {
         console.error('Error polling room status:', error)
@@ -137,11 +156,11 @@ export default function PieceSelectionPage() {
 
   async function handleJoinRoom() {
     if (!user) {
-      setError("请先登录")
+      toast.error("请先登录")
       return
     }
     if (!roomId.trim()) {
-      setError("请输入房间ID")
+      toast.error("请输入房间ID")
       return
     }
     if (loading) {
@@ -149,7 +168,6 @@ export default function PieceSelectionPage() {
       return
     }
     setLoading(true)
-    setError(null)
 
     try {
       console.log('Attempting to join room:', roomId)
@@ -216,7 +234,6 @@ export default function PieceSelectionPage() {
                 if (factionData.success) {
                   setPlayerFaction(factionData.faction)
                   setRoomStatus(roomData.players.length === 2 ? "ready" : "waiting")
-                  setError(null)
                   return
                 }
               }
@@ -251,14 +268,13 @@ export default function PieceSelectionPage() {
         if (factionData.success) {
           setPlayerFaction(factionData.faction)
           setRoomStatus(data.players.length === 2 ? "ready" : "waiting")
-          setError(null)
           console.log('Faction claimed successfully:', factionData.faction)
         }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "加入房间失败"
       console.error('Join room error:', err)
-      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -266,15 +282,11 @@ export default function PieceSelectionPage() {
 
   function handleStartGame() {
     if (!user) {
-      setError("请先登录")
+      toast.error("请先登录")
       return
     }
     if (!roomId.trim()) {
-      setError("请先加入房间")
-      return
-    }
-    if (roomPlayers.length < 2) {
-      setError("房间中至少需要2个玩家才能开始游戏")
+      toast.error("请先加入房间")
       return
     }
     if (loading) {
@@ -282,12 +294,12 @@ export default function PieceSelectionPage() {
       return
     }
     setLoading(true)
-    setError(null)
 
     console.log('Attempting to start game:', {
       roomId,
       userId: user.id,
-      selectedPiecesCount: playerFaction === "red" ? redSelectedPieces.length : blueSelectedPieces.length
+      selectedPiecesCount: playerFaction === "red" ? redSelectedPieces.length : blueSelectedPieces.length,
+      clientSidePlayersCount: roomPlayers.length
     })
 
     // 根据玩家的实际身份发送选择的棋子
@@ -319,13 +331,13 @@ export default function PieceSelectionPage() {
           console.log('Game started successfully, redirecting to battle')
           window.location.href = `/battle/${roomId}?playerName=${encodeURIComponent(user.username)}&playerId=${encodeURIComponent(user.id)}`
         } else {
-          console.log('Game start failed:', data.message)
-          setError(data.message || "开始游戏失败")
+          console.log('Game start failed:', data.error || data.message)
+          toast.error(data.error || data.message || "开始游戏失败")
         }
       })
       .catch((err) => {
         console.error('Error starting game:', err)
-        setError(err instanceof Error ? err.message : "开始游戏失败")
+        toast.error(err instanceof Error ? err.message : "开始游戏失败")
       })
       .finally(() => {
         setLoading(false)
@@ -334,23 +346,22 @@ export default function PieceSelectionPage() {
 
   function handleSelectPieces() {
     if (!user) {
-      setError("请先登录")
+      toast.error("请先登录")
       return
     }
     if (!roomId.trim()) {
-      setError("请先加入房间")
+      toast.error("请先加入房间")
       return
     }
     if (playerFaction === "red" && redSelectedPieces.length === 0) {
-      setError("请选择至少1个红方棋子")
+      toast.error("请选择至少1个红方棋子")
       return
     }
     if (playerFaction === "blue" && blueSelectedPieces.length === 0) {
-      setError("请选择至少1个蓝方棋子")
+      toast.error("请选择至少1个蓝方棋子")
       return
     }
     setLoading(true)
-    setError(null)
 
     const selectedPieces = playerFaction === "red" ? redSelectedPieces : blueSelectedPieces
     
@@ -377,21 +388,16 @@ export default function PieceSelectionPage() {
       })
       .then((data) => {
         if (data.success) {
-          setError(null)
-          setSuccess("棋子选择成功！")
+          toast.success("棋子选择成功！")
           setIsPiecesSelected(true)
-          // 3秒后清除成功消息
-          setTimeout(() => {
-            setSuccess(null)
-          }, 3000)
         } else {
-          setError(data.message || "选择棋子失败")
+          toast.error(data.message || "选择棋子失败")
         }
       })
       .catch((err) => {
         const errorMessage = err instanceof Error ? err.message : "选择棋子失败"
         console.error('Select pieces error:', err)
-        setError(errorMessage)
+        toast.error(errorMessage)
       })
       .finally(() => {
         setLoading(false)
@@ -522,16 +528,6 @@ export default function PieceSelectionPage() {
                   {roomStatus === "ready" && (
                     <div className="rounded-md bg-green-900/50 border border-green-800 p-3 text-sm text-green-100">
                       双方都已加入，可以开始游戏
-                    </div>
-                  )}
-                  {error && (
-                    <div className="rounded-md bg-red-900/50 border border-red-800 p-3 text-sm text-red-100">
-                      {error}
-                    </div>
-                  )}
-                  {success && (
-                    <div className="rounded-md bg-green-900/50 border border-green-800 p-3 text-sm text-green-100">
-                      {success}
                     </div>
                   )}
                 </div>

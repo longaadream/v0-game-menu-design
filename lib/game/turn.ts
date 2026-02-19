@@ -9,6 +9,8 @@ export type PlayerId = string
 
 export interface PlayerTurnMeta {
   playerId: PlayerId
+  /** 玩家昵称 */
+  name?: string
   /** 当前累计的充能点数（用于释放充能技能） */
   chargePoints: number
   /** 当前行动点 */
@@ -145,8 +147,7 @@ function validateMove(
     throw new BattleRuleError("Move must be in a straight line (rook-style)")
   }
 
-  const stats = state.pieceStatsByTemplateId[piece.templateId]
-  const maxRange = stats?.moveRange
+  const maxRange = piece.moveRange
   const distance = Math.abs(piece.x - toX) + Math.abs(piece.y - toY)
   if (maxRange != null && maxRange > 0 && distance > maxRange) {
     throw new BattleRuleError("Move distance exceeds piece moveRange")

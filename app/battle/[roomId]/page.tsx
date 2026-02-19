@@ -7,6 +7,7 @@ import { ArrowLeft, Loader2, Swords, Shield, Zap, Footprints, Flag } from "lucid
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { toast } from "sonner"
 import { GameBoard } from "@/components/game-board"
 import type { BattleState, BattleAction } from "@/lib/game/turn"
 import { getPieceById, loadPieces } from "@/lib/game/piece-repository"
@@ -97,7 +98,6 @@ export default function BattlePage() {
     if (!roomId) return
     try {
       setLoading(true)
-      setError(null)
       const res = await fetch(`/api/rooms/${roomId}/battle`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,11 +105,14 @@ export default function BattlePage() {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        throw new Error(data.error || "Failed to apply battle action")
+        // 使用toast通知显示错误信息，而不是设置错误状态
+        toast.error(data.error || "操作失败")
+        return
       }
       setBattle(data as BattleState)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error")
+      // 使用toast通知显示错误信息，而不是设置错误状态
+      toast.error(err instanceof Error ? err.message : "未知错误")
     } finally {
       setLoading(false)
     }
@@ -215,11 +218,13 @@ export default function BattlePage() {
         const winner = remainingPlayers[0]
         const isCurrentPlayerWinner = winner.playerId.toLowerCase() === currentPlayerId?.toLowerCase()
         
-        // 立即显示胜利/失败画面
-        alert(isCurrentPlayerWinner ? "恭喜你获胜了！" : `你输了，${winner.playerId} 获胜！`)
+        // 使用toast通知显示胜利/失败消息
+        toast(isCurrentPlayerWinner ? "恭喜你获胜了！" : `你输了，${winner.playerId} 获胜！`)
         
         // 重定向回大厅
-        router.push('/play')
+        setTimeout(() => {
+          router.push('/play')
+        }, 2000)
       }
     }
   }
@@ -351,46 +356,33 @@ export default function BattlePage() {
               <span className="text-sm text-zinc-400">回合</span>
               <span className="text-lg font-bold text-zinc-100">{battle.turn.turnNumber}</span>
             </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="destructive" size="sm">
-                  <Flag className="mr-2 h-4 w-4" />
-                  投降
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>确认投降</DialogTitle>
-                  <DialogDescription>
-                    你确定要投降吗？这将导致你输掉当前游戏。
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="outline">取消</Button>
-                  <Button 
-                    variant="destructive" 
-                    onClick={async () => {
-                      if (currentPlayerId) {
-                        try {
-                          await sendBattleAction({
-                            type: "surrender",
-                            playerId: currentPlayerId
-                          })
-                          
-                          // 投降后立即显示战败画面
-                          alert("你已投降，游戏结束！")
-                          router.push('/play')
-                        } catch (error) {
-                          console.error("投降失败：", error)
-                        }
-                      }
-                    }}
-                  >
-                    确认投降
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={async () => {
+                if (currentPlayerId) {
+                  try {
+                    await sendBattleAction({
+                      type: "surrender",
+                      playerId: currentPlayerId
+                    })
+                    
+                    // 投降后显示通知
+                    toast("你已投降，游戏结束！")
+                    
+                    // 重定向回大厅
+                    setTimeout(() => {
+                      router.push('/play')
+                    }, 2000)
+                  } catch (error) {
+                    console.error("投降失败：", error)
+                  }
+                }
+              }}
+            >
+              <Flag className="mr-2 h-4 w-4" />
+              投降
+            </Button>
           </div>
         </div>
 
@@ -1066,6 +1058,8 @@ export default function BattlePage() {
                 {battle.players.map((player) => {
                   const isCurrentPlayer = player.playerId.toLowerCase() === currentPlayerId?.toLowerCase()
                   const playerPiece = battle.pieces.find(p => p.ownerPlayerId === player.playerId)
+                  // 从 room.players 中获取玩家的昵称
+                  const playerName = room?.players.find(p => p.id === player.playerId)?.name || player.playerId
                   return (
                     <div
                       key={player.playerId}
@@ -1082,7 +1076,7 @@ export default function BattlePage() {
                             : "bg-zinc-500"
                         }`} />
                         <span className={`text-sm ${isCurrentPlayer ? "font-medium text-zinc-200" : "text-zinc-400"}`}>
-                          {player.playerId} {isCurrentPlayer && "(你)"}
+                          {playerName} {isCurrentPlayer && "(你)"}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-xs">

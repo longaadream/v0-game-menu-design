@@ -34,21 +34,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
     const trimmedPlayerId = playerId?.trim()
     const trimmedPlayerName = playerName?.trim()
     if (!trimmedPlayerId) {
+      console.log('Missing playerId:', { playerId })
       return NextResponse.json({ error: "playerId is required" }, { status: 400 })
     }
 
-    if (room.status !== "waiting") {
+    // 重新获取最新的房间状态，避免并发问题
+    const latestRoom = roomStore.getRoom(roomId)
+    if (!latestRoom) {
+      console.log('Room not found:', roomId)
+      return NextResponse.json({ error: "Room not found" }, { status: 404 })
+    }
+
+    if (latestRoom.status !== "waiting") {
+      console.log('Cannot join room, status is not waiting:', { roomId, status: latestRoom.status })
       return NextResponse.json(
         { error: "Cannot join a game that has already started or finished" },
         { status: 400 }
       )
     }
 
-    if (room.players.length >= room.maxPlayers) {
+    if (latestRoom.players.length >= latestRoom.maxPlayers) {
+      console.log('Room is full:', { roomId, currentPlayers: latestRoom.players.length, maxPlayers: latestRoom.maxPlayers })
       return NextResponse.json({ error: "Room is full" }, { status: 400 })
     }
 
-    const existing = room.players.find(
+    const existing = latestRoom.players.find(
       (p) => p.id === trimmedPlayerId,
     )
 
@@ -58,24 +68,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
         name: trimmedPlayerName || `Player ${trimmedPlayerId.slice(0, 8)}`,
         joinedAt: Date.now(),
       }
-      room.players.push(player)
+      latestRoom.players.push(player)
       
       // 如果房间还没有房主，将当前加入的玩家设置为房主
-      if (!room.hostId) {
-        room.hostId = trimmedPlayerId
+      if (!latestRoom.hostId) {
+        latestRoom.hostId = trimmedPlayerId
       }
+      console.log('Player joined room:', { roomId, playerId: trimmedPlayerId, playerName: trimmedPlayerName, totalPlayers: latestRoom.players.length })
+    } else {
+      console.log('Player already in room:', { roomId, playerId: trimmedPlayerId })
     }
 
-    roomStore.setRoom(room.id, room)
-    return NextResponse.json(room)
+    roomStore.setRoom(roomId, latestRoom)
+    console.log('Room updated:', { roomId, totalPlayers: latestRoom.players.length, players: latestRoom.players })
+    return NextResponse.json(latestRoom)
   }
 
   if (action === "claim-faction") {
     // 重新获取最新的房间状态，确保使用最新的玩家信息
     const latestRoom = roomStore.getRoom(roomId)
     if (!latestRoom) {
+      console.log('Room not found for claim-faction:', roomId)
       return NextResponse.json({ error: "Room not found" }, { status: 404 })
     }
+
+    console.log('Claim faction request received:', { roomId, playerId, playerName })
 
     let existingPlayer = latestRoom.players.find(
       (p) => p.id === playerId.trim()
@@ -89,18 +106,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
       }
       latestRoom.players.push(newPlayer)
       existingPlayer = newPlayer
+      console.log('Added new player to room:', { roomId, playerId: newPlayer.id, playerName: newPlayer.name })
+    } else {
+      console.log('Player already exists in room:', { roomId, playerId: existingPlayer.id, faction: existingPlayer.faction })
     }
 
     // 检查玩家是否已经有身份
     if (existingPlayer.faction) {
+      console.log('Player already has faction:', { roomId, playerId: existingPlayer.id, faction: existingPlayer.faction })
       return NextResponse.json({ success: true, faction: existingPlayer.faction, message: "Faction already claimed" })
     }
 
     // 检查已分配的身份
     const assignedFactions = latestRoom.players.map(p => p.faction).filter(Boolean) as Array<"red" | "blue">
+    console.log('Current assigned factions:', { roomId, factions: assignedFactions })
     
     // 如果两个身份都已分配，返回错误
     if (assignedFactions.length >= 2) {
+      console.log('All factions already claimed:', { roomId, factions: assignedFactions })
       return NextResponse.json({ error: "All factions are already claimed" }, { status: 400 })
     }
 
@@ -109,9 +132,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
     if (assignedFactions.length === 0) {
       // 如果还没有分配身份，随机分配一个
       faction = Math.random() > 0.5 ? "red" : "blue"
+      console.log('Randomly assigned faction:', { roomId, playerId: existingPlayer.id, faction })
     } else {
       // 如果已经分配了一个身份，分配剩下的那个
       faction = assignedFactions[0] === "red" ? "blue" : "red"
+      console.log('Assigned remaining faction:', { roomId, playerId: existingPlayer.id, faction, existingFaction: assignedFactions[0] })
     }
 
     // 设置玩家身份
@@ -119,22 +144,35 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
 
     // 保存房间状态
     roomStore.setRoom(roomId, latestRoom)
+    console.log('Room updated after faction claim:', { roomId, totalPlayers: latestRoom.players.length, players: latestRoom.players })
     return NextResponse.json({ success: true, faction, message: `Faction ${faction} claimed successfully` })
   }
 
   if (action === "select-pieces") {
+    console.log('Select pieces request received:', { roomId, playerId, playerName, piecesCount: pieces?.length || 0 })
+
     if (!pieces || pieces.length === 0) {
+      console.log('No pieces selected:', { roomId, playerId })
       return NextResponse.json({ error: "Please select at least 1 piece" }, { status: 400 })
     }
 
-    const existingPlayer = room.players.find(
+    // 重新获取最新的房间状态，避免并发问题
+    const latestRoom = roomStore.getRoom(roomId)
+    if (!latestRoom) {
+      console.log('Room not found:', roomId)
+      return NextResponse.json({ error: "Room not found" }, { status: 404 })
+    }
+
+    const existingPlayer = latestRoom.players.find(
       (p) => p.id === playerId.trim()
     )
 
     if (existingPlayer) {
       existingPlayer.selectedPieces = pieces
       existingPlayer.hasSelectedPieces = true
-      roomStore.setRoom(roomId, room)
+      roomStore.setRoom(roomId, latestRoom)
+      console.log('Updated existing player pieces:', { roomId, playerId: existingPlayer.id, piecesCount: pieces.length })
+      console.log('Room after update:', { roomId, totalPlayers: latestRoom.players.length, players: latestRoom.players })
       return NextResponse.json({ success: true, message: "Pieces selected successfully" })
     }
 
@@ -146,8 +184,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
       hasSelectedPieces: true,
     }
 
-    room.players.push(newPlayer)
-    roomStore.setRoom(roomId, room)
+    latestRoom.players.push(newPlayer)
+    roomStore.setRoom(roomId, latestRoom)
+    console.log('Added new player with pieces:', { roomId, playerId: newPlayer.id, playerName: newPlayer.name, piecesCount: pieces.length })
+    console.log('Room after adding new player:', { roomId, totalPlayers: latestRoom.players.length, players: latestRoom.players })
 
     return NextResponse.json({ success: true, message: "Player joined and pieces selected" })
   }
@@ -156,10 +196,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
     // 重新获取最新的房间状态，确保使用最新的玩家信息
     const latestRoom = roomStore.getRoom(roomId)
     if (!latestRoom) {
+      console.log('Room not found:', roomId)
       return NextResponse.json({ error: "Room not found" }, { status: 404 })
     }
 
+    // 输出房间信息以便调试
+    console.log('Start game request received:', {
+      roomId,
+      playerId,
+      playerName,
+      roomStatus: latestRoom.status,
+      playersCount: latestRoom.players.length,
+      players: latestRoom.players.map(p => ({ id: p.id, name: p.name, faction: p.faction, hasSelectedPieces: p.hasSelectedPieces })),
+      room: latestRoom
+    })
+
     if (latestRoom.status !== "waiting" && latestRoom.status !== "ready") {
+      console.log('Room status check failed:', { expected: ['waiting', 'ready'], actual: latestRoom.status })
       return NextResponse.json(
         { error: "Game is already in progress or finished" },
         { status: 400 },
@@ -167,6 +220,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
     }
 
     if (latestRoom.players.length < 2) {
+      console.log('Player count check failed:', { expected: 2, actual: latestRoom.players.length, players: latestRoom.players })
       return NextResponse.json(
         { error: "At least 2 players are required to start game" },
         { status: 400 },
@@ -175,12 +229,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
 
     // 检查所有玩家是否已经分配了身份
     const playersWithFaction = latestRoom.players.filter(p => p.faction)
+    console.log('Faction check:', { totalPlayers: latestRoom.players.length, playersWithFaction: playersWithFaction.length })
     if (playersWithFaction.length < 2) {
+      console.log('Faction check failed:', { expected: 2, actual: playersWithFaction.length })
       return NextResponse.json(
         { error: "All players must claim a faction before starting the game" },
         { status: 400 },
       )
     }
+
+
 
     // 总是使用房间中所有玩家的selectedPieces，确保包含所有玩家选择的棋子
     // 这样可以确保双方都有棋子进入游戏
