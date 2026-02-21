@@ -22,7 +22,7 @@ interface SkillDefinition {
   }>
   range: string
   areaSize?: number
-  requiresTarget: boolean
+  requiresTarget?: boolean
   icon?: string
   previewCode?: string
 }
@@ -42,6 +42,10 @@ export async function GET(request: NextRequest) {
           try {
             const data = JSON.parse(content) as SkillDefinition
             if (data && typeof data === 'object' && 'id' in data) {
+              // 确保requiresTarget字段存在，如果不存在则设置为false
+              if (data.requiresTarget === undefined) {
+                data.requiresTarget = false;
+              }
               skills[data.id] = data
             }
           } catch (parseError) {
@@ -62,8 +66,7 @@ export async function GET(request: NextRequest) {
                   maxCharges: 0,
                   powerMultiplier: 1.0,
                   code: "function executeSkill(context) { return { message: '技能执行', success: true }; }",
-                  range: "single",
-                  requiresTarget: false
+                  range: "single"
                 }
                 skills[simpleSkill.id] = simpleSkill
               }

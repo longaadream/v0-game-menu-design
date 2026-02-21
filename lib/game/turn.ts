@@ -568,6 +568,18 @@ export function applyBattleAction(
       }
 
       const result = executeSkillFunction(skillDef, context, next)
+      
+      // 检查是否需要目标选择
+      if (result.needsTargetSelection) {
+        // 创建一个包含目标选择信息的错误对象
+        const targetSelectionError = new BattleRuleError('需要选择目标') as any
+        targetSelectionError.needsTargetSelection = true
+        targetSelectionError.targetType = result.targetType || 'piece'
+        targetSelectionError.range = result.range || 5
+        targetSelectionError.filter = result.filter || 'enemy'
+        throw targetSelectionError
+      }
+      
       if (result.success) {
         // 效果已经在技能执行时直接应用，这里只需要处理返回的消息
         console.log('Skill executed:', result.message)
@@ -835,13 +847,13 @@ export function applyBattleAction(
       
       // 检查是否需要目标选择
       if (result.needsTargetSelection) {
-        // 抛出一个特殊的错误，指示需要目标选择
-        const error = new Error(result.message) as any
-        error.needsTargetSelection = true
-        error.targetType = result.targetType
-        error.range = result.range
-        error.filter = result.filter
-        throw error
+        // 创建一个包含目标选择信息的错误对象
+        const targetSelectionError = new BattleRuleError('需要选择目标') as any
+        targetSelectionError.needsTargetSelection = true
+        targetSelectionError.targetType = result.targetType || 'piece'
+        targetSelectionError.range = result.range || 5
+        targetSelectionError.filter = result.filter || 'enemy'
+        throw targetSelectionError
       }
       
       if (result.success) {

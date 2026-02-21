@@ -107,7 +107,7 @@ export interface SkillDefinition {
   /** 范围大小（仅对area类型有效） */
   areaSize?: number
   /** 是否需要目标 */
-  requiresTarget: boolean
+  requiresTarget?: boolean
   /** 行动点消耗 */
   actionPointCost: number
   /** 技能图标 */
@@ -390,51 +390,120 @@ function createTargetSelectors(battle: BattleState, sourcePiece: PieceInstance):
 function createEffectFunctions(battle: BattleState, sourcePiece: PieceInstance, target?: { x: number, y: number }, context?: SkillExecutionContext) {
   const selectors = createTargetSelectors(battle, sourcePiece);
   
+  // 保存全局的dealDamage和healDamage函数，避免递归调用
+  const globalDealDamage = dealDamage;
+  const globalHealDamage = healDamage;
+  
   return {
     // 目标选择器
     select: selectors,
     
     // 目标选择函数 - 用于在技能代码中唤起目标选择
-      selectTarget: (options?: {
-        type: 'piece' | 'grid';
-        range?: number;
-        filter?: 'enemy' | 'ally' | 'all';
-      }) => {
-        const defaultOptions = {
-          type: 'piece' as const,
-          range: 5,
-          filter: 'enemy' as const,
-          ...options
-        };
+    selectTarget: (options?: {
+      type: 'piece' | 'grid';
+      range?: number;
+      filter?: 'enemy' | 'ally' | 'all';
+    }) => {
+      const defaultOptions = {
+        type: 'piece' as const,
+        range: 5,
+        filter: 'enemy' as const,
+        ...options
+      };
+      
+      // 检查是否已经有目标信息（用户已经选择了目标）
+      // 使用context参数来获取目标信息
+      if (defaultOptions.type === 'piece' && context && context.target) {
+        // 尝试从battle.pieces中查找原始目标实例
+        const targetInstanceId = context.target.instanceId;
+        console.log('=== selectTarget debug ===');
+        console.log('Target instance ID from context:', targetInstanceId);
+        console.log('Number of pieces in battle.pieces:', battle.pieces.length);
+        console.log('Pieces in battle.pieces:', battle.pieces.map(p => ({ instanceId: p.instanceId, templateId: p.templateId })));
+        console.log('Context target:', context.target);
         
-        // 检查是否已经有目标信息（用户已经选择了目标）
-        // 使用context参数来获取目标信息
-        if (defaultOptions.type === 'piece' && context && context.target) {
-          // 如果需要选择棋子且context.target存在，直接返回目标棋子
-          return context.target;
-        } else if (defaultOptions.type === 'grid' && context) {
-          // 如果需要选择格子，检查context中的目标信息
-          if (context.targetPosition) {
-            // 如果有targetPosition，使用它
-            return context.targetPosition;
-          } else if (context.target && context.target.x !== undefined && context.target.y !== undefined) {
-            // 如果只有target，使用其位置
-            return {
-              x: context.target.x,
-              y: context.target.y
-            };
+        if (targetInstanceId) {
+          // 遍历battle.pieces，确保找到正确的实例
+          for (let i = 0; i < battle.pieces.length; i++) {
+            const piece = battle.pieces[i];
+            console.log(`Checking piece ${i}:`, piece.instanceId, 'vs target:', targetInstanceId);
+            console.log(`Type comparison: ${typeof piece.instanceId} vs ${typeof targetInstanceId}`);
+            console.log(`Strict equality: ${piece.instanceId === targetInstanceId}`);
+            console.log(`Loose equality: ${piece.instanceId == targetInstanceId}`);
+            
+            if (piece.instanceId === targetInstanceId) {
+              console.log('Found original target piece by direct comparison:', piece);
+              // 返回原始实例，这样修改会影响到battle.pieces中的对象
+              console.log('Returning original target piece');
+              return piece;
+            }
           }
         }
         
-        // 没有目标信息，返回需要目标选择的结果
-        // 这会触发前端显示目标选择界面
-        return {
-          needsTargetSelection: true,
-          targetType: defaultOptions.type,
-          range: defaultOptions.range,
-          filter: defaultOptions.filter
+        // 如果通过instanceId找不到，尝试通过位置查找
+        if (context.target.x !== undefined && context.target.y !== undefined) {
+          console.log('Attempting to find target by position:', context.target.x, context.target.y);
+          const targetByPosition = battle.pieces.find(p => {
+            const match = p.x === context.target.x && p.y === context.target.y;
+            console.log(`Checking piece at ${p.x},${p.y}: ${match}`);
+            return match;
+          });
+          if (targetByPosition) {
+            console.log('Found target piece by position:', targetByPosition);
+            return targetByPosition;
+          }
+        }
+        
+        // 如果仍然找不到，尝试创建一个新的目标实例并添加到battle.pieces中
+        // 这是一个极端的备用方案，确保我们总是能修改一个会被保存的实例
+        console.warn('Creating new target piece instance as last resort');
+        const newTargetPiece = {
+          instanceId: targetInstanceId || `temp_${Date.now()}`,
+          templateId: context.target.templateId,
+          ownerPlayerId: context.target.ownerPlayerId,
+          faction: context.target.faction || 'neutral',
+          currentHp: context.target.currentHp,
+          maxHp: context.target.maxHp,
+          attack: context.target.attack,
+          defense: context.target.defense,
+          x: context.target.x || 0,
+          y: context.target.y || 0,
+          moveRange: context.target.moveRange || 1,
+          skills: context.target.skills || [],
+          buffs: context.target.buffs || [],
+          debuffs: context.target.debuffs || [],
+          ruleTags: context.target.ruleTags || [],
+          statusTags: context.target.statusTags || []
         };
-      },
+        
+        // 将新创建的目标实例添加到battle.pieces中
+        battle.pieces.push(newTargetPiece);
+        console.log('Added new target piece to battle.pieces:', newTargetPiece);
+        
+        return newTargetPiece;
+      } else if (defaultOptions.type === 'grid' && context) {
+        // 如果需要选择格子，检查context中的目标信息
+        if (context.targetPosition) {
+          // 如果有targetPosition，使用它
+          return context.targetPosition;
+        } else if (context.target && context.target.x !== undefined && context.target.y !== undefined) {
+          // 如果只有target，使用其位置
+          return {
+            x: context.target.x,
+            y: context.target.y
+          };
+        }
+      }
+      
+      // 没有目标信息，返回需要目标选择的结果
+      // 这会触发前端显示目标选择界面
+      return {
+        needsTargetSelection: true,
+        targetType: defaultOptions.type,
+        range: defaultOptions.range,
+        filter: defaultOptions.filter
+      };
+    },
     
     // 传送效果
     teleport: (x: number, y?: number) => {
@@ -498,8 +567,15 @@ function createEffectFunctions(battle: BattleState, sourcePiece: PieceInstance, 
     },
     
     // 造成伤害
-    dealDamage: (targetPiece: PieceInstance, baseDamage: number, damageType: DamageType = "physical", skillId?: string) => {
-      return dealDamage(sourcePiece, targetPiece, baseDamage, damageType, battle, skillId);
+    dealDamage: (attacker: PieceInstance, targetPiece: PieceInstance, baseDamage: number, damageType: DamageType = "physical", battleState?: BattleState, skillId?: string) => {
+      // 忽略传入的 battleState，使用闭包中的 battle，确保修改的是正确的实例
+      return globalDealDamage(attacker, targetPiece, baseDamage, damageType, battle, skillId);
+    },
+    
+    // 治疗
+    healDamage: (healer: PieceInstance, targetPiece: PieceInstance, baseHeal: number, battleState?: BattleState, skillId?: string) => {
+      // 忽略传入的 battleState，使用闭包中的 battle，确保修改的是正确的实例
+      return globalHealDamage(healer, targetPiece, baseHeal, battle, skillId);
     }
   };
 }
@@ -518,22 +594,26 @@ export function dealDamage(attacker: PieceInstance, target: PieceInstance, baseD
   // 计算最终伤害（考虑防御力）
   let finalDamage: number;
   
+  // 确保baseDamage和target.defense都是有效的数字
+  const validBaseDamage = Number(baseDamage) || 0;
+  const validDefense = Number(target.defense) || 0;
+  
   switch (damageType) {
     case "physical":
       // 物理伤害：受到防御力影响
-      finalDamage = Math.max(1, Math.round(baseDamage - target.defense)); // 至少造成1点伤害
+      finalDamage = Math.max(1, Math.round(validBaseDamage - validDefense)); // 至少造成1点伤害
       break;
     case "magical":
       // 法术伤害：受到魔法抗性影响（暂时使用防御力代替）
-      finalDamage = Math.max(1, Math.round(baseDamage - target.defense)); // 至少造成1点伤害
+      finalDamage = Math.max(1, Math.round(validBaseDamage - validDefense)); // 至少造成1点伤害
       break;
     case "true":
       // 真实伤害：不受防御力影响
-      finalDamage = Math.max(1, Math.round(baseDamage)); // 至少造成1点伤害
+      finalDamage = Math.max(1, Math.round(validBaseDamage)); // 至少造成1点伤害
       break;
     default:
       // 默认使用物理伤害
-      finalDamage = Math.max(1, Math.round(baseDamage - target.defense)); // 至少造成1点伤害
+      finalDamage = Math.max(1, Math.round(validBaseDamage - validDefense)); // 至少造成1点伤害
   }
   
   // 记录原始生命值
@@ -605,6 +685,53 @@ export function dealDamage(attacker: PieceInstance, target: PieceInstance, baseD
   };
 }
 
+/**
+ * 处理治疗计算和应用的函数
+ * @param healer 治疗者棋子
+ * @param target 目标棋子
+ * @param baseHeal 基础治疗值
+ * @param battle 战斗状态
+ * @param skillId 技能ID（可选）
+ * @returns 治疗结果
+ */
+export function healDamage(healer: PieceInstance, target: PieceInstance, baseHeal: number, battle: BattleState, skillId?: string) {
+  // 计算最终治疗值
+  const finalHeal = Math.max(0, Math.round(baseHeal));
+  
+  // 记录原始生命值
+  const originalHp = target.currentHp;
+  
+  // 应用治疗
+  target.currentHp = Math.min(target.maxHp, target.currentHp + finalHeal);
+  
+  // 计算实际治疗量
+  const actualHeal = target.currentHp - originalHp;
+  
+  // 触发治疗相关的触发器
+  globalTriggerSystem.checkTriggers(battle, {
+    type: "afterHealDealt",
+    sourcePiece: healer,
+    targetPiece: target,
+    heal: actualHeal,
+    skillId
+  });
+  
+  globalTriggerSystem.checkTriggers(battle, {
+    type: "afterHealTaken",
+    sourcePiece: target,
+    targetPiece: healer,
+    heal: actualHeal,
+    skillId
+  });
+  
+  return {
+    success: true,
+    heal: actualHeal,
+    targetHp: target.currentHp,
+    message: `${healer.templateId}为${target.templateId}回复${actualHeal}点生命值`
+  };
+}
+
 // 执行技能函数
   export function executeSkillFunction(skillDef: SkillDefinition, context: SkillExecutionContext, battle: BattleState): SkillExecutionResult {
   try {
@@ -651,6 +778,7 @@ export function dealDamage(attacker: PieceInstance, target: PieceInstance, baseD
       // 效果函数
     teleport: effects.teleport,
     dealDamage: effects.dealDamage,
+    healDamage: effects.healDamage,
     
     // 状态效果函数
     statusEffectSystem: statusEffectSystem,
@@ -777,6 +905,7 @@ export function dealDamage(attacker: PieceInstance, target: PieceInstance, baseD
               const calculateDistance = environment.calculateDistance;
               const isTargetInRange = environment.isTargetInRange;
               const dealDamage = environment.dealDamage;
+              const healDamage = environment.healDamage;
               const Math = environment.Math;
               const console = environment.console;
               

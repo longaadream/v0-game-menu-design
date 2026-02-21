@@ -618,7 +618,7 @@ export default function BattlePage() {
                             </span>
                             <span className="flex items-center gap-1">
                               <Shield className="h-3 w-3" />
-                              护盾: {piece.shield || 0}
+                              防御: {piece.defense || 0}
                             </span>
                           </div>
                         </div>
@@ -785,7 +785,7 @@ export default function BattlePage() {
                             </span>
                             <span className="flex items-center gap-1">
                               <Shield className="h-3 w-3" />
-                              护盾: {piece.shield || 0}
+                              防御: {piece.defense || 0}
                             </span>
                           </div>
                         </div>

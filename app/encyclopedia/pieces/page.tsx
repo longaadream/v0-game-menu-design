@@ -402,8 +402,10 @@ export default function CharacterEncyclopediaPage() {
                         description: "技能描述未找到",
                         icon: "❓",
                         type: "normal",
+                        kind: "active",
                         cooldownTurns: 0,
-                        chargeCost: 0
+                        chargeCost: 0,
+                        actionPointCost: 1
                       };
                       
                       return (
@@ -428,12 +430,18 @@ export default function CharacterEncyclopediaPage() {
                                 <h5 className="font-semibold mb-1">{skillData.name}</h5>
                                 <p className="text-sm text-gray-400 mb-2">{skillData.description}</p>
                                 <div className="text-xs text-gray-500">
-                                  <div>Type: {skillData.type === 'super' ? 'Super Skill' : 'Normal Skill'}</div>
-                                  {skillData.cooldownTurns > 0 && (
-                                    <div>Cooldown: {skillData.cooldownTurns} turns</div>
+                                  <div>类型: {skillData.type === 'super' ? '充能技能' : skillData.type === 'ultimate' ? '终极技能' : '普通技能'}</div>
+                                  {skillData.kind === 'active' && (
+                                    <div>行动点消耗: {skillData.actionPointCost || 0}</div>
                                   )}
                                   {skillData.chargeCost > 0 && (
-                                    <div>Charge Cost: {skillData.chargeCost}</div>
+                                    <div>充能点消耗: {skillData.chargeCost}</div>
+                                  )}
+                                  {skillData.cooldownTurns > 0 && (
+                                    <div>冷却: {skillData.cooldownTurns} 回合</div>
+                                  )}
+                                  {skillData.usesRemaining === 1 && (
+                                    <div className="text-red-400">限定技</div>
                                   )}
                                 </div>
                               </div>

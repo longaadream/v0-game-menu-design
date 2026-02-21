@@ -1,161 +1,7 @@
 import type { PieceTemplate } from "./piece"
 
-// 硬编码默认棋子数据，确保getPieceById总是能返回有效的棋子模板
-const defaultPiecesData: Record<string, PieceTemplate> = {
-  "red-mage": {
-    id: "red-mage",
-    name: "红方法师",
-    faction: "red",
-    description: "高攻击力，低防御力",
-    rarity: "rare",
-    image: "🔥",
-    stats: {
-      maxHp: 80,
-      attack: 30,
-      defense: 3,
-      moveRange: 2
-    },
-    skills: [
-      {
-        skillId: "teleport",
-        level: 1
-      },
-      {
-        skillId: "fireball",
-        level: 1
-      }
-    ],
-    isDefault: true
-  },
-  "blue-mage": {
-    id: "blue-mage",
-    name: "蓝方法师",
-    faction: "blue",
-    description: "高攻击力，低防御力",
-    rarity: "rare",
-    image: "🔥",
-    stats: {
-      maxHp: 80,
-      attack: 28,
-      defense: 4,
-      moveRange: 2
-    },
-    skills: [
-      {
-        skillId: "teleport",
-        level: 1
-      },
-      {
-        skillId: "fireball",
-        level: 1
-      }
-    ],
-    isDefault: true
-  },
-  "red-warrior": {
-    id: "red-warrior",
-    name: "红方战士",
-    faction: "red",
-    description: "高防御力，中等攻击力",
-    rarity: "common",
-    image: "⚔️",
-    stats: {
-      maxHp: 120,
-      attack: 20,
-      defense: 8,
-      moveRange: 3
-    },
-    skills: [
-      {
-        skillId: "basic-attack",
-        level: 1
-      },
-      {
-        skillId: "shield",
-        level: 1
-      }
-    ],
-    isDefault: true
-  },
-  "blue-warrior": {
-    id: "blue-warrior",
-    name: "蓝方战士",
-    faction: "blue",
-    description: "高防御力，中等攻击力",
-    rarity: "common",
-    image: "⚔️",
-    stats: {
-      maxHp: 120,
-      attack: 20,
-      defense: 8,
-      moveRange: 3
-    },
-    skills: [
-      {
-        skillId: "basic-attack",
-        level: 1
-      },
-      {
-        skillId: "shield",
-        level: 1
-      }
-    ],
-    isDefault: true
-  },
-  "red-archer": {
-    id: "red-archer",
-    name: "红方射手",
-    faction: "red",
-    description: "高攻击力，低防御力，远射程",
-    rarity: "rare",
-    image: "🏹",
-    stats: {
-      maxHp: 100,
-      attack: 25,
-      defense: 5,
-      moveRange: 4
-    },
-    skills: [
-      {
-        skillId: "basic-attack",
-        level: 1
-      },
-      {
-        skillId: "buff-attack",
-        level: 1
-      }
-    ],
-    isDefault: true
-  },
-  "blue-archer": {
-    id: "blue-archer",
-    name: "蓝方射手",
-    faction: "blue",
-    description: "高攻击力，低防御力，远射程",
-    rarity: "rare",
-    image: "🏹",
-    stats: {
-      maxHp: 100,
-      attack: 25,
-      defense: 5,
-      moveRange: 4
-    },
-    skills: [
-      {
-        skillId: "basic-attack",
-        level: 1
-      },
-      {
-        skillId: "buff-attack",
-        level: 1
-      }
-    ],
-    isDefault: true
-  }
-}
-
-// 客户端版本：初始为默认棋子数据，通过API获取数据
-export let DEFAULT_PIECES: Record<string, PieceTemplate> = { ...defaultPiecesData }
+// 客户端版本：初始为空对象，通过API获取数据
+export let DEFAULT_PIECES: Record<string, PieceTemplate> = {}
 
 // 从API加载棋子数据
 export async function loadPieces(): Promise<void> {
@@ -170,13 +16,15 @@ export async function loadPieces(): Promise<void> {
         data.pieces.forEach((piece: PieceTemplate) => {
           piecesObject[piece.id] = piece
         })
-        // 合并API返回的数据和默认数据，确保默认数据总是可用
-        DEFAULT_PIECES = { ...defaultPiecesData, ...piecesObject }
+        // 直接使用API返回的数据，不使用默认数据
+        DEFAULT_PIECES = piecesObject
         console.log('Loaded pieces from API:', Object.keys(DEFAULT_PIECES))
       }
     }
   } catch (error) {
     console.error('Error loading pieces:', error)
+    // 加载失败，使用空对象
+    DEFAULT_PIECES = {}
   }
 }
 
@@ -186,14 +34,14 @@ if (typeof window === 'undefined') {
   try {
     const { loadJsonFilesServer } = require('./file-loader')
     const loadedPieces = loadJsonFilesServer<PieceTemplate>('data/pieces')
-    // 合并加载的数据和默认数据，确保默认数据总是可用
-    DEFAULT_PIECES = { ...defaultPiecesData, ...loadedPieces }
+    // 直接使用加载的数据，不使用默认数据
+    DEFAULT_PIECES = loadedPieces
     
     console.log('Loaded pieces:', Object.keys(DEFAULT_PIECES))
   } catch (error) {
     console.error('Error loading pieces from files:', error)
-    // 加载失败，使用默认数据
-    DEFAULT_PIECES = { ...defaultPiecesData }
+    // 加载失败，使用空对象
+    DEFAULT_PIECES = {}
   }
 }
 

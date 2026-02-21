@@ -173,7 +173,33 @@ dealDamage(attacker: PieceInstance, target: PieceInstance, baseDamage: number, d
 }
 ```
 
+## 治疗处理函数
+
+为了简化治疗处理并确保所有治疗相关的触发器都能正确触发，我们提供了 `healDamage` 函数。这个函数会处理治疗计算、应用治疗、触发相关触发器等逻辑。
+
+### 函数签名
+
+```typescript
+/**
+ * 处理治疗计算和应用的函数
+ * @param healer 治疗者棋子
+ * @param target 目标棋子
+ * @param baseHeal 基础治疗值
+ * @param battle 战斗状态
+ * @param skillId 技能ID（可选）
+ * @returns 治疗结果
+ */
+healDamage(healer: PieceInstance, target: PieceInstance, baseHeal: number, battle: BattleState, skillId?: string): {
+  success: boolean;
+  heal: number;
+  targetHp: number;
+  message: string;
+}
+```
+
 ### 使用示例
+
+#### 处理伤害
 
 在技能代码中，你可以通过 `dealDamage` 函数来处理伤害：
 
@@ -194,6 +220,31 @@ function executeSkill(context) {
   return {
     message: damageResult.message,
     success: damageResult.success
+  };
+}
+```
+
+#### 处理治疗
+
+在技能代码中，你可以通过 `healDamage` 函数来处理治疗：
+
+```javascript
+function executeSkill(context) {
+  // 选择最近的盟友
+  const targetAlly = select.getLowestHpAlly();
+  if (!targetAlly) {
+    return { message: '没有可治疗的盟友', success: false };
+  }
+  
+  // 计算基础治疗值
+  const baseHeal = 5;
+  
+  // 使用healDamage函数处理治疗
+  const healResult = healDamage(context.piece, targetAlly, baseHeal, context.battle, 'heal-skill');
+  
+  return {
+    message: healResult.message,
+    success: healResult.success
   };
 }
 ```
@@ -352,6 +403,32 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
 }
 ```
 
+### 示例2：主动技能 - 圣光闪耀
+
+实现"为7格内一个友军回复5点生命值"的主动治疗技能。
+
+#### 步骤1：创建技能文件
+
+创建 `data/skills/light-of-the-light.json`：
+
+```json
+{
+  "id": "light-of-the-light",
+  "name": "圣光闪耀",
+  "description": "为7格内一个友军回复5点生命值",
+  "icon": "✨",
+  "kind": "active",
+  "type": "normal",
+  "cooldownTurns": 1,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "actionPointCost": 2,
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetAlly = selectTarget({ type: 'piece', range: 7, filter: 'ally' }); if (!targetAlly || targetAlly.needsTargetSelection) { return targetAlly; } const healValue = 5; const healResult = healDamage(sourcePiece, targetAlly, healValue, context.battle, context.skill.id); return { message: sourcePiece.templateId + '为' + targetAlly.templateId + '回复' + healResult.heal + '点生命值', success: true }; }",
+  "previewCode": "function calculatePreview(piece, skillDef) { const healValue = 5; return { description: '为7格内一个友军回复' + healValue + '点生命值', expectedValues: { heal: healValue } }; }",
+  "range": "single"
+}
+```
+
 ### 步骤2：装备技能
 
 将技能分配给角色，在角色的 `skills` 数组中添加技能：
@@ -363,13 +440,13 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
     "level": 1
   },
   {
-    "skillId": "fireball",
+    "skillId": "light-of-the-light",
     "level": 1
   }
 ]
 ```
 
-### 示例2：被动技能 - 反击
+### 示例3：被动技能 - 反击
 
 实现"当受到伤害时，选择一个3格内的目标，造成100%攻击力的伤害"的技能。
 
@@ -754,7 +831,12 @@ function executeSkill(context) {
    - **所有效果都必须通过code标签执行**，禁止使用JSON硬编码
    - 灵活性优先：设计技能时应考虑扩展性，避免硬编码固定值
 
-6. **JSON格式**：
+6. **治疗处理**：
+   - 使用 `healDamage` 函数处理治疗效果
+   - 正确设置治疗值和技能ID
+   - 治疗效果会触发相应的触发器
+
+7. **JSON格式**：
    - 确保文件是有效的JSON格式
    - 使用转义的 `\n` 表示换行
    - 所有字符串使用双引号
