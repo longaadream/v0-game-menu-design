@@ -1,0 +1,1 @@
+{"id":"rule-blizzard-effect","name":"暴风雪效果","description":"在对方回合结束时，对暴风雪区域内的所有敌人造成伤害和冰冻","trigger":{"type":"endTurn","conditions":{}},"effect":{"type":"triggerSkill","skillId":"blizzard-effect","message":"暴风雪效果触发"},"limits":{"cooldownTurns":0,"maxUses":0}}

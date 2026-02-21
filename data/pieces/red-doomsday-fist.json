@@ -1,0 +1,33 @@
+{
+  "id": "red-doomsday-fist",
+  "name": "末日铁拳",
+  "faction": "red",
+  "description": "高机动性近战战士，拥有强大的冲刺和范围攻击能力",
+  "rarity": "rare",
+  "image": "doomsday-fist.jpg",
+  "stats": {
+    "maxHp": 13,
+    "attack": 2,
+    "defense": 1,
+    "moveRange": 3
+  },
+  "skills": [
+    {
+      "skillId": "rocket-punch",
+      "level": 1
+    },
+    {
+      "skillId": "hardy-block",
+      "level": 1
+    },
+    {
+      "skillId": "hand-cannon",
+      "level": 1
+    },
+    {
+      "skillId": "earthshatter",
+      "level": 1
+    }
+  ],
+  "isDefault": false
+}

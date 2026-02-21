@@ -1,0 +1,1 @@
+{"id":"freeze","type":"freeze","name":"冰冻","description":"冰冻的目标无法行动，包括移动、攻击、使用技能等","intensity":1,"isDebuff":true,"canStack":false,"maxStacks":1,"code":"function EffectTrigger(context) { return { success: true, message: context.piece.templateId + '被冰冻，无法行动' }; }"}

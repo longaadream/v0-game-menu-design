@@ -70,9 +70,9 @@ export default function BattlePage() {
       const data = (await res.json()) as Room
       setRoom(data)
 
-      if (data.status === "in-progress") {
-        await fetchBattle(id)
-      }
+      // 无论房间状态如何，都尝试获取战斗状态
+      // 这样可以确保在游戏刚刚启动时能够获取到最新的战斗状态
+      await fetchBattle(id)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error")
     } finally {
@@ -229,16 +229,24 @@ export default function BattlePage() {
           })
             .then(response => {
               console.log('Room deletion response:', { status: response.status, statusText: response.statusText })
+              // 确保删除请求完成后再重定向
+              setTimeout(() => {
+                router.push('/play')
+              }, 500)
             })
             .catch(error => {
               console.error('Error deleting room:', error)
+              // 即使出错也要重定向
+              setTimeout(() => {
+                router.push('/play')
+              }, 500)
             })
+        } else {
+          // 如果没有roomId，直接重定向
+          setTimeout(() => {
+            router.push('/play')
+          }, 500)
         }
-        
-        // 重定向回大厅
-        setTimeout(() => {
-          router.push('/play')
-        }, 2000)
       }
     }
   }
@@ -261,9 +269,14 @@ export default function BattlePage() {
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null)
 
   const selectedPiece = useMemo(() => {
-    if (!selectedPieceId || !battle) return null
-    return battle.pieces.find(p => p.instanceId === selectedPieceId)
-  }, [selectedPieceId, battle])
+    if (!selectedPieceId || !battle || !currentPlayerId) return null
+    const piece = battle.pieces.find(p => p.instanceId === selectedPieceId)
+    // 只有己方棋子才能被选中为当前操作棋子
+    if (piece && piece.ownerPlayerId.toLowerCase() === currentPlayerId.toLowerCase()) {
+      return piece
+    }
+    return null
+  }, [selectedPieceId, battle, currentPlayerId])
 
   if (loading) {
     return (
@@ -415,6 +428,17 @@ export default function BattlePage() {
                         setSelectedSkillId(null)
                       }
                     }}
+                    onPieceClick={(pieceId) => {
+                      // 检查点击的是否是己方棋子
+                      const clickedPiece = battle.pieces.find(p => p.instanceId === pieceId);
+                      if (clickedPiece && clickedPiece.ownerPlayerId.toLowerCase() === currentPlayerId?.toLowerCase()) {
+                        setSelectedPieceId(pieceId);
+                        // 重置选择状态
+                        setIsSelectingMoveTarget(false);
+                        setIsSelectingTeleportTarget(false);
+                        setSelectedSkillId(null);
+                      }
+                    }}
                     selectedPieceId={selectedPieceId}
                     isSelectingMoveTarget={isSelectingMoveTarget}
                     isSelectingTeleportTarget={isSelectingTeleportTarget}
@@ -436,9 +460,8 @@ export default function BattlePage() {
                     const piece = battle.pieces.find(p => p.instanceId === action.payload.pieceId);
                     if (piece) {
                       // 尝试获取棋子模板名称
-                      pieceName = piece.templateId || "未知棋子";
-                      // 这里应该通过templateId获取棋子的名称，但目前battle.pieceStatsByTemplateId可能没有name属性
-                      // 后续需要修改battle-setup.ts，确保pieceStatsByTemplateId包含name属性
+                      const pieceTemplate = getPieceById(piece.templateId);
+                      pieceName = pieceTemplate?.name || piece.templateId || "未知棋子";
                     }
                   }
                   
@@ -446,18 +469,13 @@ export default function BattlePage() {
                   let formattedMessage = action.payload?.message || action.type || "未知操作";
                   
                   // 替换消息中的templateId为更友好的名称
-                  if (pieceName !== "未知棋子") {
-                    // 简单的名称映射，后续应该从模板中获取
-                    const pieceNameMap: Record<string, string> = {
-                      "red-warrior": "红方战士",
-                      "blue-warrior": "蓝方战士",
-                      "red-archer": "红方射手",
-                      "blue-archer": "蓝方射手",
-                      "red-mage": "红方法师",
-                      "blue-mage": "蓝方法师"
-                    };
-                    const friendlyName = pieceNameMap[pieceName] || pieceName;
-                    formattedMessage = formattedMessage.replace(pieceName, friendlyName);
+                  if (action.payload?.pieceId) {
+                    const piece = battle.pieces.find(p => p.instanceId === action.payload.pieceId);
+                    if (piece) {
+                      const pieceTemplate = getPieceById(piece.templateId);
+                      const friendlyName = pieceTemplate?.name || piece.templateId;
+                      formattedMessage = formattedMessage.replace(piece.templateId, friendlyName);
+                    }
                   }
                   
                   return (
@@ -465,17 +483,7 @@ export default function BattlePage() {
                       <span className="text-zinc-500">[{action.turn || battle.turn.turnNumber}] </span>
                       <span className={action.playerId === currentPlayerId ? "text-green-400" : "text-blue-400"}>
                         {/* 使用友好的棋子名称 */}
-                        {(() => {
-                          const pieceNameMap: Record<string, string> = {
-                            "red-warrior": "红方战士",
-                            "blue-warrior": "蓝方战士",
-                            "red-archer": "红方射手",
-                            "blue-archer": "蓝方射手",
-                            "red-mage": "红方法师",
-                            "blue-mage": "蓝方法师"
-                          };
-                          return pieceNameMap[pieceName] || pieceName;
-                        })()}
+                        {pieceName}
                       </span>
                       <span className="text-zinc-400">: </span>
                       <span>{formattedMessage}</span>
@@ -517,10 +525,16 @@ export default function BattlePage() {
                                 <img 
                                   src={image} 
                                   alt={pieceTemplate?.name || "Piece"} 
-                                  className="h-8 w-8 object-contain"
+                                  className="h-full w-full object-contain"
                                 />
+                              ) : image && (image.length <= 3 || image.includes("️")) ? (
+                                <span className="text-3xl font-bold text-white">{image}</span>
                               ) : image ? (
-                                <span className="text-2xl">{image}</span>
+                                <img 
+                                  src={`/${image}`} 
+                                  alt={pieceTemplate?.name || "Piece"} 
+                                  className="h-full w-full object-contain"
+                                />
                               ) : (
                                 <Swords className="h-6 w-6 text-white" />
                               )}
@@ -678,10 +692,16 @@ export default function BattlePage() {
                                 <img 
                                   src={image} 
                                   alt={pieceTemplate?.name || "Piece"} 
-                                  className="h-8 w-8 object-contain"
+                                  className="h-full w-full object-contain"
                                 />
+                              ) : image && (image.length <= 3 || image.includes("️")) ? (
+                                <span className="text-3xl font-bold text-white">{image}</span>
                               ) : image ? (
-                                <span className="text-2xl">{image}</span>
+                                <img 
+                                  src={`/${image}`} 
+                                  alt={pieceTemplate?.name || "Piece"} 
+                                  className="h-full w-full object-contain"
+                                />
                               ) : (
                                 <Swords className="h-6 w-6 text-white" />
                               )}
@@ -965,7 +985,7 @@ export default function BattlePage() {
                             }
                             
                             return mergedSkill
-                          }).filter(skill => skill)
+                          }).filter(skill => skill && skill.kind !== "passive")
                           
                           console.log('Available skills:', availableSkills)
                           

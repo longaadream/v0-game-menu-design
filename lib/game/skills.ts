@@ -529,6 +529,13 @@ export function dealDamage(attacker: PieceInstance, target: PieceInstance, baseD
     if (playerMeta) {
       playerMeta.chargePoints += 1; // 每次击杀获得1点充能
     }
+    
+    // 从棋盘上移除死亡的棋子
+    const targetIndex = battle.pieces.findIndex(p => p.instanceId === target.instanceId);
+    if (targetIndex !== -1) {
+      battle.pieces.splice(targetIndex, 1);
+      console.log(`Removed killed piece ${target.instanceId} from board`);
+    }
   }
   
   return {

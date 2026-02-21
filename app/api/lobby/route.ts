@@ -1,21 +1,32 @@
 import { NextRequest, NextResponse } from "next/server"
 import type { BattleState } from "@/lib/game/turn"
-import { roomStore, type Room } from "@/lib/game/room-store"
+import { getRoomStore, type Room } from "@/lib/game/room-store"
+
+// 获取 RoomStore 实例
+console.log('Getting RoomStore instance in lobby route')
+const roomStore = getRoomStore()
 
 // 导出 Room 类型供其他文件使用
 export type { Room }
 
 // 导出存储实例供其他路由使用
 export function getRoomsStore() {
-  return roomStore
+  return getRoomStore()
 }
 
 export async function GET() {
+  console.log('=== Lobby API GET Request ===')
+  
+  // 先确保房间存储已初始化
   const allRooms = Array.from(roomStore.getRooms().values())
   console.log('All rooms in store:', allRooms.map(r => ({ id: r.id, name: r.name, hostId: r.hostId })))
   
+  // 过滤出有效的房间（排除可能的空数据）
+  const validRooms = allRooms.filter(room => room.id && room.name)
+  console.log('Valid rooms:', validRooms.length)
+  
   // 去重处理，确保每个房间ID只出现一次
-  const uniqueRooms = Array.from(new Map(allRooms.map(room => [room.id, room])).values())
+  const uniqueRooms = Array.from(new Map(validRooms.map(room => [room.id, room])).values())
   console.log('Unique rooms to return:', uniqueRooms.map(r => ({ id: r.id, name: r.name, hostId: r.hostId })))
   
   const formattedRooms = uniqueRooms.map((room) => ({
@@ -24,12 +35,13 @@ export async function GET() {
     status: room.status,
     createdAt: room.createdAt,
     maxPlayers: room.maxPlayers,
-    playerCount: room.players.length,
+    playerCount: room.players?.length || 0,
     hostId: room.hostId,
     mapId: room.mapId,
     visibility: room.visibility,
   }))
 
+  console.log('Lobby API returning', formattedRooms.length, 'rooms')
   return NextResponse.json({ rooms: formattedRooms })
 }
 

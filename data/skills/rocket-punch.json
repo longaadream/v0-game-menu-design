@@ -1,0 +1,16 @@
+{
+  "id": "rocket-punch",
+  "name": "火箭重拳",
+  "description": "对一个方向冲刺三格，如果路径上有敌人将停留在第一个敌人的面前一格并对敌人造成自身攻击力100%的物理伤害",
+  "icon": "🚀",
+  "kind": "active",
+  "type": "normal",
+  "cooldownTurns": 1,
+  "maxCharges": 0,
+  "powerMultiplier": 1.0,
+  "actionPointCost": 1,
+  "code": "function executeSkill(context) {\n  const direction = context.targetDirection;\n  if (!direction) {\n    return { message: '请选择冲刺方向', success: false };\n  }\n  const startPos = sourcePiece.position;\n  let targetEnemy = null;\n  let stopPos = startPos;\n  for (let i = 1; i <= 3; i++) {\n    const nextPos = { x: startPos.x + direction.x * i, y: startPos.y + direction.y * i };\n    if (!context.battleMap.isPositionValid(nextPos)) {\n      break;\n    }\n    const pieceAtPos = context.battleMap.getPieceAt(nextPos);\n    if (pieceAtPos && pieceAtPos.faction !== sourcePiece.faction) {\n      targetEnemy = pieceAtPos;\n      stopPos = { x: startPos.x + direction.x * (i - 1), y: startPos.y + direction.y * (i - 1) };\n      break;\n    }\n    if (pieceAtPos) {\n      break;\n    }\n    stopPos = nextPos;\n  }\n  sourcePiece.position = stopPos;\n  if (targetEnemy) {\n    const damageValue = sourcePiece.attack * context.skill.powerMultiplier;\n    const damageResult = dealDamage(targetEnemy, damageValue, 'physical', context.skill.id);\n    return { message: sourcePiece.templateId + ' 冲刺并对 ' + targetEnemy.templateId + ' 造成 ' + damageResult.damage + ' 点伤害', success: damageResult.success };\n  }\n  return { message: sourcePiece.templateId + ' 向前冲刺', success: true };\n}",
+  "previewCode": "function calculatePreview(piece, skillDef) {\n  const damageValue = Math.round(piece.attack * skillDef.powerMultiplier);\n  return { description: '向前冲刺三格，对路径上第一个敌人造成' + damageValue + '点伤害（相当于攻击力100%）', expectedValues: { damage: damageValue } };\n}",
+  "range": "direction",
+  "requiresTarget": false
+}

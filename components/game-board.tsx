@@ -10,6 +10,7 @@ type GameBoardProps = {
   map: BoardMap
   pieces?: PieceInstance[]
   onTileClick?: (x: number, y: number) => void
+  onPieceClick?: (pieceId: string) => void
   selectedPieceId?: string
   isSelectingMoveTarget?: boolean
   isSelectingTeleportTarget?: boolean
@@ -32,7 +33,7 @@ function tileColor(tile: Tile): string {
   }
 }
 
-export function GameBoard({ map, pieces = [], onTileClick, selectedPieceId, isSelectingMoveTarget, isSelectingTeleportTarget, teleportRange = 5 }: GameBoardProps) {
+export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selectedPieceId, isSelectingMoveTarget, isSelectingTeleportTarget, teleportRange = 5 }: GameBoardProps) {
   const size = Math.max(map.width, map.height)
   
   // 组件加载时自动加载棋子数据
@@ -226,47 +227,82 @@ export function GameBoard({ map, pieces = [], onTileClick, selectedPieceId, isSe
           >
             {/* 棋子显示 */}
             {pieces && pieces.some(p => p.x === tile.x && p.y === tile.y) && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                {(() => {
-                  const piece = pieces.find(p => p.x === tile.x && p.y === tile.y)
-                  if (!piece) return null
-                  
-                  // 通过templateId获取棋子模板
-                  const pieceTemplate = getPieceById(piece.templateId)
-                  const image = pieceTemplate?.image
-                  
-                  // 检查棋子是否被选中
-                  const isSelected = selectedPieceId === piece.instanceId
-                  
-                  if (image && image.startsWith("http")) {
-                    return (
-                      <div className={`transition-all duration-200 ${isSelected ? "ring-4 ring-green-500 rounded-full p-1" : `hover:ring-4 hover:ring-${piece.faction === "red" ? "red" : "blue"}-500 rounded-full p-1`}`}>
-                        <img
-                          src={image}
-                          alt={pieceTemplate?.name || "Piece"}
-                          className="w-8 h-8 object-contain"
-                        />
-                      </div>
-                    )
-                  } else if (image) {
-                    return (
-                      <div className={`text-2xl font-bold transition-all duration-200 ${
-                        piece.faction === "red" ? "text-red-500" : "text-blue-500"
-                      } ${isSelected ? "ring-4 ring-green-500 rounded-full p-1" : `hover:ring-4 hover:ring-${piece.faction === "red" ? "red" : "blue"}-500 rounded-full p-1`}`}>
-                        {image}
-                      </div>
-                    )
-                  } else {
-                    return (
-                      <div className={`text-2xl font-bold transition-all duration-200 ${
-                        piece.faction === "red" ? "text-red-500" : "text-blue-500"
-                      } ${isSelected ? "ring-4 ring-green-500 rounded-full p-1" : `hover:ring-4 hover:ring-${piece.faction === "red" ? "red" : "blue"}-500 rounded-full p-1`}`}>
-                        {piece.faction === "red" ? "⚔" : "🛡"}
-                      </div>
-                    )
+              (() => {
+                const piece = pieces.find(p => p.x === tile.x && p.y === tile.y)
+                if (!piece) return null
+                
+                // 通过templateId获取棋子模板
+                const pieceTemplate = getPieceById(piece.templateId)
+                const image = pieceTemplate?.image
+                
+                // 检查棋子是否被选中
+                const isSelected = selectedPieceId === piece.instanceId
+                
+                // 确定棋子的阵营
+                const getFaction = () => {
+                  // 1. 从piece对象获取
+                  if (piece.faction) {
+                    return piece.faction === "red" ? "red" : "blue"
                   }
-                })()}
-              </div>
+                  // 2. 从模板获取
+                  if (pieceTemplate?.faction) {
+                    return pieceTemplate.faction === "red" ? "red" : "blue"
+                  }
+                  // 3. 从模板ID判断
+                  if (piece.templateId) {
+                    if (piece.templateId.toLowerCase().includes("red")) {
+                      return "red"
+                    } else if (piece.templateId.toLowerCase().includes("blue")) {
+                      return "blue"
+                    }
+                  }
+                  // 默认阵营
+                  return "blue"
+                }
+                
+                const faction = getFaction()
+                console.log('Final faction:', faction)
+                console.log('Piece object:', piece)
+                console.log('Piece template:', pieceTemplate)
+                const borderColor = faction === "red" ? "border-red-500" : "border-blue-500"
+                console.log('Border color class:', borderColor)
+                const hoverBorderClass = `hover:border-2 ${borderColor} hover:border-4`
+                console.log('Hover border class:', hoverBorderClass)
+                
+                return (
+                  <div 
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-200 cursor-pointer ${isSelected ? "border-4 border-green-500" : hoverBorderClass}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onPieceClick) {
+                        onPieceClick(piece.instanceId);
+                      }
+                    }}
+                  >
+                    {image && image.startsWith("http") ? (
+                      <img
+                        src={image}
+                        alt={pieceTemplate?.name || "Piece"}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : image && (image.length <= 3 || image.includes("️")) ? (
+                      <span className={`text-4xl font-bold ${faction === "red" ? "text-red-500" : "text-blue-500"}`}>
+                        {image}
+                      </span>
+                    ) : image ? (
+                      <img
+                        src={`/${image}`}
+                        alt={pieceTemplate?.name || "Piece"}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <span className={`text-3xl font-bold ${faction === "red" ? "text-red-500" : "text-blue-500"}`}>
+                        {faction === "red" ? "⚔" : "🛡"}
+                      </span>
+                    )}
+                  </div>
+                )
+              })()
             )}
 
             {/* 显示类型首字母 */}

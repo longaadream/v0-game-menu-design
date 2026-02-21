@@ -1,0 +1,18 @@
+{
+  "id": "rule-status-freeze",
+  "name": "冰冻状态规则",
+  "description": "处理冰冻状态的触发时机和效果",
+  "trigger": {
+    "type": "beginTurn",
+    "conditions": {}
+  },
+  "effect": {
+    "type": "triggerStatusEffect",
+    "statusId": "freeze",
+    "message": "冰冻状态触发"
+  },
+  "limits": {
+    "cooldownTurns": 0,
+    "maxUses": 0
+  }
+}

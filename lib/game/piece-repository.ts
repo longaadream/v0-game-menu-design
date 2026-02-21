@@ -163,8 +163,17 @@ export async function loadPieces(): Promise<void> {
     const response = await fetch('/api/pieces')
     if (response.ok) {
       const data = await response.json()
-      // 合并API返回的数据和默认数据，确保默认数据总是可用
-      DEFAULT_PIECES = { ...defaultPiecesData, ...data }
+      // 检查API返回的数据格式
+      if (data && data.pieces && Array.isArray(data.pieces)) {
+        // 将数组转换为对象格式
+        const piecesObject: Record<string, PieceTemplate> = {}
+        data.pieces.forEach((piece: PieceTemplate) => {
+          piecesObject[piece.id] = piece
+        })
+        // 合并API返回的数据和默认数据，确保默认数据总是可用
+        DEFAULT_PIECES = { ...defaultPiecesData, ...piecesObject }
+        console.log('Loaded pieces from API:', Object.keys(DEFAULT_PIECES))
+      }
     }
   } catch (error) {
     console.error('Error loading pieces:', error)

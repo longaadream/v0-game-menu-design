@@ -99,8 +99,11 @@
 | `afterPieceSummoned` | `piece`（召唤者）, `targetPiece`（被召唤者） | `context.piece`（召唤者）, `context.targetPiece`（被召唤者） |
 | `beginTurn` | `piece`（当前回合玩家的棋子）, `turnNumber`（回合数）, `playerId`（玩家ID） | `context.piece`（当前棋子）, `context.turnNumber`（回合数）, `context.playerId`（玩家ID） |
 | `endTurn` | `piece`（当前回合玩家的棋子）, `turnNumber`（回合数）, `playerId`（玩家ID） | `context.piece`（当前棋子）, `context.turnNumber`（回合数）, `context.playerId`（玩家ID） |
-| `afterMove` | `piece`（移动的棋子）, `playerId`（玩家ID） | `context.piece`（移动的棋子）, `context.playerId`（玩家ID） |
-| `afterSkillUsed` | `piece`（使用技能的棋子）, `skillId`（技能ID）, `playerId`（玩家ID） | `context.piece`（使用技能的棋子）, `context.skillId`（技能ID）, `context.playerId`（玩家ID） |
+| `afterMove` | 移动后 | `piece`（移动的棋子）, `playerId`（玩家ID） | `context.piece`（移动的棋子）, `context.playerId`（玩家ID） |
+| `beforeMove` | 即将移动前 | `piece`（即将移动的棋子）, `targetPosition`（目标位置） | `context.piece`（即将移动的棋子）, `context.targetPosition`（目标位置） |
+| `beforeSkillUse` | 即将释放技能前 | `piece`（即将释放技能的棋子）, `skillId`（技能ID） | `context.piece`（即将释放技能的棋子）, `context.skillId`（技能ID） |
+| `beforeAttack` | 即将攻击前 | `piece`（即将攻击的棋子）, `targetPiece`（目标棋子） | `context.piece`（即将攻击的棋子）, `context.targetPiece`（目标棋子） |
+| `afterSkillUsed` | 技能使用后 | `piece`（使用技能的棋子）, `skillId`（技能ID）, `playerId`（玩家ID） | `context.piece`（使用技能的棋子）, `context.skillId`（技能ID）, `context.playerId`（玩家ID） |
 | `whenever` | 根据触发时机不同，可能包含上述所有信息 | 根据具体情况获取相应信息 |
 
 ### 详细示例：如何在技能中获取死亡玩家信息

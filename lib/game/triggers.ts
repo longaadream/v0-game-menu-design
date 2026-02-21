@@ -93,6 +93,8 @@ export interface TriggerRule {
     cooldownTurns?: number  // 冷却回合
     currentCooldown?: number // 当前冷却
     uses?: number           // 当前使用次数
+    duration?: number       // 持续回合数
+    remainingDuration?: number // 剩余持续回合数
   }
 }
 
@@ -116,15 +118,12 @@ export class TriggerSystem {
     // 初始化为空，不自动加载所有规则
   }
 
-  // 加载指定的规则（客户端版本 - 仅使用默认规则）
+  // 加载指定的规则
   loadSpecificRules(ruleIds: string[]): void {
     try {
-      // 在客户端，我们只使用默认规则
-      // 服务器端会处理JSON规则加载
-      const defaultRules = this.createDefaultRules()
-      const selectedRules = defaultRules.filter(rule => ruleIds.includes(rule.id))
-      this.addRules(selectedRules)
-      console.log(`Loaded ${selectedRules.length} specific rules (client-side):`, ruleIds)
+      // 清空现有规则
+      this.clearRules()
+      console.log(`Loaded 0 specific rules:`, ruleIds)
     } catch (error) {
       console.error('Error loading specific rules:', error)
     }
@@ -155,11 +154,7 @@ export class TriggerSystem {
     return this.rules
   }
 
-  // 重新加载规则（客户端版本）
-  reloadRules(): void {
-    this.clearRules()
-    this.addRules(this.createDefaultRules())
-  }
+
 
   // 检查并触发规则
   checkTriggers(battle: BattleState, context: TriggerContext): { success: boolean; messages: string[] } {
@@ -541,83 +536,36 @@ export class TriggerSystem {
 
   // 更新冷却
   updateCooldowns(): void {
-    for (const rule of this.rules) {
-      if (rule.limits && rule.limits.currentCooldown && rule.limits.currentCooldown > 0) {
-        rule.limits.currentCooldown--
+    for (let i = this.rules.length - 1; i >= 0; i--) {
+      const rule = this.rules[i];
+      if (rule.limits) {
+        // 处理冷却
+        if (rule.limits.currentCooldown && rule.limits.currentCooldown > 0) {
+          rule.limits.currentCooldown--;
+        }
+        
+        // 处理持续时间
+        if (rule.limits.duration !== undefined) {
+          // 初始化剩余持续时间
+          if (rule.limits.remainingDuration === undefined) {
+            rule.limits.remainingDuration = rule.limits.duration;
+          }
+          
+          // 减少持续时间
+          rule.limits.remainingDuration--;
+          
+          // 如果持续时间结束，移除规则
+          if (rule.limits.remainingDuration <= 0) {
+            this.rules.splice(i, 1);
+            console.log(`Rule ${rule.id} (${rule.name}) expired and was removed`);
+          }
+        }
       }
     }
   }
-
-  // 创建默认规则
-  createDefaultRules(): TriggerRule[] {
-    return [
-      {
-        id: "rule-1",
-        name: "击杀回蓝",
-        description: "每当击杀一个敌人时，获得1点充能",
-        trigger: {
-          type: "afterPieceKilled"
-        },
-        effect: (battle, context) => {
-          if (context.sourcePiece) {
-            const playerMeta = battle.players.find(p => p.playerId === context.sourcePiece.ownerPlayerId)
-            if (playerMeta) {
-              playerMeta.chargePoints += 1
-              return { success: true, message: `${context.sourcePiece.templateId}击杀敌人获得1点充能` }
-            }
-          }
-          return { success: false }
-        }
-      },
-      {
-        id: "rule-2",
-        name: "攻击回血",
-        description: "每当使用技能造成伤害后，恢复2点生命值",
-        trigger: {
-          type: "afterDamageDealt",
-          conditions: {
-            minDamage: 1
-          }
-        },
-        effect: (battle, context) => {
-          if (context.sourcePiece) {
-            context.sourcePiece.currentHp = Math.min(
-              context.sourcePiece.currentHp + 2,
-              context.sourcePiece.maxHp
-            )
-            return { success: true, message: `${context.sourcePiece.templateId}恢复2点生命值` }
-          }
-          return { success: false }
-        }
-      },
-      {
-        id: "rule-3",
-        name: "灵魂收割",
-        description: "当一个敌方角色死亡时，死神获得等同于其最大生命值的最大生命值和血量",
-        trigger: {
-          type: "afterPieceKilled",
-          conditions: {
-            pieceType: "blue-reaper"
-          }
-        },
-        effect: (battle, context) => {
-          if (context.sourcePiece && context.targetPiece && context.sourcePiece.templateId === "blue-reaper") {
-            const targetMaxHp = context.targetPiece.maxHp
-            // 增加最大生命值
-            context.sourcePiece.maxHp += targetMaxHp
-            // 增加当前生命值
-            context.sourcePiece.currentHp += targetMaxHp
-            return { success: true, message: `${context.sourcePiece.templateId}从${context.targetPiece.templateId}的死亡中汲取力量，生命值增加${targetMaxHp}` }
-          }
-          return { success: false }
-        }
-      }
-    ]
-  }
+  
+  
 }
 
 // 全局触发系统实例
 export const globalTriggerSystem = new TriggerSystem()
-
-// 初始化默认规则
-globalTriggerSystem.addRules(globalTriggerSystem.createDefaultRules())

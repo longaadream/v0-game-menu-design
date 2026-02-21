@@ -1,15 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, Swords, Star, UserPlus, LogIn } from "lucide-react"
+import { ArrowLeft, Swords, Star, UserPlus, LogIn, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { toast } from "sonner"
 import { getPiecesByFaction, loadPieces, type PieceTemplate } from "@/lib/game/piece-repository"
+import { loadSkills, getSkillById, type SkillDefinition } from "@/lib/game/skill-repository"
 
 type User = {
   id: string
@@ -37,6 +38,9 @@ export default function PieceSelectionPage() {
   const [allPlayersSelected, setAllPlayersSelected] = useState(false)
   const [roomPlayers, setRoomPlayers] = useState<Array<{ name: string; hasSelectedPieces: boolean }>>([])
   const [gameStarting, setGameStarting] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
+  const [selectedPiece, setSelectedPiece] = useState<PieceTemplate | null>(null)
+  const [expandedSkills, setExpandedSkills] = useState<Record<string, boolean>>({})
 
   // 检查用户登录状态
   useEffect(() => {
@@ -58,105 +62,137 @@ export default function PieceSelectionPage() {
     setRoomId(urlRoomId ? urlRoomId.trim() : "")
   }, [searchParams])
 
-  // 加载棋子数据
+  // 加载棋子和技能数据
   useEffect(() => {
-    async function fetchPieces() {
+    async function fetchData() {
       await loadPieces()
+      await loadSkills()
       // 加载完成后更新棋子状态
       setRedPieces(getPiecesByFaction("red"))
       setBluePieces(getPiecesByFaction("blue"))
     }
-    fetchPieces()
+    fetchData()
   }, [])
 
-  // 轮询检查房间状态，确保所有玩家都能及时获取状态更新
+  // 手动获取房间状态的函数
+  function fetchRoomStatus() {
+    const trimmedRoomId = roomId.trim()
+    if (!trimmedRoomId || !user) {
+      return
+    }
+
+    console.log('Fetching room status:', { roomId: trimmedRoomId })
+    const apiUrl = `/api/rooms/${encodeURIComponent(trimmedRoomId)}`
+    console.log('API request URL:', apiUrl)
+    
+    fetch(apiUrl)
+      .then(res => {
+        console.log('Fetch response details:', {
+          status: res.status,
+          statusText: res.statusText,
+          headers: Object.fromEntries(res.headers.entries())
+        })
+        
+        if (res.ok) {
+          // 检查响应是否为JSON
+          const contentType = res.headers.get('content-type')
+          console.log('Response content type:', contentType)
+          
+          if (contentType && contentType.includes('application/json')) {
+            return res.json()
+          } else {
+            console.error('Response is not JSON:', contentType)
+            return res.text().then(text => {
+              console.error('Response text:', text.substring(0, 200) + '...')
+              throw new Error('Response is not JSON')
+            })
+          }
+        } else {
+          console.log('Failed to fetch room status:', { status: res.status, statusText: res.statusText })
+          return res.json().catch(() => res.text()).then(data => {
+            console.log('Error response data:', data)
+            throw new Error('Failed to fetch room status')
+          })
+        }
+      })
+      .then(data => {
+        console.log('Room data received:', data)
+        
+        // 检查房间状态是否已经是"in-progress"，如果是，直接跳转到战斗页面
+        if (data.status === "in-progress") {
+          console.log('Room is already in progress, redirecting to battle')
+          window.location.href = `/battle/${trimmedRoomId}?playerName=${encodeURIComponent(user.username)}&playerId=${encodeURIComponent(user.id.trim())}`
+          return
+        }
+        
+        // 更新房间状态和玩家列表
+        if (data.players) {
+          console.log('Updating room status with players:', data.players)
+          setRoomStatus(data.players.length === 2 ? "ready" : "waiting")
+          
+          // 更新玩家列表和棋子选择状态
+          const players = data.players.map((p: any) => {
+            // 确保正确计算玩家的选择状态，处理undefined情况
+            const isCurrentPlayer = p.id.trim() === user.id.trim()
+            // 计算玩家的实际选择状态，不强制将当前玩家标记为已选择
+            const hasSelected = Boolean(p.hasSelectedPieces === true || (p.selectedPieces && p.selectedPieces.length > 0))
+            console.log('Processing player:', {
+              name: p.name,
+              isCurrentPlayer,
+              hasSelectedPiecesFromAPI: p.hasSelectedPieces,
+              selectedPiecesFromAPI: p.selectedPieces,
+              selectedPiecesCount: p.selectedPieces?.length || 0,
+              calculatedHasSelected: hasSelected
+            })
+            return {
+              name: p.name,
+              hasSelectedPieces: hasSelected
+            }
+          })
+          
+          console.log('Updated room players:', players)
+          setRoomPlayers(players)
+          
+          // 更新当前玩家的选择状态
+          const currentPlayer = data.players.find((p: any) => p.id.trim() === user.id.trim())
+          const currentPlayerHasSelected = currentPlayer ? Boolean(currentPlayer.hasSelectedPieces === true || (currentPlayer.selectedPieces && currentPlayer.selectedPieces.length > 0)) : false
+          setCurrentPlayerSelected(currentPlayerHasSelected)
+          setIsPiecesSelected(currentPlayerHasSelected)
+          
+          // 检查是否所有玩家都已选择
+          const allSelected = players.length >= 2 && players.every(p => p.hasSelectedPieces)
+          setAllPlayersSelected(allSelected)
+          
+          // 如果所有玩家都已选择，自动开始游戏
+          if (allSelected) {
+            console.log('All players have selected pieces, auto-starting game')
+            handleStartGame()
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching room status:', error)
+        if (error instanceof Error) {
+          console.error('Error message:', error.message)
+        }
+      })
+  }
+
+  // 状态检查，确保其他玩家的操作能及时同步
   useEffect(() => {
     const trimmedRoomId = roomId.trim()
     if (!trimmedRoomId || !playerFaction || !user) {
       return
     }
 
-    const interval = setInterval(async () => {
-      try {
-        console.log('Polling room status:', { roomId: trimmedRoomId, timestamp: Date.now() })
-        const res = await fetch(`/api/rooms/${encodeURIComponent(trimmedRoomId)}`)
-        console.log('Fetch response status:', { status: res.status, statusText: res.statusText })
-        if (res.ok) {
-          const data = await res.json()
-          console.log('Room data received:', data)
-          // 检查房间状态是否已经是"in-progress"，如果是，直接跳转到战斗页面
-          if (data.status === "in-progress") {
-            console.log('Room is already in progress, redirecting to battle')
-            window.location.href = `/battle/${trimmedRoomId}?playerName=${encodeURIComponent(user.username)}&playerId=${encodeURIComponent(user.id.trim())}`
-            return
-          }
-          
-          // 更新房间状态
-          if (data.players) {
-            console.log('Updating room status with players:', data.players)
-            setRoomStatus(data.players.length === 2 ? "ready" : "waiting")
-            
-            // 更新玩家列表和棋子选择状态
-            const players = data.players.map((p: any) => ({
-              name: p.name,
-              hasSelectedPieces: p.hasSelectedPieces === true || (p.selectedPieces && p.selectedPieces.length > 0)
-            }))
-            setRoomPlayers(players)
-            
-            // 输出详细的玩家状态以便调试
-            console.log('Player status details:', data.players.map((p: any) => ({
-              id: p.id,
-              idTrimmed: p.id.trim(),
-              name: p.name,
-              hasSelectedPieces: p.hasSelectedPieces,
-              selectedPiecesCount: p.selectedPieces?.length || 0
-            })))
-            
-            // 检查是否所有玩家都选择了棋子，并且至少有2个玩家
-            const allSelected = data.players.length >= 2 && data.players.every((p: any) => {
-              const hasSelected = p.hasSelectedPieces === true || (p.selectedPieces && p.selectedPieces.length > 0)
-              console.log('Player selection check:', { player: p.name, hasSelectedPieces: p.hasSelectedPieces, selectedPiecesCount: p.selectedPieces?.length || 0, hasSelected })
-              return hasSelected
-            })
-            setAllPlayersSelected(allSelected)
-            console.log('All players selected check:', { allSelected, playerCount: data.players.length })
-            
-            // 检查当前玩家是否已经选择了棋子
-            const currentPlayer = data.players.find((p: any) => p.id.trim() === user.id.trim())
-            const currentPlayerSelected = currentPlayer && (currentPlayer.hasSelectedPieces === true || (currentPlayer.selectedPieces && currentPlayer.selectedPieces.length > 0))
-            setCurrentPlayerSelected(currentPlayerSelected)
-            
-            // 输出详细的房间状态以便调试
-            console.log('Room status update:', {
-              roomId: trimmedRoomId,
-              playersCount: data.players.length,
-              players: data.players.map((p: any) => ({ id: p.id, name: p.name, hasSelectedPieces: p.hasSelectedPieces, selectedPiecesCount: p.selectedPieces?.length || 0, faction: p.faction })),
-              allSelected,
-              currentPlayerSelected,
-              isPiecesSelected,
-              roomStatus: data.status,
-              currentUserId: user.id.trim()
-            })
-            
-            // 如果所有玩家都选择了棋子，并且当前玩家也选择了棋子，自动开始游戏
-            if (allSelected && currentPlayerSelected && !gameStarting) {
-              console.log('All players have selected pieces, auto-starting game')
-              setGameStarting(true)
-              // 延迟一小段时间，让用户看到"游戏即将开始"的消息
-              setTimeout(() => {
-                void handleStartGame()
-              }, 1000)
-            }
-          } else {
-            console.log('No players data in room response:', data)
-          }
-        } else {
-          console.log('Failed to fetch room status:', { status: res.status, statusText: res.statusText })
-        }
-      } catch (error) {
-        console.error('Error polling room status:', error)
-      }
-    }, 1000) // 每1秒检查一次，增加轮询频率
+    // 初始加载时获取一次状态
+    fetchRoomStatus()
+
+    // 每1秒检查一次状态，确保其他玩家的操作能及时同步
+    // 1秒的频率既能保证及时性，又不会对服务器造成太大压力
+    const interval = setInterval(() => {
+      fetchRoomStatus()
+    }, 1000) // 1秒一次，确保状态及时同步
 
     return () => clearInterval(interval)
   }, [roomId, playerFaction, user])
@@ -260,6 +296,9 @@ export default function PieceSelectionPage() {
                 if (factionData.success) {
                   setPlayerFaction(factionData.faction)
                   setRoomStatus(roomData.players.length === 2 ? "ready" : "waiting")
+                  
+                  // 玩家已经在房间中时，获取最新的房间状态
+                  await fetchRoomStatus()
                   return
                 }
               }
@@ -295,6 +334,8 @@ export default function PieceSelectionPage() {
           setPlayerFaction(factionData.faction)
           setRoomStatus(data.players.length === 2 ? "ready" : "waiting")
           console.log('Faction claimed successfully:', factionData.faction)
+          // 加入房间后获取最新的房间状态
+          await fetchRoomStatus()
         }
       }
     } catch (err) {
@@ -322,6 +363,7 @@ export default function PieceSelectionPage() {
       return
     }
     setLoading(true)
+    setGameStarting(true)
 
     console.log('Attempting to start game:', {
       roomId: trimmedRoomId,
@@ -333,35 +375,53 @@ export default function PieceSelectionPage() {
     // 根据玩家的实际身份发送选择的棋子
     const selectedPieces = playerFaction === "red" ? redSelectedPieces : blueSelectedPieces
     
-    fetch(`/api/rooms/${encodeURIComponent(trimmedRoomId)}/actions`, {
+    console.log('Selected pieces to send:', selectedPieces)
+    
+    const apiUrl = `/api/rooms/${encodeURIComponent(trimmedRoomId)}/actions`
+    console.log('API URL:', apiUrl)
+    
+    const requestBody = JSON.stringify({
+      action: "start-game",
+      playerName: user.username,
+      playerId: user.id.trim(),
+      pieces: selectedPieces.map(p => ({
+        templateId: p.id,
+        faction: p.faction,
+      })),
+    })
+    
+    console.log('Request body:', requestBody)
+    
+    fetch(apiUrl, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
         "Accept": "application/json"
       },
-      body: JSON.stringify({
-        action: "start-game",
-        playerName: user.username,
-        playerId: user.id.trim(),
-        pieces: selectedPieces.map(p => ({
-          templateId: p.id,
-          faction: p.faction,
-        })),
-      }),
+      body: requestBody,
     })
       .then((res) => {
         console.log('Start game response status:', res.status)
-        return res.json()
+        console.log('Start game response status text:', res.statusText)
+        return res.json().catch(() => ({
+          success: false,
+          error: `响应解析失败 (${res.status})`
+        }))
       })
       .then((data) => {
         console.log('Start game response data:', data)
         if (data.success) {
           console.log('Game started successfully, redirecting to battle')
-          window.location.href = `/battle/${trimmedRoomId}?playerName=${encodeURIComponent(user.username)}&playerId=${encodeURIComponent(user.id.trim())}`
+          const battleUrl = `/battle/${trimmedRoomId}?playerName=${encodeURIComponent(user.username)}&playerId=${encodeURIComponent(user.id.trim())}`
+          console.log('Battle URL:', battleUrl)
+          window.location.href = battleUrl
         } else {
           console.log('Game start failed:', data.error || data.message)
           toast.error(data.error || data.message || "开始游戏失败")
           setGameStarting(false)
+          
+          // 游戏启动失败后，获取最新的房间状态
+          fetchRoomStatus()
         }
       })
       .catch((err) => {
@@ -396,31 +456,111 @@ export default function PieceSelectionPage() {
 
     const selectedPieces = playerFaction === "red" ? redSelectedPieces : blueSelectedPieces
     
-    fetch(`/api/rooms/${encodeURIComponent(trimmedRoomId)}/actions`, {
+    console.log('=== Select Pieces Operation ===')
+    console.log('Input parameters:', {
+      roomId: {
+        original: roomId,
+        trimmed: trimmedRoomId
+      },
+      playerId: {
+        original: user.id,
+        trimmed: user.id.trim()
+      },
+      playerName: user.username,
+      playerFaction: playerFaction,
+      selectedPiecesCount: selectedPieces.length,
+      selectedPieces: selectedPieces
+    })
+    
+    const apiUrl = `/api/rooms/${encodeURIComponent(trimmedRoomId)}/actions`
+    console.log('API URL:', apiUrl)
+    
+    const requestBody = {
+      action: "select-pieces",
+      playerName: user.username,
+      playerId: user.id.trim(),
+      pieces: selectedPieces.map(p => ({
+        templateId: p.id,
+        faction: p.faction,
+      })),
+    }
+    
+    console.log('Request body:', requestBody)
+    
+    fetch(apiUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "select-pieces",
-        playerName: user.username,
-        playerId: user.id.trim(),
-        pieces: selectedPieces.map(p => ({
-          templateId: p.id,
-          faction: p.faction,
-        })),
-      }),
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(requestBody),
     })
       .then((res) => {
+        console.log('Response status:', { status: res.status, statusText: res.statusText })
         if (!res.ok) {
           return res.json().then(data => {
+            console.log('Error response data:', data)
             throw new Error(data.error || "选择棋子失败")
           })
         }
         return res.json()
       })
       .then((data) => {
+        console.log('Success response data:', data)
         if (data.success) {
           toast.success("棋子选择成功！")
-          setIsPiecesSelected(true)
+          
+          // 使用后端返回的房间数据更新本地状态
+          if (data.room && data.room.players) {
+            console.log('Using backend returned room data to update local state:', data.room.players)
+            
+            // 计算所有玩家的选择状态
+            const playersWithStatus = data.room.players.map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              hasSelected: Boolean(p.hasSelectedPieces === true || (p.selectedPieces && p.selectedPieces.length > 0)),
+              isCurrentPlayer: p.id.trim() === user.id.trim()
+            }))
+            
+            console.log('Players with selection status:', playersWithStatus)
+            
+            // 检查是否所有玩家都已选择完成（至少2个玩家）
+            const allSelected = data.room.players.length >= 2 && playersWithStatus.every(p => p.hasSelected)
+            console.log('All players selected check:', allSelected)
+            
+            // 无论是否所有玩家都已选择，都更新本地状态
+            console.log('Updating local state after piece selection')
+            
+            // 只在玩家真正选择了棋子后才更新状态
+            const hasActuallySelected = selectedPieces.length > 0
+            setIsPiecesSelected(hasActuallySelected)
+            setCurrentPlayerSelected(hasActuallySelected)
+            
+            // 更新玩家列表状态
+            const players = data.room.players.map((p: any) => {
+              const isCurrentPlayer = p.id.trim() === user.id.trim()
+              return {
+                name: p.name,
+                hasSelectedPieces: isCurrentPlayer ? hasActuallySelected : Boolean(p.hasSelectedPieces === true || (p.selectedPieces && p.selectedPieces.length > 0))
+              }
+            })
+            console.log('Updated room players with current player status:', players)
+            setRoomPlayers(players)
+            
+            // 选择棋子后立即获取最新的房间状态，检查游戏是否已经启动
+            // 游戏启动的逻辑现在由后端处理，前端只需要检查状态并跳转
+            console.log('Checking if game has started on server')
+            fetchRoomStatus()
+          } else {
+            // 如果后端返回的数据中没有房间信息，根据实际选择情况更新状态
+            console.log('No room data in response, updating local state based on actual selection')
+            const hasActuallySelected = selectedPieces.length > 0
+            setIsPiecesSelected(hasActuallySelected)
+            setCurrentPlayerSelected(hasActuallySelected)
+            
+            // 即使没有房间数据，也获取最新的房间状态
+            fetchRoomStatus()
+          }
         } else {
           toast.error(data.message || "选择棋子失败")
         }
@@ -432,6 +572,7 @@ export default function PieceSelectionPage() {
       })
       .finally(() => {
         setLoading(false)
+        console.log('Select pieces operation completed')
       })
   }
 
@@ -583,22 +724,49 @@ export default function PieceSelectionPage() {
                 <div
                   key={piece.id}
                   onClick={() => handleRedPieceToggle(piece)}
-                  className={`relative p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    // 显示棋子详细信息
+                    console.log('Right-click on piece:', piece.name);
+                    setSelectedPiece(piece);
+                    setShowDetails(true);
+                  }}
+                  className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all ${
                     redSelectedPieces.some(p => p.id === piece.id)
                       ? "border-red-500 bg-red-900/20"
                       : "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
                   }`}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className={`text-4xl ${piece.image}`}>
-                      {piece.image}
+                  <div className="flex items-center gap-2">
+                    <div className={`flex items-center justify-center rounded-lg ${piece.faction === "red" ? "bg-red-600" : "bg-blue-600"} h-14 w-14`}>
+                      {piece.image && piece.image.startsWith("http") ? (
+                        <img 
+                          src={piece.image} 
+                          alt={piece.name} 
+                          className="h-10 w-10 object-contain"
+                        />
+                      ) : piece.image && (piece.image.length <= 3 || piece.image.includes("️")) ? (
+                        <span className="text-4xl font-bold text-white">{piece.image}</span>
+                      ) : piece.image ? (
+                        <img 
+                          src={`/${piece.image}`} 
+                          alt={piece.name} 
+                          className="h-10 w-10 object-contain"
+                        />
+                      ) : (
+                        <Swords className="h-7 w-7 text-white" />
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-zinc-100">{piece.name}</div>
-                      <Badge className={getRarityColor(piece.rarity)}>
-                        {piece.rarity}
-                      </Badge>
-                      <p className="text-sm text-zinc-400 mt-1">{piece.description}</p>
+                      <div className="flex items-center gap-1">
+                        <Badge className={getRarityColor(piece.rarity)}>
+                          {piece.rarity}
+                        </Badge>
+                        <span className="text-xs text-zinc-400">
+                          HP: {piece.stats.maxHp} | 攻击: {piece.stats.attack} | 防御: {piece.stats.defense}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   {redSelectedPieces.some(p => p.id === piece.id) && (
@@ -628,22 +796,49 @@ export default function PieceSelectionPage() {
                 <div
                   key={piece.id}
                   onClick={() => handleBluePieceToggle(piece)}
-                  className={`relative p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    // 显示棋子详细信息
+                    console.log('Right-click on piece:', piece.name);
+                    setSelectedPiece(piece);
+                    setShowDetails(true);
+                  }}
+                  className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all ${
                     blueSelectedPieces.some(p => p.id === piece.id)
                       ? "border-blue-500 bg-blue-900/20"
                       : "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
                   }`}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className={`text-4xl ${piece.image}`}>
-                      {piece.image}
+                  <div className="flex items-center gap-2">
+                    <div className={`flex items-center justify-center rounded-lg ${piece.faction === "red" ? "bg-red-600" : "bg-blue-600"} h-14 w-14`}>
+                      {piece.image && piece.image.startsWith("http") ? (
+                        <img 
+                          src={piece.image} 
+                          alt={piece.name} 
+                          className="h-10 w-10 object-contain"
+                        />
+                      ) : piece.image && (piece.image.length <= 3 || piece.image.includes("️")) ? (
+                        <span className="text-4xl font-bold text-white">{piece.image}</span>
+                      ) : piece.image ? (
+                        <img 
+                          src={`/${piece.image}`} 
+                          alt={piece.name} 
+                          className="h-10 w-10 object-contain"
+                        />
+                      ) : (
+                        <Swords className="h-7 w-7 text-white" />
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-zinc-100">{piece.name}</div>
-                      <Badge className={getRarityColor(piece.rarity)}>
-                        {piece.rarity}
-                      </Badge>
-                      <p className="text-sm text-zinc-400 mt-1">{piece.description}</p>
+                      <div className="flex items-center gap-1">
+                        <Badge className={getRarityColor(piece.rarity)}>
+                          {piece.rarity}
+                        </Badge>
+                        <span className="text-xs text-zinc-400">
+                          HP: {piece.stats.maxHp} | 攻击: {piece.stats.attack} | 防御: {piece.stats.defense}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   {blueSelectedPieces.some(p => p.id === piece.id) && (
@@ -680,7 +875,25 @@ export default function PieceSelectionPage() {
                     <div className="flex flex-wrap gap-2">
                       {redSelectedPieces.map((piece) => (
                         <div key={piece.id} className="flex items-center gap-2">
-                          <div className={`text-3xl ${piece.image}`}>{piece.image}</div>
+                          <div className="h-8 w-8 flex items-center justify-center bg-red-600 rounded">
+                            {piece.image && piece.image.startsWith("http") ? (
+                              <img 
+                                src={piece.image} 
+                                alt={piece.name} 
+                                className="h-6 w-6 object-contain"
+                              />
+                            ) : piece.image && (piece.image.length <= 3 || piece.image.includes("️")) ? (
+                              <span className="text-2xl font-bold text-white">{piece.image}</span>
+                            ) : piece.image ? (
+                              <img 
+                                src={`/${piece.image}`} 
+                                alt={piece.name} 
+                                className="h-6 w-6 object-contain"
+                              />
+                            ) : (
+                              <Swords className="h-4 w-4 text-white" />
+                            )}
+                          </div>
                           <span className="text-sm text-zinc-300">{piece.name}</span>
                         </div>
                       ))}
@@ -693,7 +906,25 @@ export default function PieceSelectionPage() {
                     <div className="flex flex-wrap gap-2">
                       {blueSelectedPieces.map((piece) => (
                         <div key={piece.id} className="flex items-center gap-2">
-                          <div className={`text-3xl ${piece.image}`}>{piece.image}</div>
+                          <div className="h-8 w-8 flex items-center justify-center bg-blue-600 rounded">
+                            {piece.image && piece.image.startsWith("http") ? (
+                              <img 
+                                src={piece.image} 
+                                alt={piece.name} 
+                                className="h-6 w-6 object-contain"
+                              />
+                            ) : piece.image && (piece.image.length <= 3 || piece.image.includes("️")) ? (
+                              <span className="text-2xl font-bold text-white">{piece.image}</span>
+                            ) : piece.image ? (
+                              <img 
+                                src={`/${piece.image}`} 
+                                alt={piece.name} 
+                                className="h-6 w-6 object-contain"
+                              />
+                            ) : (
+                              <Swords className="h-4 w-4 text-white" />
+                            )}
+                          </div>
                           <span className="text-sm text-zinc-300">{piece.name}</span>
                         </div>
                       ))}
@@ -759,6 +990,144 @@ export default function PieceSelectionPage() {
               <div className="h-6 w-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
             </div>
             <p className="text-blue-200">双方都已选择棋子，游戏即将开始...</p>
+          </div>
+        )}
+
+        {/* 棋子详细信息弹窗 */}
+        {showDetails && selectedPiece && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-zinc-900 rounded-lg border border-zinc-700 w-full max-w-md p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-zinc-100">棋子详情</h2>
+                <button 
+                  onClick={() => setShowDetails(false)} 
+                  className="text-zinc-400 hover:text-zinc-100"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`flex items-center justify-center rounded-lg ${selectedPiece.faction === "red" ? "bg-red-600" : "bg-blue-600"} h-16 w-16`}>
+                  {selectedPiece.image && selectedPiece.image.startsWith("http") ? (
+                    <img 
+                      src={selectedPiece.image} 
+                      alt={selectedPiece.name} 
+                      className="h-12 w-12 object-contain"
+                    />
+                  ) : selectedPiece.image && (selectedPiece.image.length <= 3 || selectedPiece.image.includes("️")) ? (
+                    <span className="text-5xl font-bold text-white">{selectedPiece.image}</span>
+                  ) : selectedPiece.image ? (
+                    <img 
+                      src={`/${selectedPiece.image}`} 
+                      alt={selectedPiece.name} 
+                      className="h-12 w-12 object-contain"
+                    />
+                  ) : (
+                    <Swords className="h-8 w-8 text-white" />
+                  )}
+                </div>
+                <div>
+                  <div className="font-bold text-xl text-zinc-100">{selectedPiece.name}</div>
+                  <Badge className={getRarityColor(selectedPiece.rarity)}>
+                    {selectedPiece.rarity}
+                  </Badge>
+                </div>
+              </div>
+              
+              <p className="text-sm text-zinc-300 mb-4">{selectedPiece.description}</p>
+              
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="flex items-center gap-1">
+                  <span className="text-zinc-400">HP:</span>
+                  <span className="text-white">{selectedPiece.stats.maxHp}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-zinc-400">攻击:</span>
+                  <span className="text-white">{selectedPiece.stats.attack}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-zinc-400">防御:</span>
+                  <span className="text-white">{selectedPiece.stats.defense}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-zinc-400">移动范围:</span>
+                  <span className="text-white">{selectedPiece.stats.moveRange}</span>
+                </div>
+              </div>
+              
+              {selectedPiece.skills && selectedPiece.skills.length > 0 && (
+                <div className="mt-4">
+                  <div className="font-medium text-zinc-300 mb-2">技能:</div>
+                  <div className="space-y-2">
+                    {selectedPiece.skills.map((skill) => {
+                      const skillDefinition = getSkillById(skill.skillId)
+                      return (
+                        <div key={skill.skillId} className="bg-zinc-800 rounded overflow-hidden">
+                          <div 
+                            className="p-2 cursor-pointer hover:bg-zinc-700 transition-colors flex items-center justify-between"
+                            onClick={() => setExpandedSkills(prev => ({
+                              ...prev,
+                              [skill.skillId]: !prev[skill.skillId]
+                            }))}
+                          >
+                            <div>
+                              <div className="font-medium text-zinc-200">{skillDefinition?.name || skill.skillId}</div>
+                              <div className="text-xs text-zinc-400">等级: {skill.level}</div>
+                            </div>
+                            <div className="text-zinc-400">
+                              {expandedSkills[skill.skillId] ? '▼' : '►'}
+                            </div>
+                          </div>
+                          {expandedSkills[skill.skillId] && skillDefinition && (
+                            <div className="p-2 border-t border-zinc-700 bg-zinc-900/50">
+                              <div className="text-xs space-y-1">
+                                {skillDefinition.kind && (
+                                  <div>
+                                    <span className="text-zinc-400">类型:</span>
+                                    <span className="text-white">{skillDefinition.kind === 'active' ? '主动' : '被动'}</span>
+                                  </div>
+                                )}
+                                {skillDefinition.description && (
+                                  <div>
+                                    <span className="text-zinc-400">描述:</span>
+                                    <span className="text-white">{skillDefinition.description}</span>
+                                  </div>
+                                )}
+                                {skillDefinition.actionPointCost !== undefined && (
+                                  <div>
+                                    <span className="text-zinc-400">行动点消耗:</span>
+                                    <span className="text-white">{skillDefinition.actionPointCost}</span>
+                                  </div>
+                                )}
+                                {skillDefinition.chargeCost !== undefined && (
+                                  <div>
+                                    <span className="text-zinc-400">充能点消耗:</span>
+                                    <span className="text-white">{skillDefinition.chargeCost}</span>
+                                  </div>
+                                )}
+                                {skillDefinition.cooldownTurns > 0 && (
+                                  <div>
+                                    <span className="text-zinc-400">冷却回合:</span>
+                                    <span className="text-white">{skillDefinition.cooldownTurns}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              <div className="mt-6 flex justify-end">
+                <Button onClick={() => setShowDetails(false)}>
+                  关闭
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>

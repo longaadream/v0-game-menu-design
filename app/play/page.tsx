@@ -137,18 +137,41 @@ export default function PlayPage() {
     
     try {
       setLoading(true)
+      console.log('=== Clear All Rooms Operation ===')
+      console.log('Number of rooms to delete:', myRooms.length)
+      
       // 删除所有用户作为房主的房间
       for (const room of myRooms) {
-        await fetch(`/api/rooms/${room.id}`, {
-          method: "DELETE",
-        })
+        // 确保使用修剪后的房间 ID，与后端存储的键匹配
+        const roomIdToDelete = room.id.trim()
+        const encodedRoomId = encodeURIComponent(roomIdToDelete)
+        console.log('Deleting room:', { id: roomIdToDelete, name: room.name, encoded: encodedRoomId })
+        
+        try {
+          const res = await fetch(`/api/rooms/${encodedRoomId}`, {
+            method: "DELETE",
+          })
+          const data = await res.json().catch(() => ({}))
+          console.log('Delete room response:', { status: res.status, data })
+          
+          // 即使服务器返回 404 (Room not found)，也视为删除成功
+          const isSuccess = res.ok && data.success || res.status === 404
+          if (!isSuccess) {
+            console.error('Failed to delete room:', { id: roomIdToDelete, error: data.error })
+          }
+        } catch (error) {
+          console.error('Error deleting room:', { id: roomIdToDelete, error })
+        }
       }
+      
       // 重新加载房间列表
+      console.log('Reloading room list after clearing all rooms')
       await fetchMyRooms()
     } catch (error) {
       console.error('清空房间失败:', error)
     } finally {
       setLoading(false)
+      console.log('=== Clear All Rooms Operation Complete ===')
     }
   }
 
@@ -384,15 +407,26 @@ export default function PlayPage() {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch(`/api/rooms/${roomId}`, {
+      // 确保使用修剪后的房间 ID，与后端存储的键匹配
+      const trimmedRoomId = roomId.trim()
+      const encodedRoomId = encodeURIComponent(trimmedRoomId)
+      console.log('Sending DELETE request for room:', { original: roomId, trimmed: trimmedRoomId, encoded: encodedRoomId })
+      const res = await fetch(`/api/rooms/${encodedRoomId}`, {
         method: "DELETE",
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
+      console.log('DELETE response:', { status: res.status, data })
+      
+      // 检查删除是否成功
+      // 即使服务器返回 404 (Room not found)，也视为删除成功，因为房间已经不存在了
+      const isSuccess = res.ok && data.success || res.status === 404
+      
+      if (!isSuccess) {
         throw new Error(data.error || "Failed to delete room")
       }
 
       // 重新加载房间列表，确保所有玩家都能看到最新的房间状态
+      console.log('Reloading room list after deletion')
       await fetchMyRooms()
 
       // 清空状态
@@ -401,8 +435,11 @@ export default function PlayPage() {
       setBattle(null)
       // 移除 URL 上的 roomId
       router.replace("/play")
+      console.log('Room deletion process completed successfully')
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error")
+      const errorMessage = err instanceof Error ? err.message : "Unknown error"
+      setError(errorMessage)
+      console.error('Error deleting room:', errorMessage)
       // 即使出错，也要重新加载房间列表
       await fetchMyRooms()
     } finally {
@@ -648,45 +685,54 @@ export default function PlayPage() {
                             onClick={async () => {
                               try {
                                 setLoading(true)
-                                const roomId = room.id.trim()
+                                // 确保使用修剪后的房间 ID，与后端存储的键匹配
+                                const roomIdToDelete = room.id.trim()
+                                const encodedRoomId = encodeURIComponent(roomIdToDelete)
                                 console.log('=== Delete Room Operation ===')
-                                console.log('Room to delete:', { id: roomId, name: room.name })
+                                console.log('Room to delete:', { id: roomIdToDelete, name: room.name, encoded: encodedRoomId })
                                 
                                 // 发送 DELETE 请求到服务器
                                 console.log('Sending DELETE request to server')
-                                const res = await fetch(`/api/rooms/${encodeURIComponent(roomId)}`, {
+                                const res = await fetch(`/api/rooms/${encodedRoomId}`, {
                                   method: "DELETE",
                                 })
                                 
-                                // 无论服务器返回什么状态，都从前端状态中删除房间
-                                // 因为即使服务器找不到房间，我们也希望在前端界面上移除它
-                                console.log('Server response:', { status: res.status, statusText: res.statusText })
+                                // 解析服务器响应
+                                const data = await res.json().catch(() => ({}))
+                                console.log('Server response:', { status: res.status, statusText: res.statusText, data })
+                                
+                                // 检查删除是否成功
+                                // 即使服务器返回 404 (Room not found)，也视为删除成功，因为房间已经不存在了
+                                const isSuccess = res.ok && data.success || res.status === 404
+                                
+                                if (!isSuccess) {
+                                  throw new Error(data.error || "删除房间失败")
+                                }
+                                
+                                console.log('Room deletion successful!')
                                 
                                 // 重新加载房间列表，确保所有玩家都能看到最新的房间状态
                                 console.log('Reloading room list')
                                 await fetchMyRooms()
                                 
                                 // 如果当前显示的房间就是被删除的房间，将其设置为 null
-                                if (room && room.id === roomId) {
-                                  console.log('Clearing current room state:', roomId)
+                                if (roomId && roomId.trim() === roomIdToDelete) {
+                                  console.log('Clearing current room state:', roomIdToDelete)
                                   setRoom(null)
                                   setRoomId(null)
                                   setBattle(null)
+                                  // 移除 URL 上的 roomId
+                                  router.replace("/play")
                                 }
                                 
                                 console.log('=== Delete Room Operation Complete ===')
                               } catch (error) {
-                                console.error('删除房间失败:', error)
+                                const errorMessage = error instanceof Error ? error.message : "删除房间失败"
+                                console.error('删除房间失败:', errorMessage)
+                                // 显示错误信息
+                                setError(errorMessage)
                                 // 即使出错，也要重新加载房间列表
                                 await fetchMyRooms()
-                                if (room) {
-                                  const roomId = room.id.trim()
-                                  if (room.id === roomId) {
-                                    setRoom(null)
-                                    setRoomId(null)
-                                    setBattle(null)
-                                  }
-                                }
                               } finally {
                                 setLoading(false)
                               }

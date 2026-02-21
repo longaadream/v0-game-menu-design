@@ -5,7 +5,7 @@
   "trigger": {
     "type": "afterPieceKilled",
     "conditions": {
-      "pieceType": "blue-reaper"
+      "pieceType": "red-reaper"
     }
   },
   "effect": {
