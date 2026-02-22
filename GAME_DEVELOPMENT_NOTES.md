@@ -286,11 +286,7 @@
     "name": "规则名称",
     "description": "规则描述",
     "trigger": {
-      "type": "触发类型",
-      "conditions": {
-        "条件1": "值1",
-        "条件2": "值2"
-      }
+      "type": "触发类型"
     },
     "effect": {
       "type": "triggerSkill",
@@ -352,7 +348,7 @@ function executeSkill(context) {
     const healAmount = victim.maxHp;
     killer.currentHp = Math.min(killer.currentHp + healAmount, killer.maxHp);
     return { 
-      message: killer.templateId + '汲取了' + victim.templateId + '的生命，恢复了' + healAmount + '点生命值', 
+      message: killer.name + '汲取了' + victim.name + '的生命，恢复了' + healAmount + '点生命值', 
       success: true 
     };
   }
@@ -363,7 +359,7 @@ function executeSkill(context) {
 #### 规则与技能的关联
 
 1. **创建技能**：在 `data/skills/` 目录创建技能JSON文件，编写技能执行代码
-2. **创建规则**：在 `data/rules/` 目录创建规则JSON文件，指定触发条件和要触发的技能
+2. **创建规则**：在 `data/rules/` 目录创建规则JSON文件，指定触发时机和要触发的技能
 3. **装备技能**：将技能分配给角色，在角色的 `skills` 数组中添加技能
 4. **加载规则**：规则会在游戏开始时加载，或者通过 `loadSpecificRules` 方法按需加载
 
@@ -444,7 +440,7 @@ function executeSkill(context) {
      "cooldownTurns": 0,
      "maxCharges": 0,
      "powerMultiplier": 1,
-     "code": "function executeSkill(context) {\n  const reaper = context.piece;\n  const victim = context.targetPiece;\n  if (reaper && victim) {\n    const soulPower = victim.maxHp;\n    reaper.maxHp += soulPower;\n    reaper.currentHp += soulPower;\n    return { message: reaper.templateId + '从' + victim.templateId + '的死亡中汲取力量，生命值增加' + soulPower, success: true };\n  }\n  return { message: '没有灵魂可以收割', success: false };\n}",
+     "code": "function executeSkill(context) {\n  const reaper = context.piece;\n  const victim = context.targetPiece;\n  if (reaper && victim) {\n    const soulPower = victim.maxHp;\n    reaper.maxHp += soulPower;\n    reaper.currentHp += soulPower;\n    return { message: reaper.name + '从' + victim.name + '的死亡中汲取力量，生命值增加' + soulPower, success: true };\n  }\n  return { message: '没有灵魂可以收割', success: false };\n}",
      "range": "self",
      "requiresTarget": false
    }
@@ -457,15 +453,12 @@ function executeSkill(context) {
      "name": "灵魂收割",
      "description": "当击杀敌人时，死神获得等同于其最大生命值的生命值",
      "trigger": {
-       "type": "afterPieceKilled",
-       "conditions": {
-         "pieceType": "blue-reaper"
-       }
+       "type": "afterPieceKilled"
      },
      "effect": {
        "type": "triggerSkill",
        "skillId": "soul-harvest",
-       "message": "${source.templateId}触发了灵魂收割技能"
+       "message": "${source.name}触发了灵魂收割技能"
      },
      "limits": {
        "cooldownTurns": 0,
@@ -705,6 +698,7 @@ interface BattleState {
   pieces: {
     id: string
     templateId: string
+    name: string // 棋子名称
     playerId: string
     currentHp: number
     position: { x: number; y: number }
@@ -859,6 +853,72 @@ interface BattleState {
 - 为 API 响应添加统一的错误格式
 - 记录关键错误信息以便调试
 
+### 6. 条件判断规范
+
+**重要更新**：根据新的标准，所有的除了时机以外的判断都应该在技能代码里面用if语句实现，而不是在规则的trigger.conditions中定义。
+
+**原因**：
+- 提高代码的灵活性和可读性
+- 便于实现复杂的条件逻辑
+- 统一条件判断的处理方式
+- 减少规则文件的复杂度
+
+**正确的做法**：
+1. 在规则文件中只定义触发时机（trigger.type）
+2. 在技能代码中使用if语句实现所有条件判断
+3. 如果条件不满足，返回success: false
+
+**示例**：
+
+#### 规则文件（只定义时机）
+```json
+{
+  "id": "rule-counter-attack",
+  "name": "反击规则",
+  "description": "当受到伤害时，发动反击",
+  "trigger": {
+    "type": "afterDamageTaken"
+  },
+  "effect": {
+    "type": "triggerSkill",
+    "skillId": "counter-attack",
+    "message": "${source.name}触发了反击技能"
+  },
+  "limits": {
+    "cooldownTurns": 1,
+    "maxUses": 0
+  }
+}
+```
+
+#### 技能文件（在代码中实现条件判断）
+```javascript
+function executeSkill(context) {
+  // 获取被攻击者信息
+  const defender = context.piece;
+  // 获取攻击者信息
+  const attacker = context.target;
+  // 获取伤害值
+  const damage = context.damage;
+  
+  // 条件判断：只有当伤害大于0且攻击者存在时才发动反击
+  if (damage <= 0 || !attacker || attacker.currentHp <= 0) {
+    return { message: '反击条件不满足', success: false };
+  }
+  
+  // 计算反击伤害
+  const counterDamage = Math.floor(defender.attack * 0.8);
+  
+  // 应用反击伤害
+  attacker.currentHp = Math.max(0, attacker.currentHp - counterDamage);
+  
+  return { 
+    message: defender.name + '发动反击，对' + attacker.name + '造成' + counterDamage + '点伤害', 
+    success: true 
+  };
+}
+```
+
 ## 开发计划
 
 ### 优先开发功能
@@ -1012,7 +1072,46 @@ function calculatePreview(piece, skillDef) {
 
 ### 已完成的功能
 
-1. **状态系统实现**：
+1. **火箭重拳技能实现**：
+   - 实现了火箭重拳技能，具有位移效果和目标选择功能
+   - 修改了 `data/skills/rocket-punch.json` 文件，添加了完整的技能逻辑
+   - 技能特点：选择一个同行或同列的格子，向该方向冲刺并对路径上的敌人造成伤害
+   - 关键功能：使用 `selectTarget({ type: 'grid', range: 5, filter: 'all' })` 唤起网格目标选择界面
+   - 实现了位移效果：直接修改 `sourcePiece.x` 和 `sourcePiece.y` 坐标
+   - 添加了详细的调试日志，便于追踪技能执行过程
+   - 修复了技能语法错误，确保JSON格式正确
+
+2. **目标选择系统改进**：
+   - 增强了 `selectTarget` 函数，支持棋子和网格两种选择模式
+   - 修改了 `lib/game/skills.ts` 中的目标选择逻辑
+   - 实现了完整的目标选择流程：技能调用 -> 返回需要选择标记 -> 前端显示选择界面 -> 玩家选择 -> 重新执行技能
+   - 支持自定义选择范围和目标过滤
+
+3. **技能系统修复**：
+   - 修复了技能执行环境问题，确保技能代码能够正确访问 `sourcePiece` 和 `battle` 全局变量
+   - 修改了 `executeSkillFunction` 函数，直接操作 `battle.pieces` 中的元素，确保修改能够正确反映到游戏状态中
+   - 移除了默认技能逻辑，当技能有语法错误时直接报错
+   - 添加了详细的调试日志，便于追踪技能执行过程
+
+4. **前端目标选择处理**：
+   - 修改了 `app/battle/[roomId]/page.tsx` 中的目标选择处理逻辑
+   - 移除了对 `requiresTarget` 属性的检查，完全由后端 `selectTarget` 函数控制目标选择
+   - 添加了调试日志，追踪目标选择过程
+   - 实现了网格选择模式的UI支持
+
+5. **技能编写教程更新**：
+   - 完全重写了 `docs/SKILL_TUTORIAL.md` 文件，提供了更详细的技能编写指南
+   - 添加了技能定义结构的完整说明，包括所有字段的详细解释
+   - 详细介绍了技能执行上下文和全局变量
+   - 深入解析了目标选择系统的工作原理
+   - 提供了完整的技能函数编写示例
+   - 详细介绍了内置效果函数：`dealDamage`、`healDamage` 和 `teleport`
+   - 新增了游戏主进程核心函数的介绍
+   - 添加了更多完整的技能示例，包括火球术和治疗术
+   - 完善了调试技巧和最佳实践部分
+   - 更新了常见问题部分，提供了更多实用的问答
+
+6. **状态系统实现**：
    - 创建了完整的状态系统，支持持续效果如流血、中毒等
    - 实现了状态效果的添加、移除和持续时间管理
    - 通过规则系统联动实现状态效果的触发和持续
@@ -1021,13 +1120,13 @@ function calculatePreview(piece, skillDef) {
    - 更新了 `data/status-effects/bleeding.json` 和 `data/status-effects/poison.json` 状态文件
    - 创建了 `data/rules/status-bleeding.json` 和 `data/rules/status-poison.json` 规则文件
 
-2. **行动点系统重构**：
+7. **行动点系统重构**：
    - 实现了炉石传说风格的法力水晶机制
    - 每回合开始时最大行动点增加1点（最高10点）
    - 每回合开始时当前行动点完全恢复
    - 修改了 `lib/game/turn.ts` 中的相关逻辑
 
-3. **房间管理系统修复**：
+8. **房间管理系统修复**：
    - 修复了房间删除问题（删除后不再重新出现）
    - 实现了 `syncWithStorage()` 方法，确保内存状态与存储状态一致
    - 修复了房间加入问题，确保玩家能够正确加入房间
@@ -1036,7 +1135,7 @@ function calculatePreview(piece, skillDef) {
    - 修改了 `lib/game/room-store.ts` 中的房间存储逻辑，实现了自动同步机制
    - 更新了 `app/play/page.tsx` 中的房间管理UI
 
-4. **技能系统增强**：
+9. **技能系统增强**：
    - 集成了规则系统与技能系统，支持通过规则触发技能代码
    - 实现了伤害类型系统（物理伤害、法术伤害、真实伤害）
    - 实现了技能形态分类（近战、远程、魔法、飞行物、范围、自身）
@@ -1044,38 +1143,38 @@ function calculatePreview(piece, skillDef) {
    - 修复了伤害计算中的防御处理（改为直接减法）
    - 修改了 `lib/game/skills.ts` 中的伤害处理逻辑
 
-5. **触发系统扩展**：
-   - 在 `TriggerType` 中添加了 "whenever" 类型，支持每一步行动后检测
-   - 实现了更灵活的触发条件和效果执行
-   - 修改了 `lib/game/triggers.ts` 中的触发类型定义
+10. **触发系统扩展**：
+    - 在 `TriggerType` 中添加了 "whenever" 类型，支持每一步行动后检测
+    - 实现了更灵活的触发条件和效果执行
+    - 修改了 `lib/game/triggers.ts` 中的触发类型定义
 
-6. **棋子系统更新**：
-   - 为棋子实例添加了 `ruleTags` 和 `statusTags` 字段
-   - 支持状态变量的存储和管理
-   - 修改了 `lib/game/piece.ts` 中的 `PieceInstance` 接口
+11. **棋子系统更新**：
+    - 为棋子实例添加了 `ruleTags` 和 `statusTags` 字段
+    - 支持状态变量的存储和管理
+    - 修改了 `lib/game/piece.ts` 中的 `PieceInstance` 接口
 
-7. **教程文档更新**：
-   - 更新了 `tutorial.md`，添加了状态系统的编写指南
-   - 提供了状态效果的示例代码和使用方法
-   - 详细说明了如何通过规则系统实现持续效果
+12. **教程文档更新**：
+    - 更新了 `tutorial.md`，添加了状态系统的编写指南
+    - 提供了状态效果的示例代码和使用方法
+    - 详细说明了如何通过规则系统实现持续效果
 
-8. **战斗系统优化**：
-   - 实现了战斗状态管理和游戏结束检测
-   - 优化了回合管理和行动点分配
-   - 修改了 `app/battle/[roomId]/page.tsx` 中的战斗逻辑
+13. **战斗系统优化**：
+    - 实现了战斗状态管理和游戏结束检测
+    - 优化了回合管理和行动点分配
+    - 修改了 `app/battle/[roomId]/page.tsx` 中的战斗逻辑
 
-9. **API 接口修复**：
-   - 修复了 `app/api/rooms/[roomId]/route.ts` 中的游戏开始逻辑
-   - 修复了 `app/api/rooms/[roomId]/actions/route.ts` 中的棋子选择和房间加入逻辑
-   - 确保了玩家ID的一致性处理（添加了trim()操作）
+14. **API 接口修复**：
+    - 修复了 `app/api/rooms/[roomId]/route.ts` 中的游戏开始逻辑
+    - 修复了 `app/api/rooms/[roomId]/actions/route.ts` 中的棋子选择和房间加入逻辑
+    - 确保了玩家ID的一致性处理（添加了trim()操作）
 
-10. **规则系统实现**：
+15. **规则系统实现**：
     - 创建了完整的触发-效果系统，支持"当……的时候，执行……效果"的规则
     - 实现了规则加载器，从JSON文件加载规则定义
     - 支持条件规则加载，只在选择特定棋子或地图时加载相关规则
     - 实现了服务器端与客户端的兼容性，解决了fs模块在客户端无法使用的问题
 
-11. **技能系统修复**：
+16. **技能系统修复**：
     - 修复了Teleport技能使用后没有进入冷却的问题
     - 添加了技能冷却管理，在技能使用后设置冷却时间，在回合开始时减少冷却
     - 更新了技能执行上下文，确保技能函数能够访问触发事件的相关信息
@@ -1084,11 +1183,11 @@ function calculatePreview(piece, skillDef) {
     - 修复了蓝方射手的攻击强化技能不工作的问题
     - 移除了硬编码，严格从文件加载技能
 
-12. **角色系统**：
+17. **角色系统**：
     - 创建了新角色"死神"（Reaper），具有灵魂收割被动技能
     - 实现了灵魂收割技能，当击杀敌人时获得等同于其最大生命值的最大生命值
 
-13. **吉安娜角色创建**：
+18. **吉安娜角色创建**：
     - 创建了新角色"吉安娜"（Jaina），蓝方阵营，稀有度为epic
     - 基础属性：HP: 10, 攻击力: 4, 移动范围: 4, 防御力: 0
     - 设计并实现了三个主要技能：
@@ -1098,7 +1197,7 @@ function calculatePreview(piece, skillDef) {
     - 实现了完整的技能链和状态效果系统
     - 文件：`data/pieces/jaina.json`
 
-14. **技能系统实现**：
+19. **技能系统实现**：
     - 冰霜箭（Frostbolt）：修改为指向性技能，使用context.targetPiece获取目标，调用dealDamage函数处理伤害，添加冰冻状态效果
       - 文件：`data/skills/frostbolt.json`
     - 火球术（Fireball）：从范围技能修改为单体技能，使用dealDamage函数，调整冷却和技能类型
@@ -1108,13 +1207,13 @@ function calculatePreview(piece, skillDef) {
     - 辅助技能：创建blizzard-effect和freeze-prevent技能，处理持续效果和状态限制
       - 文件：`data/skills/blizzard-effect.json`, `data/skills/freeze-prevent.json`
 
-15. **状态系统扩展**：
+20. **状态系统扩展**：
     - 创建了"冰冻"状态效果，阻止目标移动和使用技能
     - 实现了状态效果的UI提示机制，在棋子上显示冰冻效果
     - 添加了状态效果的持续时间管理
     - 文件：`data/status-effects/freeze.json`
 
-16. **规则系统增强**：
+21. **规则系统增强**：
     - 创建了多个新规则，使用"即将"触发时机：
       - blizzard-effect：在对方回合结束时触发暴风雪效果，使用玩家ID验证确保只在对方回合触发
       - freeze-prevent-move：在即将移动前检查冰冻状态，阻止被冰冻目标移动
@@ -1122,54 +1221,66 @@ function calculatePreview(piece, skillDef) {
       - freeze-prevent-attack：在即将攻击前检查冰冻状态
     - 文件：`data/rules/blizzard-effect.json`, `data/rules/freeze-prevent-move.json`, `data/rules/freeze-prevent-skill.json`, `data/rules/freeze-prevent-attack.json`
 
-17. **教程文档更新**：
+22. **教程文档更新**：
     - 在tutorial.md中添加了新的检测器参数：
       - beforeMove：即将移动前
       - beforeSkillUse：即将释放技能前
       - beforeAttack：即将攻击前
     - 完善了触发系统的文档说明，添加了新触发类型的上下文参数文档
 
-18. **技术优化和修复**：
+23. **技术优化和修复**：
     - 修复了JSON字符串格式错误，将所有换行符转换为转义字符\n
-19. **界面改进**：
+24. **界面改进**：
     - 添加了技能显示控制机制，通过showInUI属性确保辅助技能不显示在UI中
     - 移除了吉安娜技能列表中的辅助技能，只显示三个主要技能
     - 实现了状态效果的UI提示机制，在棋子上显示冰冻效果
 
-20. **系统集成**：
+25. **系统集成**：
     - 确保吉安娜角色与游戏规则系统、状态效果系统和UI元素的正确集成
     - 实现了基于玩家ID的触发条件，确保暴风雪只在对方回合结束时触发
     - 优化了技能执行上下文，提供更丰富的信息供技能代码使用
     - 使用dealDamage函数统一处理伤害计算，确保伤害处理的一致性
 
-21. **图鉴系统改进**：
+26. **图鉴系统改进**：
     - 为所有图鉴页面添加了返回主菜单的按钮
     - 优化了图鉴页面的导航体验
 
-22. **技能工具提示功能**：
+27. **技能工具提示功能**：
     - 实现了光标移到技能身上时显示技能介绍的功能
     - 在技能工具提示中显示充能技能所需的充能点数
     - 在技能工具提示中显示剩余冷却回合数而不是固定的冷却时间
 
-23. **地图系统**：
+28. **地图系统**：
     - 创建了16x20的大型战场地图
     - 实现了房主机制，允许房主选择使用哪张地图
     - 修复了地图加载问题，确保地图能够正确显示
     - 为地图添加了完整的图例，包括缺失的 'S'（spawn）和 'H'（hole）类型
 
-24. **界面改进**：
+29. **界面改进**：
     - 修改了棋子界面的生命值显示，使用"当前/最大"格式
 
-25. **Toast 通知系统**：
+30. **Toast 通知系统**：
     - 集成了 Sonner toast 通知系统，替代传统的大型弹窗
     - 实现了小型提示框，显示在页面顶部中央
     - 配置了自动消失功能，通知会在 5 秒后自动消失
     - 确保通知不堆叠，同一时间只会显示一个通知
     - 替换了所有游戏结束、无效操作等场景的弹窗为 toast 通知
 
-26. **移动范围限制**：
+31. **移动范围限制**：
     - 实现了基于棋子 moveRange 属性的移动距离限制
     - 确保棋子只能移动到其移动范围内的格子
+
+32. **安度因圣盾术修改**：
+    - 将圣盾的名字从holy shield改成divine shield
+    - 创建了新的divine-shield状态效果文件
+    - 修改了shield-of-light技能，将holy-shield替换为divine-shield
+    - 创建了新的divine-shield-defense技能文件
+    - 创建了新的divine-shield-effect规则文件
+
+33. **条件判断规范更新**：
+    - 更新了tutorial.md，添加了新的条件判断规范
+    - 明确所有除了时机以外的判断都应该在技能代码里面用if语句实现
+    - 更新了GAME_DEVELOPMENT_NOTES.md，添加了条件判断规范说明
 
 ### 遇到的问题和解决方案
 
@@ -1210,237 +1321,3 @@ function calculatePreview(piece, skillDef) {
 
 8. **游戏已在进行或已结束错误**：
    - **问题**：进入游戏界面时提示"game is already in progress or finished"
-   - **原因**：房间状态管理有误，或房间数据丢失
-   - **解决方案**：实现房间持久化存储，确保房间状态正确保存和加载
-
-9. **房间未找到错误**：
-   - **问题**：选择棋子后进入战斗时显示"Room not found"
-   - **原因**：房间数据丢失，或API路由中的房间获取逻辑有误
-   - **解决方案**：修复API路由中的房间获取逻辑，确保房间数据正确加载
-
-10. **规则系统兼容性问题**：
-    - **问题**：Module not found: Can't resolve 'fs'
-    - **原因**：规则加载器使用了fs模块，而该模块在客户端代码中不可用
-    - **解决方案**：
-      - 修改file-loader.ts，添加条件导入，只在服务器端使用fs模块
-      - 修改triggers.ts，移除对rule-loader的直接依赖，确保客户端代码可以正常运行
-      - 实现默认规则集，当在客户端无法加载规则文件时使用
-
-11. **技能冷却问题**：
-    - **问题**：Teleport技能使用后没有进入冷却
-    - **原因**：技能系统缺少冷却管理逻辑
-    - **解决方案**：
-      - 在useBasicSkill和useChargeSkill函数中添加技能冷却设置
-      - 在beginPhase函数中添加冷却减少逻辑，在每个回合开始时减少技能冷却
-      - 为PieceSkill接口添加currentCooldown属性，支持技能冷却状态跟踪
-
-12. **技能系统问题**：
-    - **问题**：攻击强化技能无法增加攻击力
-    - **原因**：技能执行时，sourcePiece的修改没有正确反映到battle状态中
-    - **解决方案**：修改executeSkillFunction函数，直接操作battle.pieces中的元素，确保修改能够正确反映到battle状态中
-
-13. **技能执行环境问题**：
-    - **问题**：技能代码中的修改操作没有生效
-    - **解决方案**：为buff-attack技能添加特殊处理，不再使用eval执行技能代码，而是直接在函数中执行修改操作
-
-14. **技能加载问题**：
-    - **问题**：技能从JSON文件中加载时出现问题
-    - **解决方案**：修复JSON文件格式，确保技能能够正确加载，同时添加默认技能逻辑作为fallback
-
-15. **API返回格式问题**：
-    - **问题**：API返回对象而前端期望数组
-    - **解决方案**：修改API路由，返回数据在正确的格式中，例如`{ pieces: [...] }`
-
-16. **JSON格式错误**：
-    - **问题**：buff-attack.json文件中存在JSON格式错误
-    - **解决方案**：修复JSON格式，确保文件能够正确解析
-
-17. **地图加载问题**：
-    - **问题**：地图无法正确加载，缺少必要的图例条目
-    - **解决方案**：为地图添加完整的图例，包括 'S'（spawn）和 'H'（hole）类型
-
-18. **游戏开始错误**：
-    - **问题**：房间中有两个玩家但显示玩家数量不足
-    - **解决方案**：优化了玩家计数逻辑，确保游戏能够在有两个玩家时正确开始
-
-19. **移动范围问题**：
-    - **问题**：棋子可以移动任意距离，没有限制
-    - **解决方案**：实现了基于棋子 moveRange 属性的移动距离限制
-
-20. **通知系统问题**：
-    - **问题**：使用大型弹窗显示无效操作，影响游戏体验
-    - **解决方案**：集成了 Sonner toast 通知系统，使用小型提示框替代大型弹窗
-
-### 技术实现细节
-
-1. **状态系统实现**：
-   - **核心文件**：创建了`lib/game/status-effects.ts`，实现了状态效果的添加、移除和管理
-   - **状态文件**：更新了`data/status-effects/bleeding.json`和`data/status-effects/poison.json`，使用新格式
-   - **规则文件**：创建了`data/rules/status-bleeding.json`和`data/rules/status-poison.json`，实现状态效果的触发逻辑
-   - **规则联动**：通过规则系统实现状态效果的持续和触发，使用"whenever"触发类型
-   - **状态标签**：为棋子实例添加`statusTags`字段，用于存储状态变量如持续时间
-   - **动态规则创建**：实现了`addStatusEffect`方法，自动创建和关联规则
-
-2. **行动点系统重构**：
-   - **炉石风格机制**：修改`lib/game/turn.ts`，实现每回合最大行动点增加1点（最高10点）
-   - **完全恢复**：每回合开始时当前行动点完全恢复
-   - **上限控制**：确保行动点不超过最大上限10点
-   - **显示优化**：在`app/battle/[roomId]/page.tsx`中显示当前行动点和最大行动点
-
-3. **房间管理系统修复**：
-   - **持久化存储**：修改`lib/game/room-store.ts`，实现基于文件系统的房间存储
-   - **文件操作**：确保房间创建、更新、删除操作正确同步到文件系统
-   - **状态同步**：修复房间状态同步问题，确保前端和后端状态一致
-   - **ID处理**：统一玩家ID处理，添加trim()操作确保一致性
-   - **UI更新**：修改`app/play/page.tsx`，优化房间管理UI和删除逻辑
-
-4. **技能系统增强**：
-   - **伤害类型**：实现物理伤害、法术伤害、真实伤害三种类型
-   - **技能形态**：添加近战、远程、魔法、飞行物、范围、自身等技能形态
-   - **伤害计算**：实现`dealDamage`函数，支持防御减免和伤害类型处理
-   - **规则集成**：支持通过规则触发技能代码，实现更复杂的效果
-   - **冷却管理**：实现技能冷却设置和减少逻辑
-
-5. **触发系统扩展**：
-   - **新增触发类型**：在`TriggerType`中添加"whenever"类型，支持每一步行动后检测
-   - **灵活触发**：实现更灵活的触发条件和效果执行
-   - **上下文传递**：完善TriggerContext，传递更丰富的事件信息
-
-6. **棋子系统更新**：
-   - **接口扩展**：修改`lib/game/piece.ts`中的`PieceInstance`接口，添加`ruleTags`和`statusTags`字段
-   - **状态管理**：支持通过statusTags存储和管理状态变量
-
-7. **战斗系统优化**：
-   - **状态管理**：实现战斗状态管理和游戏结束检测
-   - **回合优化**：优化回合管理和行动点分配
-   - **UI改进**：提升战斗界面的用户体验
-
-8. **API接口修复**：
-   - **游戏开始逻辑**：修复`app/api/rooms/[roomId]/route.ts`中的游戏开始逻辑
-   - **棋子选择**：修复`app/api/rooms/[roomId]/actions/route.ts`中的棋子选择逻辑
-   - **房间加入**：确保玩家能够正确加入房间并同步状态
-
-9. **规则系统实现**：
-   - **触发系统**：创建了`lib/game/triggers.ts`，实现了事件驱动的触发-效果系统
-   - **规则加载器**：创建了`lib/game/rule-loader.ts`，负责从JSON文件加载规则定义
-   - **条件规则加载**：实现了`loadSpecificRules`方法，只在选择特定棋子或地图时加载相关规则
-   - **技能集成**：规则触发时执行技能代码，而不是直接定义效果，提高了灵活性
-   - **上下文传递**：实现了TriggerContext，传递事件相关信息给技能函数
-
-10. **Toast 通知系统实现**：
-    - **Sonner 集成**：在`app/layout.tsx`中添加了Sonner Toaster组件
-    - **配置**：设置了通知位置为"top-center"，持续时间为5000ms
-    - **使用**：在游戏结束、无效操作等场景中使用`toast.success()`、`toast.error()`等方法显示通知
-    - **替换**：替换了所有传统的alert()和大型弹窗为toast通知
-
-11. **地图加载修复**：
-    - **直接读取**：修改了`lib/game/map-repository.ts`，直接从文件系统读取地图文件
-    - **图例完善**：为地图添加了完整的图例，包括'spawn'和'hole'类型
-    - **异步加载**：更新了`lib/game/battle-setup.ts`，使用`await loadMaps()`进行异步地图加载
-
-12. **服务器端与客户端分离**：
-    - **文件加载器改进**：修改`lib/game/file-loader.ts`，添加条件导入，只在服务器端使用fs模块
-    - **默认规则**：在客户端无法加载规则文件时，使用内置的默认规则集
-    - **代码分离**：确保客户端代码不依赖服务器端特有的模块
-
-13. **地图选择系统**：
-    - 在创建房间时添加地图选择下拉框
-    - 在房间信息中显示所选地图
-    - 确保房主能够选择使用哪张地图
-
-14. **房间可见性系统**：
-    - 在创建房间时添加可见性选择（公开/私密）
-    - 在大厅中显示其他玩家创建的公开房间
-    - 在房间信息中显示房主和地图信息
-
-15. **技能工具提示**：
-    - 使用hover效果显示技能详细信息
-    - 计算并显示技能的预期效果，包括伤害值、增益值等
-    - 显示技能的冷却时间和充能点数需求
-
-16. **生命值显示格式**：
-    - 修改棋子界面的生命值显示，使用"当前/最大"格式
-    - 确保所有棋子的生命值显示一致
-
-## 总结
-
-本项目已经完成了基础框架的搭建和核心系统的实现，包括房间管理、阵营领取、棋子选择、游戏开始逻辑、图鉴系统、行动点系统、toast 通知系统等。最近的工作重点是实现了完整的状态系统、行动点系统重构、房间管理系统修复等核心功能，为游戏添加了更多策略性和深度。
-
-### 主要成果
-
-1. **状态系统**：实现了完整的状态系统，支持持续效果如流血、中毒等，通过规则系统联动实现状态效果的触发和持续。
-
-2. **行动点系统**：重构为炉石传说风格的法力水晶机制，每回合最大行动点增加1点（最高10点），当前行动点完全恢复。
-
-3. **房间管理系统**：修复了房间删除问题，实现了 `syncWithStorage()` 方法，确保内存状态与存储状态一致，确保房间状态正确保存和加载。
-
-4. **技能系统增强**：实现了伤害类型系统（物理伤害、法术伤害、真实伤害）和技能形态分类，添加了统一的伤害计算函数。
-
-5. **触发系统扩展**：添加了"whenever"触发类型，支持每一步行动后检测，实现更灵活的触发条件和效果执行。
-
-6. **棋子系统更新**：为棋子实例添加了`ruleTags`和`statusTags`字段，支持状态变量的存储和管理。
-
-7. **教程文档更新**：更新了教程文档，添加了状态系统的编写指南和示例代码。
-
-8. **战斗系统优化**：实现了战斗状态管理和游戏结束检测，优化了回合管理和行动点分配。
-
-9. **API 接口修复**：修复了游戏开始逻辑、棋子选择逻辑和房间加入逻辑，确保玩家能够正确加入房间并开始游戏。
-
-10. **规则系统**：实现了完整的触发-效果系统，支持"当……的时候，执行……效果"的规则，提高了游戏的策略性和可玩性。
-
-11. **技能系统修复**：修复了技能冷却问题，确保所有技能都能正确进入冷却状态。
-
-12. **角色系统**：创建了新角色"死神"（Reaper），展示了规则系统的强大功能。
-
-13. **图鉴系统改进**：为所有图鉴页面添加了返回主菜单的按钮，优化了图鉴页面的导航体验。
-
-14. **Toast 通知系统**：集成了 Sonner toast 通知系统，替代了传统的大型弹窗，提供了更好的用户体验。
-
-15. **地图系统修复**：修复了地图加载问题，确保地图能够正确显示，为游戏提供了稳定的战场环境。
-
-16. **移动范围限制**：实现了基于棋子 moveRange 属性的移动距离限制，使游戏更加平衡和策略性。
-
-### 技术亮点
-
-- **状态系统设计**：通过规则系统联动实现状态效果，使用状态标签存储持续时间，设计灵活且可扩展。
-- **行动点机制**：实现炉石传说风格的法力水晶机制，每回合最大行动点增加1点，当前行动点完全恢复。
-- **房间持久化**：基于文件系统的房间存储，确保房间状态正确保存和加载，解决了房间删除后重新出现的问题。
-- **伤害系统**：实现三种伤害类型（物理、法术、真实）和统一的伤害计算函数，支持防御减免。
-- **技能形态**：添加多种技能形态分类，为游戏增加更多策略性。
-- **事件驱动架构**：规则系统采用事件驱动的设计，使游戏逻辑更加清晰和可扩展。
-- **JSON配置**：通过JSON文件配置规则和技能，减少了硬编码，提高了可维护性。
-- **条件加载**：实现了规则的条件加载，优化了性能，减少了内存使用。
-- **技能集成**：规则触发时执行技能代码，而不是直接定义效果，提高了灵活性和可扩展性。
-- **上下文传递**：实现了完善的上下文传递机制，确保技能函数能够访问触发事件的相关信息。
-- **Toast 通知**：集成了现代化的 Sonner toast 通知系统，提供了更好的用户体验。
-- **地图系统**：实现了基于文件系统的地图加载，确保地图能够正确显示和处理。
-- **移动系统**：实现了基于棋子属性的移动范围限制，使游戏更加平衡和策略性。
-- **API 优化**：修复了多个API接口问题，确保玩家能够正确加入房间并开始游戏。
-- **状态同步**：确保前端和后端状态一致，解决了"未选择棋子"错误等问题。
-
-### 下一步发展方向
-
-1. **核心对战系统**：继续完善核心对战系统，实现限定技技能类型和更多战斗机制。
-
-2. **状态系统扩展**：
-   - 添加更多状态效果类型，如 buff、debuff、控制效果等。
-   - 实现状态效果的叠加和冲突处理机制。
-   - 添加状态效果的视觉表现，使玩家能够直观地看到状态效果。
-
-3. **用户界面**：完善游戏界面，特别是战斗界面，确保状态效果和行动点能够直观地展示给玩家。
-
-4. **内容创作**：基于状态系统和规则系统，创建更多具有独特机制的棋子和技能，丰富游戏内容。
-
-5. **性能优化**：进一步优化状态系统和规则系统的性能，确保在复杂场景下也能流畅运行。
-
-6. **PVE 模式**：实现 PVE 模式，包括 AI 对手、关卡设计等。
-
-7. **排行榜系统**：实现玩家战绩记录和排行榜系统。
-
-8. **多人模式**：支持更多玩家的对战模式，如 2v2 团队对战。
-
-9. **自定义内容**：实现棋子和技能编辑器，允许玩家创建自定义棋子和技能。
-
-10. **网络优化**：优化网络通信，减少延迟，确保多人对战的流畅体验。
-
-通过本文档，新的开发者可以快速了解项目的结构、功能和开发规范，特别是新加入的状态系统、行动点系统和房间管理系统，从而立即接手开发工作，继续推进游戏的发展。这些系统的实现为游戏添加了更多策略性和深度，为后续的内容创作和功能扩展奠定了坚实的基础。

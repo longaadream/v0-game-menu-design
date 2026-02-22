@@ -2,25 +2,13 @@
 
 import { globalTriggerSystem } from "./triggers";
 
-// 状态类型
-export enum StatusEffectType {
-  BLEEDING = "bleeding",      // 流血
-  POISON = "poison",          // 中毒
-  BURN = "burn",              // 燃烧
-  FREEZE = "freeze",          // 冰冻
-  STUN = "stun",              // 眩晕
-  BUFF_ATTACK = "buff_attack", // 攻击增益
-  BUFF_DEFENSE = "buff_defense", // 防御增益
-  DEBUFF_ATTACK = "debuff_attack", // 攻击减益
-  DEBUFF_DEFENSE = "debuff_defense", // 防御减益
-  INVULNERABLE = "invulnerable", // 无敌
-  REGENERATION = "regeneration" // 生命恢复
-}
+// 状态类型使用字符串类型，不再使用硬编码的枚举
+export type StatusEffectType = string;
 
 // 状态效果接口
 export interface StatusEffect {
   id: string;                 // 状态唯一ID
-  type: StatusEffectType | string;     // 状态类型
+  type: StatusEffectType;     // 状态类型
   name: string;               // 状态名称
   description: string;        // 状态描述
   remainingDuration: number;  // 剩余持续时间
@@ -37,7 +25,7 @@ export interface StatusEffect {
 // 状态效果定义接口（用于JSON文件）
 export interface StatusEffectDefinition {
   id: string;                 // 状态唯一ID
-  type: StatusEffectType | string;     // 状态类型
+  type: StatusEffectType;     // 状态类型
   name: string;               // 状态名称
   description: string;        // 状态描述
   intensity: number;          // 强度（用于计算效果数值）
@@ -55,19 +43,10 @@ export interface StatusEffectContext {
   gameContext: any;  // 游戏上下文
 }
 
-// 棋子状态数据接口
-export interface PieceStatusData {
-  [statusId: string]: {
-    remainingDuration: number;
-    currentStacks: number;
-    intensity: number;
-  };
-}
-
 // 扩展棋子实例接口
 declare global {
   interface PieceInstance {
-    statusData?: PieceStatusData;
+    statusData?: any; // 保留兼容性
   }
 }
 
@@ -96,16 +75,11 @@ export class StatusEffectSystem {
   }
 
   // 添加状态效果到棋子
-  addStatusEffect(pieceId: string, effect: StatusEffect): StatusEffect {
+  addStatusEffect(pieceId: string, effect: StatusEffect, uses: number = effect.remainingDuration): StatusEffect {
     const piece = this.getPieceById(pieceId);
     if (!piece) {
       console.error(`Piece not found: ${pieceId}`);
       return effect;
-    }
-
-    // 初始化棋子的状态数据
-    if (!piece.statusData) {
-      piece.statusData = {};
     }
 
     // 检查是否可以叠加
@@ -116,11 +90,12 @@ export class StatusEffectSystem {
         existingEffect.currentStacks = Math.min(existingEffect.currentStacks + 1, existingEffect.maxStacks);
         existingEffect.remainingDuration = effect.remainingDuration;
         
-        // 更新棋子状态数据
-        if (piece.statusData[existingEffect.id]) {
-          piece.statusData[existingEffect.id].remainingDuration = effect.remainingDuration;
-          piece.statusData[existingEffect.id].currentStacks = existingEffect.currentStacks;
-        }
+        // 获取当前剩余触发次数
+        const currentStatusData = this.getStatusDataFromTags(piece, existingEffect.id, existingEffect.type);
+        const remainingUses = currentStatusData.remainingUses || uses;
+        
+        // 更新棋子的statusTags
+        this.updateStatusDataTags(piece, existingEffect.id, existingEffect.type, existingEffect.remainingDuration, existingEffect.currentStacks, existingEffect.intensity, remainingUses);
         
         return existingEffect;
       }
@@ -139,13 +114,6 @@ export class StatusEffectSystem {
     }
     this.statusEffects.get(pieceId)!.push(newEffect);
 
-    // 存储状态数据到棋子实例
-    piece.statusData[newEffect.id] = {
-      remainingDuration: effect.remainingDuration,
-      currentStacks: 1,
-      intensity: effect.intensity
-    };
-
     // 将状态标签添加到棋子的statusTags数组中
     if (!piece.statusTags) {
       piece.statusTags = [];
@@ -155,9 +123,8 @@ export class StatusEffectSystem {
     if (!piece.statusTags.includes(statusTypeTag)) {
       piece.statusTags.push(statusTypeTag);
     }
-    // 添加状态持续时间标签
-    const statusDurationTag = `${effect.type}-duration-${effect.id}`;
-    piece.statusTags.push(statusDurationTag);
+    // 添加状态结构体标签
+    this.updateStatusDataTags(piece, newEffect.id, newEffect.type, newEffect.remainingDuration, newEffect.currentStacks, newEffect.intensity, uses);
 
     // 创建并添加规则
     const ruleId = this.createStatusRule(pieceId, newEffect);
@@ -168,21 +135,20 @@ export class StatusEffectSystem {
   }
 
   // 添加状态效果通过ID
-  addStatusEffectById(pieceId: string, statusId: string): StatusEffect | null {
+  addStatusEffectById(pieceId: string, statusId: string, duration: number, uses: number): StatusEffect | null {
     const definition = this.getStatusDefinition(statusId);
     if (!definition) {
       console.error(`Status effect definition not found: ${statusId}`);
       return null;
     }
 
-    // 创建状态效果，默认持续时间为3回合
-    const defaultDuration = 3;
+    // 创建状态效果
     const effect: StatusEffect = {
       id: '',
       type: definition.type,
       name: definition.name,
       description: definition.description,
-      remainingDuration: defaultDuration,
+      remainingDuration: duration,
       intensity: definition.intensity,
       isDebuff: definition.isDebuff,
       canStack: definition.canStack,
@@ -192,6 +158,62 @@ export class StatusEffectSystem {
     };
 
     return this.addStatusEffect(pieceId, effect);
+  }
+
+  // 从statusTags中获取状态数据
+  private getStatusDataFromTags(piece: any, effectId: string, type: string): { remainingDuration: number; currentStacks: number; intensity: number; remainingUses: number } {
+    let remainingDuration = 0;
+    let currentStacks = 1;
+    let intensity = 1;
+    let remainingUses = 0;
+    
+    if (piece.statusTags) {
+      // 通过effectId查找状态标签
+      // 假设statusTags现在是一个对象数组，每个对象包含id和数据
+      const statusTag = piece.statusTags.find((tag: any) => tag.id === effectId);
+      
+      if (statusTag) {
+        try {
+          // 直接从statusTag对象中获取数据
+          remainingDuration = statusTag.remainingDuration || 0;
+          currentStacks = statusTag.stacks || 1;
+          intensity = statusTag.intensity || 1;
+          remainingUses = statusTag.remainingUses || 0;
+        } catch (error) {
+          console.error('Error accessing status tag data:', error);
+        }
+      }
+    }
+    
+    return { remainingDuration, currentStacks, intensity, remainingUses };
+  }
+
+  // 更新statusTags中的状态数据
+  private updateStatusDataTags(piece: any, effectId: string, type: string, remainingDuration: number, currentStacks: number, intensity: number, remainingUses: number): void {
+    if (!piece.statusTags) {
+      piece.statusTags = [];
+    }
+    
+    // 创建状态对象
+    const statusObj = {
+      id: effectId,
+      type,
+      remainingDuration,
+      name: type,
+      remainingUses,
+      stacks: currentStacks,
+      intensity
+    };
+    
+    // 查找并更新或添加状态对象
+    const existingIndex = piece.statusTags.findIndex((tag: any) => tag.id === effectId);
+    if (existingIndex >= 0) {
+      // 更新现有状态对象
+      piece.statusTags[existingIndex] = statusObj;
+    } else {
+      // 添加新状态对象
+      piece.statusTags.push(statusObj);
+    }
   }
 
   // 创建状态效果对应的规则
@@ -208,31 +230,26 @@ export class StatusEffectSystem {
       },
       effect: (battle, context) => {
         const piece = this.getPieceById(pieceId);
-        if (!piece || !piece.statusData || !piece.statusData[effect.id]) {
+        if (!piece) {
           // 从棋子的ruleTags中移除规则ID
           if (piece && piece.ruleTags) {
-            piece.ruleTags = piece.ruleTags.filter(tag => tag !== ruleId);
+            piece.ruleTags = piece.ruleTags.filter((tag: string) => tag !== ruleId);
           }
           // 移除规则
           globalTriggerSystem.removeRule(ruleId);
           return { success: false };
         }
 
-        const statusData = piece.statusData[effect.id];
+        // 从statusTags中获取状态数据
+        const statusData = this.getStatusDataFromTags(piece, effect.id, effect.type);
         
-        // 检查持续时间
-        if (statusData.remainingDuration > 0) {
+        // 检查是否可以触发（持续时间和剩余触发次数都大于0或为-1表示无限）
+        if ((statusData.remainingDuration > 0 || statusData.remainingDuration === -1) && (statusData.remainingUses > 0 || statusData.remainingUses === -1)) {
           // 执行状态效果代码
           if (effect.code) {
             const context = {
               piece,
               battleState: battle,
-              statusEffect: {
-                ...effect,
-                remainingDuration: statusData.remainingDuration,
-                currentStacks: statusData.currentStacks,
-                intensity: statusData.intensity
-              },
               gameContext: null
             };
 
@@ -252,18 +269,22 @@ export class StatusEffectSystem {
             }
           }
 
-          // 减少持续时间
-          statusData.remainingDuration--;
-          effect.remainingDuration--;
+          // 减少持续时间和剩余触发次数（如果不是无限）
+          const newDuration = statusData.remainingDuration === -1 ? -1 : statusData.remainingDuration - 1;
+          const newUses = statusData.remainingUses === -1 ? -1 : statusData.remainingUses - 1;
+          effect.remainingDuration = newDuration;
+          
+          // 更新statusTags中的状态数据
+          this.updateStatusDataTags(piece, effect.id, effect.type, newDuration, statusData.currentStacks, statusData.intensity, newUses);
         }
 
-        // 检查是否结束
-        if (statusData.remainingDuration <= 0) {
+        // 检查是否结束（持续时间和剩余触发次数都不为-1且都为0）
+        if (statusData.remainingDuration !== -1 && statusData.remainingUses !== -1 && (statusData.remainingDuration <= 0 || statusData.remainingUses <= 0)) {
           // 移除状态效果
           this.removeStatusEffect(pieceId, effect.id);
           // 从棋子的ruleTags中移除规则ID
           if (piece.ruleTags) {
-            piece.ruleTags = piece.ruleTags.filter(tag => tag !== ruleId);
+            piece.ruleTags = piece.ruleTags.filter((tag: string) => tag !== ruleId);
           }
           // 移除规则
           globalTriggerSystem.removeRule(ruleId);
@@ -284,6 +305,12 @@ export class StatusEffectSystem {
         piece.ruleTags = [];
       }
       piece.ruleTags.push(ruleId);
+      
+      // 添加强度标签
+      if (!piece.statusTags) {
+        piece.statusTags = [];
+      }
+      piece.statusTags.push(`${effect.type}-intensity-${effect.id}:${effect.intensity}`);
     }
     
     console.log(`Created rule ${ruleId} for status effect ${effect.name}`);
@@ -312,20 +339,15 @@ export class StatusEffectSystem {
 
     // 从棋子状态数据中移除
     const piece = this.getPieceById(pieceId);
-    if (piece && piece.statusData) {
-      delete piece.statusData[effectId];
+    if (piece) {
+      if (piece.statusData) {
+        delete piece.statusData[effectId];
+      }
       
       // 从棋子的statusTags数组中移除相应的标签
       if (piece.statusTags) {
-        // 移除状态持续时间标签
-        piece.statusTags = piece.statusTags.filter(tag => !tag.includes(`${effect.type}-duration-`));
-        
-        // 检查是否还有同类型的状态效果
-        const hasSameType = this.statusEffects.get(pieceId)?.some(e => e.type === effect.type);
-        if (!hasSameType) {
-          // 移除状态类型标签
-          piece.statusTags = piece.statusTags.filter(tag => tag !== `${effect.type}`);
-        }
+        // 移除状态对象
+        piece.statusTags = piece.statusTags.filter((tag: any) => tag.id !== effectId);
       }
     }
 
@@ -358,13 +380,8 @@ export class StatusEffectSystem {
       }
       // 从棋子的statusTags中移除所有状态相关标签
       if (piece.statusTags) {
-        // 获取所有状态类型
-        const statusTypes = Array.from(this.statusDefinitions.keys());
-        // 移除所有状态相关标签
-        piece.statusTags = piece.statusTags.filter(tag => {
-          // 检查是否是状态类型标签或状态持续时间标签
-          return !statusTypes.includes(tag) && !tag.includes('-duration-');
-        });
+        // 清空statusTags数组
+        piece.statusTags = [];
       }
     }
 
@@ -378,7 +395,7 @@ export class StatusEffectSystem {
   }
 
   // 检查棋子是否有特定类型的状态效果
-  hasStatusEffect(pieceId: string, type: StatusEffectType): boolean {
+  hasStatusEffect(pieceId: string, type: string): boolean {
     const effects = this.statusEffects.get(pieceId);
     if (!effects) return false;
     return effects.some(e => e.type === type);
@@ -415,22 +432,26 @@ export class StatusEffectSystem {
     // 遍历所有棋子的状态效果
     for (const [pieceId, effects] of this.statusEffects.entries()) {
       const piece = this.getPieceById(pieceId);
-      if (!piece || !piece.statusData) continue;
+      if (!piece) continue;
 
       // 检查每个状态效果
       for (const effect of effects) {
-        const statusData = piece.statusData[effect.id];
-        if (!statusData) continue;
+        // 从statusTags中获取状态数据
+        const statusData = this.getStatusDataFromTags(piece, effect.id, effect.type);
 
-        // 检查持续时间
-        if (statusData.remainingDuration > 0) {
-          // 减少持续时间
-          statusData.remainingDuration--;
-          effect.remainingDuration--;
+        // 检查持续时间和剩余触发次数（如果不是无限）
+        if ((statusData.remainingDuration > 0 || statusData.remainingDuration === -1) && (statusData.remainingUses > 0 || statusData.remainingUses === -1)) {
+          // 减少持续时间和剩余触发次数（如果不是无限）
+          const newDuration = statusData.remainingDuration === -1 ? -1 : statusData.remainingDuration - 1;
+          const newUses = statusData.remainingUses === -1 ? -1 : statusData.remainingUses - 1;
+          effect.remainingDuration = newDuration;
+          
+          // 更新statusTags中的状态数据
+          this.updateStatusDataTags(piece, effect.id, effect.type, newDuration, statusData.currentStacks, statusData.intensity, newUses);
         }
 
-        // 检查是否结束
-        if (statusData.remainingDuration <= 0) {
+        // 检查是否结束（持续时间和剩余触发次数都不为-1且都为0）
+        if (statusData.remainingDuration !== -1 && statusData.remainingUses !== -1 && (statusData.remainingDuration <= 0 || statusData.remainingUses <= 0)) {
           // 移除状态效果
           this.removeStatusEffect(pieceId, effect.id);
         }
@@ -439,113 +460,8 @@ export class StatusEffectSystem {
   }
 }
 
-// 预定义状态效果
-export const predefinedStatusEffects = {
-  // 流血状态
-  bleeding: (intensity: number = 5): StatusEffect => ({
-    id: '',
-    type: StatusEffectType.BLEEDING,
-    name: "流血",
-    description: `每回合受到${intensity}点伤害`,
-    remainingDuration: 3, // 默认持续3回合
-    intensity,
-    isDebuff: true,
-    canStack: true,
-    maxStacks: 5,
-    currentStacks: 1,
-    code: "function EffectTrigger(context) {\n  const damage = context.statusEffect.intensity * context.statusEffect.currentStacks;\n  context.piece.currentHp = Math.max(0, context.piece.currentHp - damage);\n  console.log(context.piece.templateId + '受到流血伤害，失去' + damage + '点生命值');\n  return { success: true, message: context.piece.templateId + '受到流血伤害' };\n}"
-  }),
-
-  // 中毒状态
-  poison: (intensity: number = 3): StatusEffect => ({
-    id: '',
-    type: StatusEffectType.POISON,
-    name: "中毒",
-    description: `每回合受到${intensity}点伤害`,
-    remainingDuration: 4, // 默认持续4回合
-    intensity,
-    isDebuff: true,
-    canStack: true,
-    maxStacks: 3,
-    currentStacks: 1,
-    code: "function EffectTrigger(context) {\n  const damage = context.statusEffect.intensity * context.statusEffect.currentStacks;\n  context.piece.currentHp = Math.max(0, context.piece.currentHp - damage);\n  console.log(context.piece.templateId + '受到中毒伤害，失去' + damage + '点生命值');\n  return { success: true, message: context.piece.templateId + '受到中毒伤害' };\n}"
-  }),
-
-  // 燃烧状态
-  burn: (intensity: number = 8): StatusEffect => ({
-    id: '',
-    type: StatusEffectType.BURN,
-    name: "燃烧",
-    description: `每回合受到${intensity}点伤害`,
-    remainingDuration: 2, // 默认持续2回合
-    intensity,
-    isDebuff: true,
-    canStack: false,
-    maxStacks: 1,
-    currentStacks: 1,
-    code: "function EffectTrigger(context) {\n  const damage = context.statusEffect.intensity;\n  context.piece.currentHp = Math.max(0, context.piece.currentHp - damage);\n  console.log(context.piece.templateId + '受到燃烧伤害，失去' + damage + '点生命值');\n  return { success: true, message: context.piece.templateId + '受到燃烧伤害' };\n}"
-  }),
-
-  // 攻击增益
-  buffAttack: (intensity: number = 2): StatusEffect => ({
-    id: '',
-    type: StatusEffectType.BUFF_ATTACK,
-    name: "力量增幅",
-    description: `攻击力+${intensity}`,
-    remainingDuration: 3, // 默认持续3回合
-    intensity,
-    isDebuff: false,
-    canStack: false,
-    maxStacks: 1,
-    currentStacks: 1,
-    code: "function EffectTrigger(context) {\n  // 增益效果在应用时已经生效，这里只需要处理持续时间\n  return { success: true, message: context.piece.templateId + '的力量增幅效果持续' };\n}"
-  }),
-
-  // 防御增益
-  buffDefense: (intensity: number = 2): StatusEffect => ({
-    id: '',
-    type: StatusEffectType.BUFF_DEFENSE,
-    name: "守护光环",
-    description: `防御力+${intensity}`,
-    remainingDuration: 3, // 默认持续3回合
-    intensity,
-    isDebuff: false,
-    canStack: false,
-    maxStacks: 1,
-    currentStacks: 1,
-    code: "function EffectTrigger(context) {\n  // 增益效果在应用时已经生效，这里只需要处理持续时间\n  return { success: true, message: context.piece.templateId + '的守护光环效果持续' };\n}"
-  }),
-
-  // 生命恢复
-  regeneration: (intensity: number = 4): StatusEffect => ({
-    id: '',
-    type: StatusEffectType.REGENERATION,
-    name: "生命恢复",
-    description: `每回合恢复${intensity}点生命值`,
-    remainingDuration: 3, // 默认持续3回合
-    intensity,
-    isDebuff: false,
-    canStack: true,
-    maxStacks: 3,
-    currentStacks: 1,
-    code: "function EffectTrigger(context) {\n  const healAmount = context.statusEffect.intensity * context.statusEffect.currentStacks;\n  const newHp = Math.min(context.piece.currentHp + healAmount, context.piece.maxHp);\n  const actualHeal = newHp - context.piece.currentHp;\n  context.piece.currentHp = newHp;\n  console.log(context.piece.templateId + '受到生命恢复效果，恢复' + actualHeal + '点生命值');\n  return { success: true, message: context.piece.templateId + '恢复生命值' };\n}"
-  }),
-
-  // 眩晕状态
-  stun: (): StatusEffect => ({
-    id: '',
-    type: StatusEffectType.STUN,
-    name: "眩晕",
-    description: `无法行动`,
-    remainingDuration: 1, // 默认持续1回合
-    intensity: 1,
-    isDebuff: true,
-    canStack: false,
-    maxStacks: 1,
-    currentStacks: 1,
-    code: "function EffectTrigger(context) {\n  console.log(context.piece.templateId + '处于眩晕状态，无法行动');\n  return { success: true, message: context.piece.templateId + '处于眩晕状态' };\n}"
-  })
-};
+// 状态效果系统现在完全基于JSON文件配置，不再使用硬编码的预定义状态效果
+// 所有状态效果的逻辑都由JSON文件中的code标签实现
 
 
 

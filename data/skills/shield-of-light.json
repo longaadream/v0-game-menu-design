@@ -1,1 +1,15 @@
-{"id":"shield-of-light","name":"圣盾术","description":"使7格内一个友军获得圣盾","icon":"🛡️","kind":"active","type":"normal","cooldownTurns":2,"maxCharges":0,"powerMultiplier":1,"actionPointCost":3,"code":"function executeSkill(context) { const sourcePiece = context.piece; const targetAlly = selectTarget({ type: 'piece', range: 7, filter: 'ally' }); if (!targetAlly || targetAlly.needsTargetSelection) { return targetAlly; } if (typeof addStatusEffectById === 'function') { addStatusEffectById(targetAlly.instanceId, 'holy-shield', 1); } return { message: sourcePiece.templateId + '为' + targetAlly.templateId + '施加了圣盾', success: true }; }","previewCode":"function calculatePreview(piece, skillDef) { return { description: '使7格内一个友军获得圣盾', expectedValues: {} }; }","range":"single"}
+{
+  "id": "shield-of-light",
+  "name": "圣光术",
+  "description": "为范围内一个友军获得圣盾，抵挡一次伤害",
+  "icon": "shield",
+  "kind": "active",
+  "type": "normal",
+  "cooldownTurns": 2,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "actionPointCost": 3,
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetAlly = selectTarget({ type: 'piece', range: 7, filter: 'ally' }); if (!targetAlly || targetAlly.needsTargetSelection) { return targetAlly; } if (typeof addStatusEffectById === 'function') { addStatusEffectById(targetAlly.instanceId, { id: 'divine-shield', type: 'divine-shield', currentDuration: -1, currentUses: -1, intensity: 1, stacks: 1 }); } if (typeof addRuleById === 'function') { addRuleById(targetAlly.instanceId, 'rule-divine-shield'); } if (typeof addSkillById === 'function') { addSkillById(targetAlly.instanceId, 'divine-shield-defense'); } return { message: sourcePiece.name + ' 为 ' + targetAlly.name + ' 施加了圣盾', success: true }; }",
+  "previewCode": "function calculatePreview(piece, skillDef) { return { description: '为范围内一个友军获得圣盾，抵挡一次伤害', expectedValues: {} }; }",
+  "range": "single"
+}

@@ -129,6 +129,7 @@ export function buildInitialPiecesForPlayers(
         pieces.push({
           instanceId: `${ownerPlayerId}-${pieceIndex + 1}`,
           templateId: pieceTemplate.id,
+          name: pieceTemplate.name,
           ownerPlayerId,
           faction: actualFaction,
           currentHp: pieceTemplate.stats.maxHp,
@@ -179,6 +180,7 @@ export function buildInitialPiecesForPlayers(
         pieces.push({
           instanceId: `${redPlayer}-${index + 1}`,
           templateId: pieceTemplate.id,
+          name: pieceTemplate.name,
           ownerPlayerId: redPlayer,
           faction: "red",
           currentHp: pieceTemplate.stats.maxHp,
@@ -211,6 +213,7 @@ export function buildInitialPiecesForPlayers(
         pieces.push({
           instanceId: `${bluePlayer}-${index + 1}`,
           templateId: pieceTemplate.id,
+          name: pieceTemplate.name,
           ownerPlayerId: bluePlayer,
           faction: "blue",
           currentHp: pieceTemplate.stats.maxHp,
@@ -255,6 +258,7 @@ export function buildInitialPiecesForPlayers(
         pieces.push({
           instanceId: `${playerId}-${pieceIndex + 1}`,
           templateId: pieceTemplate.id,
+          name: pieceTemplate.name,
           ownerPlayerId: playerId,
           faction: faction,
           currentHp: pieceTemplate.stats.maxHp,
@@ -307,6 +311,7 @@ export function buildInitialPiecesForPlayers(
     pieces.push({
       instanceId: `${redPlayer}-1`,
       templateId: defaultRedPiece.id,
+      name: defaultRedPiece.name,
       ownerPlayerId: redPlayer,
       faction: "red",
       currentHp: defaultRedPiece.stats.maxHp,
@@ -334,6 +339,7 @@ export function buildInitialPiecesForPlayers(
     pieces.push({
       instanceId: `${bluePlayer}-1`,
       templateId: defaultBluePiece.id,
+      name: defaultBluePiece.name,
       ownerPlayerId: bluePlayer,
       faction: "blue",
       currentHp: defaultBluePiece.stats.maxHp,
@@ -371,6 +377,7 @@ export function buildInitialPiecesForPlayers(
       pieces.push({
         instanceId: `${redPlayer}-1`,
         templateId: defaultRedPiece.id,
+        name: defaultRedPiece.name,
         ownerPlayerId: redPlayer,
         faction: "red",
         currentHp: defaultRedPiece.stats.maxHp,
@@ -402,6 +409,7 @@ export function buildInitialPiecesForPlayers(
       pieces.push({
         instanceId: `${bluePlayer}-1`,
         templateId: defaultBluePiece.id,
+        name: defaultBluePiece.name,
         ownerPlayerId: bluePlayer,
         faction: "blue",
         currentHp: defaultBluePiece.stats.maxHp,
@@ -517,6 +525,7 @@ export async function createInitialBattleForPlayers(
   return {
     map,
     pieces,
+    graveyard: [],
     pieceStatsByTemplateId: buildDefaultPieceStats(),
     skillsById: skills,
     players: [

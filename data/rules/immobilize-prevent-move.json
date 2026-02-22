@@ -6,12 +6,8 @@
     "type": "beforeMove"
   },
   "effect": {
-    "type": "triggerStatusEffect",
-    "statusId": "immobilize",
+    "type": "triggerSkill",
+    "skillId": "immobilize-prevent-move",
     "message": "无法移动状态阻止移动"
-  },
-  "limits": {
-    "cooldownTurns": 0,
-    "maxUses": 0
   }
 }

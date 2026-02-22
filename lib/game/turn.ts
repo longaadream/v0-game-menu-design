@@ -48,6 +48,8 @@ export interface BattleActionLog {
 export interface BattleState {
   map: BoardMap
   pieces: PieceInstance[]
+  /** 墓地 - 存放死亡的棋子信息 */
+  graveyard: PieceInstance[]
   /** 按棋子模板 ID 存储基础数值，供移动范围等逻辑使用 */
   pieceStatsByTemplateId: Record<string, PieceStats>
   /** 技能静态定义 */
@@ -180,29 +182,35 @@ export function applyBattleAction(
     case "beginPhase": {
       const next = structuredClone(state) as BattleState
       if (next.turn.phase === "start") {
-        // 触发回合开始效果
-        const beginTurnResult = globalTriggerSystem.checkTriggers(next, {
-          type: "beginTurn",
-          turnNumber: next.turn.turnNumber,
-          playerId: next.turn.currentPlayerId
-        });
-
-        // 处理触发效果的消息
-        if (beginTurnResult.success && beginTurnResult.messages.length > 0) {
-          if (!next.actions) {
-            next.actions = [];
-          }
-          beginTurnResult.messages.forEach(message => {
-            next.actions!.push({
-              type: "triggerEffect",
-              playerId: next.turn.currentPlayerId,
-              turn: next.turn.turnNumber,
-              payload: {
-                message
-              }
-            });
+        // 获取当前玩家的所有棋子
+        const currentPlayerPieces = next.pieces.filter(p => p.ownerPlayerId === next.turn.currentPlayerId && p.currentHp > 0);
+        
+        // 触发回合开始效果，为每个存活的棋子都触发一次
+        currentPlayerPieces.forEach(piece => {
+          const beginTurnResult = globalTriggerSystem.checkTriggers(next, {
+            type: "beginTurn",
+            sourcePiece: piece,
+            turnNumber: next.turn.turnNumber,
+            playerId: next.turn.currentPlayerId
           });
-        }
+
+          // 处理触发效果的消息
+          if (beginTurnResult.success && beginTurnResult.messages.length > 0) {
+            if (!next.actions) {
+              next.actions = [];
+            }
+            beginTurnResult.messages.forEach(message => {
+              next.actions!.push({
+                type: "triggerEffect",
+                playerId: next.turn.currentPlayerId,
+                turn: next.turn.turnNumber,
+                payload: {
+                  message
+                }
+              });
+            });
+          }
+        });
 
         // 更新冷却
         globalTriggerSystem.updateCooldowns();
@@ -214,15 +222,68 @@ export function applyBattleAction(
           console.log(`Player ${currentPlayerMeta.playerId} has ${currentPlayerMeta.actionPoints}/${currentPlayerMeta.maxActionPoints} action points for this turn`)
         }
 
-        // 更新所有棋子技能的冷却时间
+        // 更新当前玩家棋子技能的冷却时间
         next.pieces.forEach(piece => {
-          if (piece.skills) {
+          // 只减少当前玩家棋子的技能冷却
+          if (piece.ownerPlayerId === next.turn.currentPlayerId && piece.skills) {
             piece.skills.forEach(skill => {
               if (skill.currentCooldown && skill.currentCooldown > 0) {
                 skill.currentCooldown--
                 console.log(`Reduced cooldown for skill ${skill.skillId} on piece ${piece.instanceId}: ${skill.currentCooldown} turns remaining`)
               }
             })
+          }
+        })
+
+        // 处理当前玩家棋子的状态效果持续时间
+        next.pieces.forEach(piece => {
+          // 只处理当前玩家棋子的状态效果
+          if (piece.ownerPlayerId === next.turn.currentPlayerId && piece.statusTags) {
+            // 遍历所有状态标签
+            for (let i = piece.statusTags.length - 1; i >= 0; i--) {
+              const statusTag = piece.statusTags[i];
+              // 检查状态标签是否有currentDuration属性且大于0
+              if (statusTag.currentDuration !== undefined && statusTag.currentDuration > 0) {
+                // 减少持续时间
+                statusTag.currentDuration--;
+                console.log(`Reduced duration for status ${statusTag.type} on piece ${piece.instanceId}: ${statusTag.currentDuration} turns remaining`);
+                
+                // 如果持续时间为0，清除状态标签
+                if (statusTag.currentDuration === 0) {
+                  console.log(`Status ${statusTag.type} expired on piece ${piece.instanceId}, removing status tag`);
+                  
+                  // 检查并清理相关规则
+                  if (statusTag.relatedRules && statusTag.relatedRules.length > 0) {
+                    statusTag.relatedRules.forEach(ruleId => {
+                      // 检查是否有其他状态标签关联此规则
+                      let hasOtherRelatedStatus = false;
+                      
+                      piece.statusTags.forEach(otherStatusTag => {
+                        if (otherStatusTag !== statusTag && 
+                            otherStatusTag.relatedRules && 
+                            otherStatusTag.relatedRules.includes(ruleId)) {
+                          hasOtherRelatedStatus = true;
+                        }
+                      });
+                      
+                      // 如果没有其他状态标签关联此规则，移除规则
+                      if (!hasOtherRelatedStatus && piece.rules) {
+                        const ruleIndex = piece.rules.findIndex(rule => rule.id === ruleId);
+                        if (ruleIndex !== -1) {
+                          console.log(`Removing rule ${ruleId} because no other status tags are related to it`);
+                          piece.rules.splice(ruleIndex, 1);
+                        }
+                      }
+                    });
+                  }
+                  
+                  // 从状态标签数组中移除
+                  piece.statusTags.splice(i, 1);
+                }
+              }
+            }
+            
+            // 规则清理逻辑已移至状态效果移除时处理
           }
         })
 
@@ -375,14 +436,71 @@ export function applyBattleAction(
         )
       }
 
+      // 触发即将移动前的规则（检查冰冻等状态）
+      const beforeMoveResult = globalTriggerSystem.checkTriggers(next, {
+        type: "beforeMove",
+        sourcePiece: piece,
+        playerId: action.playerId
+      });
+
+      // 检查是否有规则阻止了移动
+      if (beforeMoveResult.success) {
+        // 初始化actions数组
+        if (!next.actions) {
+          next.actions = [];
+        }
+        beforeMoveResult.messages.forEach(message => {
+          next.actions!.push({
+            type: "triggerEffect",
+            playerId: action.playerId,
+            turn: next.turn.turnNumber,
+            payload: {
+              message
+            }
+          });
+        });
+        // 检查是否有规则明确阻止了行动
+        if (beforeMoveResult.blocked) {
+          throw new BattleRuleError("行动被规则阻止");
+        }
+      }
+
       validateMove(next, piece, action.toX, action.toY)
 
+      // 记录移动前的位置
+      const fromX = piece.x
+      const fromY = piece.y
+      
+      // 执行移动
       piece.x = action.toX
       piece.y = action.toY
       
       // 消耗行动点
       const playerMeta = getPlayerMeta(next, action.playerId)
       playerMeta.actionPoints -= 1
+      
+      // 初始化actions数组（如果不存在）
+      if (!next.actions) {
+        next.actions = []
+      }
+      
+      // 记录移动信息到战斗日志
+      const pieceName = piece.name || piece.templateId;
+      const moveMessage = `${pieceName}从(${fromX}, ${fromY})移动到(${action.toX}, ${action.toY})`;
+      
+      next.actions.push({
+        type: "move",
+        playerId: action.playerId,
+        turn: next.turn.turnNumber,
+        payload: {
+          message: moveMessage,
+          pieceId: action.pieceId,
+          fromX,
+          fromY,
+          toX: action.toX,
+          toY: action.toY
+        }
+      })
 
       // 触发移动后的规则
       const moveResult = globalTriggerSystem.checkTriggers(next, {
@@ -463,25 +581,6 @@ export function applyBattleAction(
       
       let skillDef = next.skillsById[action.skillId]
       
-      // 如果技能定义找不到，使用默认技能定义
-      if (!skillDef) {
-        console.warn(`Skill definition not found for ID: ${action.skillId}, using default skill`)
-        skillDef = {
-          id: action.skillId,
-          name: action.skillId,
-          description: "Default skill",
-          kind: "active",
-          type: "normal",
-          cooldownTurns: 0,
-          maxCharges: 0,
-          powerMultiplier: 1,
-          code: "function executeSkill(context) { return { message: 'Skill executed', success: true } }",
-          range: "self",
-          requiresTarget: false,
-          actionPointCost: 1
-        }
-      }
-      
       // 检查行动点是否足够
       const playerMeta = getPlayerMeta(state, action.playerId)
       if (playerMeta.actionPoints < skillDef.actionPointCost) {
@@ -505,8 +604,38 @@ export function applyBattleAction(
       
       console.log('Skill definition used:', skillDef)
 
+      // 触发即将使用技能前的规则（检查冰冻等状态）
+      const beforeSkillUseResult = globalTriggerSystem.checkTriggers(next, {
+        type: "beforeSkillUse",
+        sourcePiece: piece,
+        playerId: action.playerId,
+        skillId: action.skillId
+      });
+
+      // 检查是否有规则阻止了技能使用
+      if (beforeSkillUseResult.success) {
+        // 初始化actions数组
+        if (!next.actions) {
+          next.actions = [];
+        }
+        beforeSkillUseResult.messages.forEach(message => {
+          next.actions!.push({
+            type: "triggerEffect",
+            playerId: action.playerId,
+            turn: next.turn.turnNumber,
+            payload: {
+              message
+            }
+          });
+        });
+        // 检查是否有规则明确阻止了行动
+        if (beforeSkillUseResult.blocked) {
+          throw new BattleRuleError("行动被规则阻止");
+        }
+      }
+
       // 执行技能
-      const { executeSkillFunction, applySkillEffects } = require('./skills')
+      const { executeSkillFunction } = require('./skills')
       
       // 构建目标信息
       let targetInfo = null;
@@ -634,37 +763,38 @@ export function applyBattleAction(
         }
       }
 
-      // 处理传送技能的目标位置（作为备用机制）
-      if (skillDef.id === "teleport" && action.targetX !== undefined && action.targetY !== undefined) {
-        // 检查目标位置是否有效
-        const targetTile = next.map.tiles.find(t => t.x === action.targetX && t.y === action.targetY)
-        if (targetTile && targetTile.props.walkable) {
-          // 检查目标位置是否被占用
-          const isOccupied = next.pieces.some(p => p.x === action.targetX && p.y === action.targetY && p.currentHp > 0)
-          if (!isOccupied) {
-            // 计算曼哈顿距离，使用技能配置中的 areaSize 作为传送范围
-            const distance = Math.abs(action.targetX - (piece.x || 0)) + Math.abs(action.targetY - (piece.y || 0))
-            const teleportRange = skillDef.areaSize || 5 // 默认5格范围
-            if (distance <= teleportRange) {
-              piece.x = action.targetX
-              piece.y = action.targetY
-            }
-          }
-        }
-      }
-
       // 初始化actions数组
       if (!next.actions) {
         next.actions = []
       }
 
       // 存储技能执行消息到战斗日志
+      // 构建更详细的技能释放消息
+      const pieceName = piece.name || piece.templateId;
+      let skillMessage = `${pieceName}使用了${skillDef.name || action.skillId}`;
+      
+      // 如果有目标，添加目标信息
+      if (action.targetPieceId) {
+        const targetPiece = next.pieces.find(p => p.instanceId === action.targetPieceId);
+        if (targetPiece) {
+          const targetName = targetPiece.name || targetPiece.templateId;
+          skillMessage += `，目标是${targetName}`;
+        }
+      } else if (action.targetX !== undefined && action.targetY !== undefined) {
+        skillMessage += `，目标位置是(${action.targetX}, ${action.targetY})`;
+      }
+      
+      // 添加技能执行结果消息
+      if (result.message) {
+        skillMessage += `，${result.message}`;
+      }
+      
       next.actions.push({
         type: "useBasicSkill",
         playerId: action.playerId,
         turn: next.turn.turnNumber,
         payload: {
-          message: result.message || "使用了普通技能",
+          message: skillMessage,
           skillId: action.skillId,
           pieceId: action.pieceId
         }
@@ -771,6 +901,36 @@ export function applyBattleAction(
       
       console.log('Skill definition used:', skillDef)
 
+      // 触发即将使用技能前的规则（检查冰冻等状态）
+      const beforeSkillUseResult = globalTriggerSystem.checkTriggers(next, {
+        type: "beforeSkillUse",
+        sourcePiece: piece,
+        playerId: action.playerId,
+        skillId: action.skillId
+      });
+
+      // 检查是否有规则阻止了技能使用
+      if (beforeSkillUseResult.success) {
+        // 初始化actions数组
+        if (!next.actions) {
+          next.actions = [];
+        }
+        beforeSkillUseResult.messages.forEach(message => {
+          next.actions!.push({
+            type: "triggerEffect",
+            playerId: action.playerId,
+            turn: next.turn.turnNumber,
+            payload: {
+              message
+            }
+          });
+        });
+        // 检查是否有规则明确阻止了行动
+        if (beforeSkillUseResult.blocked) {
+          throw new BattleRuleError("行动被规则阻止");
+        }
+      }
+
       const cost = skillDef.chargeCost ?? 0
       if (cost > 0 && playerMeta.chargePoints < cost) {
         throw new BattleRuleError("Not enough charge points to use this skill")
@@ -782,7 +942,7 @@ export function applyBattleAction(
       }
 
       // 执行技能
-      const { executeSkillFunction, applySkillEffects } = require('./skills')
+      const { executeSkillFunction } = require('./skills')
       
       // 构建目标信息
       let targetInfo = null;
@@ -912,12 +1072,32 @@ export function applyBattleAction(
       }
 
       // 存储技能执行消息到战斗日志
+      // 构建更详细的技能释放消息
+      const pieceName = piece.name || piece.templateId;
+      let skillMessage = `${pieceName}使用了${skillDef.name || action.skillId}（充能技能，消耗${cost}点充能）`;
+      
+      // 如果有目标，添加目标信息
+      if (action.targetPieceId) {
+        const targetPiece = next.pieces.find(p => p.instanceId === action.targetPieceId);
+        if (targetPiece) {
+          const targetName = targetPiece.name || targetPiece.templateId;
+          skillMessage += `，目标是${targetName}`;
+        }
+      } else if (action.targetX !== undefined && action.targetY !== undefined) {
+        skillMessage += `，目标位置是(${action.targetX}, ${action.targetY})`;
+      }
+      
+      // 添加技能执行结果消息
+      if (result.message) {
+        skillMessage += `，${result.message}`;
+      }
+      
       next.actions.push({
         type: "useChargeSkill",
         playerId: action.playerId,
         turn: next.turn.turnNumber,
         payload: {
-          message: result.message || "使用了充能技能",
+          message: skillMessage,
           skillId: action.skillId,
           pieceId: action.pieceId,
           chargeCost: cost
@@ -960,29 +1140,35 @@ export function applyBattleAction(
       }
 
       const next = structuredClone(state) as BattleState
-      // 触发回合结束效果
-      const endTurnResult = globalTriggerSystem.checkTriggers(next, {
-        type: "endTurn",
-        turnNumber: next.turn.turnNumber,
-        playerId: action.playerId
-      });
-
-      // 处理触发效果的消息
-      if (endTurnResult.success && endTurnResult.messages.length > 0) {
-        if (!next.actions) {
-          next.actions = [];
-        }
-        endTurnResult.messages.forEach(message => {
-          next.actions!.push({
-            type: "triggerEffect",
-            playerId: action.playerId,
-            turn: next.turn.turnNumber,
-            payload: {
-              message
-            }
-          });
+      // 获取当前玩家的所有棋子
+      const currentPlayerPieces = next.pieces.filter(p => p.ownerPlayerId === action.playerId && p.currentHp > 0);
+      
+      // 触发回合结束效果，为每个存活的棋子都触发一次
+      currentPlayerPieces.forEach(piece => {
+        const endTurnResult = globalTriggerSystem.checkTriggers(next, {
+          type: "endTurn",
+          sourcePiece: piece,
+          turnNumber: next.turn.turnNumber,
+          playerId: action.playerId
         });
-      }
+
+        // 处理触发效果的消息
+        if (endTurnResult.success && endTurnResult.messages.length > 0) {
+          if (!next.actions) {
+            next.actions = [];
+          }
+          endTurnResult.messages.forEach(message => {
+            next.actions!.push({
+              type: "triggerEffect",
+              playerId: action.playerId,
+              turn: next.turn.turnNumber,
+              payload: {
+                message
+              }
+            });
+          });
+        }
+      });
 
       // 触发whenever规则（每一步行动后检测）
       const wheneverResult = globalTriggerSystem.checkTriggers(next, {

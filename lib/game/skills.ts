@@ -1,7 +1,270 @@
 import type { BattleState } from "./turn"
 import type { PieceInstance } from "./piece"
 import { globalTriggerSystem } from "./triggers"
-import { statusEffectSystem, predefinedStatusEffects, StatusEffect } from "./status-effects"
+import { statusEffectSystem, StatusEffect } from "./status-effects"
+
+// 效果函数类型
+type EffectFunction = (battle: BattleState, context: any) => { success: boolean; message?: string; blocked?: boolean }
+
+// 规则定义类型
+interface RuleDefinition {
+  id: string
+  name: string
+  description: string
+  trigger: {
+    type: string
+    conditions?: any
+  }
+  effect: any
+  limits?: {
+    cooldownTurns?: number
+    maxUses?: number
+  }
+}
+
+// 触发器规则类型
+interface TriggerRule {
+  id: string
+  name: string
+  description: string
+  trigger: {
+    type: string
+    conditions?: any
+  }
+  effect: EffectFunction
+  limits?: {
+    cooldownTurns?: number
+    maxUses?: number
+  }
+}
+
+// 从文件中加载规则的函数
+function loadRuleById(ruleId: string): TriggerRule | null {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    
+    // 尝试使用process.cwd()来获取当前工作目录，确保路径正确
+    const rulePath = path.join(process.cwd(), 'data', 'rules', `${ruleId}.json`);
+    
+    if (fs.existsSync(rulePath)) {
+      console.log(`Loading rule from: ${rulePath}`);
+      const ruleContent = fs.readFileSync(rulePath, 'utf8');
+      const ruleData = JSON.parse(ruleContent);
+      
+      // 转换effect为函数
+      let effectFunction: EffectFunction;
+      
+      if (ruleData.effect) {
+        if (ruleData.effect.type === 'triggerSkill') {
+          // 触发技能的效果
+          effectFunction = (battle: BattleState, context: any) => {
+            const skillId = ruleData.effect.skillId;
+            if (skillId) {
+              console.log(`Triggering skill: ${skillId} for rule: ${ruleId}`);
+              // 直接从文件加载技能定义，使用process.cwd()确保路径正确
+              const skillPath = path.join(process.cwd(), 'data', 'skills', `${skillId}.json`);
+              if (fs.existsSync(skillPath)) {
+                try {
+                  const skillContent = fs.readFileSync(skillPath, 'utf8');
+                  const skillDef = JSON.parse(skillContent);
+                  
+                  // 保存全局的dealDamage和healDamage函数，避免递归调用
+                  const globalDealDamage = dealDamage;
+                  const globalHealDamage = healDamage;
+                  
+                  // 构建技能执行上下文
+                  const skillContext = {
+                    piece: context.sourcePiece,
+                    target: context.targetPiece,
+                    targetPosition: null,
+                    battle: {
+                      turn: battle.turn.turnNumber,
+                      currentPlayerId: battle.turn.currentPlayerId,
+                      phase: battle.turn.phase
+                    },
+                    skill: {
+                      id: skillId,
+                      name: skillDef.name,
+                      type: skillDef.type,
+                      powerMultiplier: skillDef.powerMultiplier
+                    },
+                    damage: context.damage
+                  };
+                  
+                  // 构建技能执行环境
+                  const skillEnvironment = {
+                    context: skillContext,
+                    sourcePiece: context.sourcePiece,
+                    battle: battle,
+                    select: {
+                      getAllEnemies: () => [],
+                      getAllAllies: () => [],
+                      getNearestEnemy: () => null,
+                      getLowestHpEnemy: () => null,
+                      getHighestAttackEnemy: () => null,
+                      getLowestDefenseEnemy: () => null,
+                      getLowestHpAlly: () => null,
+                      getHighestAttackAlly: () => null,
+                      getPieceAt: () => null,
+                      getEnemiesInRange: () => [],
+                      getAlliesInRange: () => []
+                    },
+                    selectTarget: () => null,
+                    teleport: () => ({ success: false }),
+                    dealDamage: (attacker, target, damage, type, battleState, skillId) => {
+                      // 直接调用全局的dealDamage函数，确保使用正确的实现
+                      return globalDealDamage(attacker, target, damage, type, battle, skillId);
+                    },
+                    healDamage: (healer, target, heal, battleState, skillId) => {
+                      // 直接调用全局的healDamage函数，确保使用正确的实现
+                      return globalHealDamage(healer, target, heal, battle, skillId);
+                    },
+                    statusEffectSystem: statusEffectSystem,
+                    addStatusEffect: (targetPiece, statusEffect) => {
+                      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, statusEffect);
+                    },
+                    addStatusEffectById: (targetPieceId, statusObject) => {
+                      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+                      if (targetPiece) {
+                        if (!targetPiece.statusTags) {
+                          targetPiece.statusTags = [];
+                        }
+                        const newStatus = {
+                          id: statusObject.id,
+                          type: statusObject.type,
+                          currentDuration: statusObject.currentDuration,
+                          currentUses: statusObject.currentUses,
+                          intensity: statusObject.intensity,
+                          stacks: statusObject.stacks,
+                          value: statusObject.value,
+                          relatedRules: []
+                        };
+                        targetPiece.statusTags.push(newStatus);
+                        return true;
+                      }
+                      return false;
+                    },
+                    removeStatusEffectById: (targetPieceId, statusId) => {
+                      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+                      if (targetPiece && targetPiece.statusTags) {
+                        const statusTagIndex = targetPiece.statusTags.findIndex(tag => tag.id === statusId);
+                        if (statusTagIndex !== -1) {
+                          targetPiece.statusTags.splice(statusTagIndex, 1);
+                          return true;
+                        }
+                      }
+                      return false;
+                    },
+                    addRuleById: (targetPieceId, ruleId) => {
+                      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+                      if (targetPiece) {
+                        const rule = loadRuleById(ruleId);
+                        if (rule) {
+                          if (!targetPiece.rules) {
+                            targetPiece.rules = [];
+                          }
+                          targetPiece.rules.push(rule);
+                          return true;
+                        }
+                      }
+                      return false;
+                    },
+                    removeRuleById: (targetPieceId, ruleId) => {
+                      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+                      if (targetPiece && targetPiece.rules) {
+                        targetPiece.rules = targetPiece.rules.filter(rule => rule.id !== ruleId);
+                        return true;
+                      }
+                      return false;
+                    },
+                    getAllEnemiesInRange: (range) => [],
+                    getAllAlliesInRange: (range) => [],
+                    calculateDistance: (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2),
+                    isTargetInRange: (target, range) => false,
+                    Math: Math,
+                    console: console
+                  };
+                  
+                  // 构建技能执行代码
+                  const fullSkillCode = `
+                    (function(environment) {
+                      const context = environment.context;
+                      const sourcePiece = environment.sourcePiece;
+                      const battle = environment.battle;
+                      const select = environment.select;
+                      const selectTarget = environment.selectTarget;
+                      const teleport = environment.teleport;
+                      const statusEffectSystem = environment.statusEffectSystem;
+                      const addStatusEffect = environment.addStatusEffect;
+                      const addStatusEffectById = environment.addStatusEffectById;
+                      const getAllEnemiesInRange = environment.getAllEnemiesInRange;
+                      const getAllAlliesInRange = environment.getAllAlliesInRange;
+                      const calculateDistance = environment.calculateDistance;
+                      const isTargetInRange = environment.isTargetInRange;
+                      const dealDamage = environment.dealDamage;
+                      const healDamage = environment.healDamage;
+                      const addRuleById = environment.addRuleById;
+                      const removeRuleById = environment.removeRuleById;
+                      const removeStatusEffectById = environment.removeStatusEffectById;
+                      const Math = environment.Math;
+                      const console = environment.console;
+                      
+                      ${skillDef.code}
+                      
+                      return executeSkill(context);
+                    })(skillEnvironment)
+                  `;
+                  
+                  // 执行技能代码
+                  const result = eval(fullSkillCode);
+                  console.log(`Skill execution result:`, result);
+                  return result;
+                } catch (error) {
+                  console.error('Error executing skill in rule effect:', error);
+                  return { success: false, message: '技能执行失败' };
+                }
+              } else {
+                console.error(`Skill file not found: ${skillPath}`);
+              }
+            }
+            return { success: true, message: `${ruleData.name}触发` };
+          };
+        } else {
+          // 默认效果函数
+          effectFunction = (battle: BattleState, context: any) => {
+            return { success: true, message: `${ruleData.name}触发` };
+          };
+        }
+      } else {
+        // 默认效果函数
+        effectFunction = (battle: BattleState, context: any) => {
+          return { success: true, message: `${ruleData.name}触发` };
+        };
+      }
+      
+      // 创建规则对象
+      const rule: TriggerRule = {
+        id: ruleData.id,
+        name: ruleData.name,
+        description: ruleData.description,
+        trigger: ruleData.trigger,
+        effect: effectFunction,
+        limits: ruleData.limits
+      };
+      
+      console.log(`Loaded rule successfully: ${ruleId}`);
+      return rule;
+    } else {
+      console.error(`Rule file not found: ${rulePath}`);
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error loading rule:', error);
+    return null;
+  }
+};
 
 export type SkillId = string
 
@@ -390,10 +653,6 @@ function createTargetSelectors(battle: BattleState, sourcePiece: PieceInstance):
 function createEffectFunctions(battle: BattleState, sourcePiece: PieceInstance, target?: { x: number, y: number }, context?: SkillExecutionContext) {
   const selectors = createTargetSelectors(battle, sourcePiece);
   
-  // 保存全局的dealDamage和healDamage函数，避免递归调用
-  const globalDealDamage = dealDamage;
-  const globalHealDamage = healDamage;
-  
   return {
     // 目标选择器
     select: selectors,
@@ -414,6 +673,29 @@ function createEffectFunctions(battle: BattleState, sourcePiece: PieceInstance, 
       // 检查是否已经有目标信息（用户已经选择了目标）
       // 使用context参数来获取目标信息
       if (defaultOptions.type === 'piece' && context && context.target) {
+        // 检查目标是否符合filter要求
+        const isAlly = context.target.ownerPlayerId === sourcePiece.ownerPlayerId;
+        const isEnemy = !isAlly;
+        
+        // 根据filter参数检查目标是否符合要求
+        if (defaultOptions.filter === 'ally' && !isAlly) {
+          // 目标是敌方，但filter要求是友方，返回需要重新选择目标
+          return {
+            needsTargetSelection: true,
+            targetType: defaultOptions.type,
+            range: defaultOptions.range,
+            filter: defaultOptions.filter
+          };
+        } else if (defaultOptions.filter === 'enemy' && !isEnemy) {
+          // 目标是友方，但filter要求是敌方，返回需要重新选择目标
+          return {
+            needsTargetSelection: true,
+            targetType: defaultOptions.type,
+            range: defaultOptions.range,
+            filter: defaultOptions.filter
+          };
+        }
+        
         // 尝试从battle.pieces中查找原始目标实例
         const targetInstanceId = context.target.instanceId;
         console.log('=== selectTarget debug ===');
@@ -460,6 +742,7 @@ function createEffectFunctions(battle: BattleState, sourcePiece: PieceInstance, 
         const newTargetPiece = {
           instanceId: targetInstanceId || `temp_${Date.now()}`,
           templateId: context.target.templateId,
+          name: context.target.name || context.target.templateId,
           ownerPlayerId: context.target.ownerPlayerId,
           faction: context.target.faction || 'neutral',
           currentHp: context.target.currentHp,
@@ -473,7 +756,8 @@ function createEffectFunctions(battle: BattleState, sourcePiece: PieceInstance, 
           buffs: context.target.buffs || [],
           debuffs: context.target.debuffs || [],
           ruleTags: context.target.ruleTags || [],
-          statusTags: context.target.statusTags || []
+          statusTags: context.target.statusTags || [],
+          rules: context.target.rules || []
         };
         
         // 将新创建的目标实例添加到battle.pieces中
@@ -569,13 +853,13 @@ function createEffectFunctions(battle: BattleState, sourcePiece: PieceInstance, 
     // 造成伤害
     dealDamage: (attacker: PieceInstance, targetPiece: PieceInstance, baseDamage: number, damageType: DamageType = "physical", battleState?: BattleState, skillId?: string) => {
       // 忽略传入的 battleState，使用闭包中的 battle，确保修改的是正确的实例
-      return globalDealDamage(attacker, targetPiece, baseDamage, damageType, battle, skillId);
+      return dealDamage(attacker, targetPiece, baseDamage, damageType, battle, skillId);
     },
     
     // 治疗
     healDamage: (healer: PieceInstance, targetPiece: PieceInstance, baseHeal: number, battleState?: BattleState, skillId?: string) => {
       // 忽略传入的 battleState，使用闭包中的 battle，确保修改的是正确的实例
-      return globalHealDamage(healer, targetPiece, baseHeal, battle, skillId);
+      return healDamage(healer, targetPiece, baseHeal, battle, skillId);
     }
   };
 }
@@ -591,6 +875,80 @@ function createEffectFunctions(battle: BattleState, sourcePiece: PieceInstance, 
  * @returns 伤害结果
  */
 export function dealDamage(attacker: PieceInstance, target: PieceInstance, baseDamage: number, damageType: DamageType, battle: BattleState, skillId?: string) {
+  // 触发即将造成伤害前的触发器
+  const beforeDamageDealtResult = globalTriggerSystem.checkTriggers(battle, {
+    type: "beforeDamageDealt",
+    sourcePiece: attacker,
+    targetPiece: target,
+    damage: baseDamage,
+    skillId
+  });
+  
+  // 检查是否有规则阻止了伤害
+  if (beforeDamageDealtResult.blocked) {
+    // 记录阻止信息到战斗日志
+    const attackerName = attacker.name || attacker.templateId;
+    const targetName = target.name || target.templateId;
+    
+    if (!battle.actions) {
+      battle.actions = [];
+    }
+    
+    battle.actions.push({
+      type: "triggerEffect",
+      playerId: attacker.ownerPlayerId,
+      turn: battle.turn.turnNumber,
+      payload: {
+        message: `${attackerName}的攻击被规则阻止`
+      }
+    });
+    
+    return {
+      success: false,
+      damage: 0,
+      isKilled: false,
+      targetHp: target.currentHp,
+      message: "攻击被规则阻止"
+    };
+  }
+  
+  // 触发即将受到伤害前的触发器
+  const beforeDamageTakenResult = globalTriggerSystem.checkTriggers(battle, {
+    type: "beforeDamageTaken",
+    sourcePiece: target,
+    targetPiece: attacker,
+    damage: baseDamage,
+    skillId
+  });
+  
+  // 检查是否有规则阻止了伤害
+  if (beforeDamageTakenResult.blocked) {
+    // 记录阻止信息到战斗日志
+    const attackerName = attacker.name || attacker.templateId;
+    const targetName = target.name || target.templateId;
+    
+    if (!battle.actions) {
+      battle.actions = [];
+    }
+    
+    battle.actions.push({
+      type: "triggerEffect",
+      playerId: attacker.ownerPlayerId,
+      turn: battle.turn.turnNumber,
+      payload: {
+        message: `${targetName}受到的伤害被规则阻止`
+      }
+    });
+    
+    return {
+      success: false,
+      damage: 0,
+      isKilled: false,
+      targetHp: target.currentHp,
+      message: "伤害被规则阻止"
+    };
+  }
+  
   // 计算最终伤害（考虑防御力）
   let finalDamage: number;
   
@@ -611,10 +969,7 @@ export function dealDamage(attacker: PieceInstance, target: PieceInstance, baseD
       // 真实伤害：不受防御力影响
       finalDamage = Math.max(1, Math.round(validBaseDamage)); // 至少造成1点伤害
       break;
-    default:
-      // 默认使用物理伤害
-      finalDamage = Math.max(1, Math.round(validBaseDamage - validDefense)); // 至少造成1点伤害
-  }
+   }
   
   // 记录原始生命值
   const originalHp = target.currentHp;
@@ -668,20 +1023,31 @@ export function dealDamage(attacker: PieceInstance, target: PieceInstance, baseD
       playerMeta.chargePoints += 1; // 每次击杀获得1点充能
     }
     
-    // 从棋盘上移除死亡的棋子
+    // 从棋盘上移除死亡的棋子，并将其移到墓地中
     const targetIndex = battle.pieces.findIndex(p => p.instanceId === target.instanceId);
     if (targetIndex !== -1) {
-      battle.pieces.splice(targetIndex, 1);
-      console.log(`Removed killed piece ${target.instanceId} from board`);
+      // 确保墓地数组存在
+      if (!battle.graveyard) {
+        battle.graveyard = [];
+      }
+      
+      // 将死亡的棋子移到墓地中
+      const killedPiece = battle.pieces.splice(targetIndex, 1)[0];
+      battle.graveyard.push(killedPiece);
+      console.log(`Moved killed piece ${target.instanceId} to graveyard`);
     }
   }
+  
+  // 尝试获取攻击者和目标的名字
+  const attackerName = attacker.name || attacker.templateId;
+  const targetName = target.name || target.templateId;
   
   return {
     success: true,
     damage: finalDamage,
     isKilled,
     targetHp: target.currentHp,
-    message: `${attacker.templateId}对${target.templateId}造成${finalDamage}点伤害${isKilled ? '，击杀敌人获得1点充能' : ''}`
+    message: `${attackerName}对${targetName}造成${finalDamage}点${damageType === 'physical' ? '物理' : damageType === 'magical' ? '魔法' : '真实'}伤害${isKilled ? '，击杀敌人获得1点充能' : ''}`
   };
 }
 
@@ -695,6 +1061,78 @@ export function dealDamage(attacker: PieceInstance, target: PieceInstance, baseD
  * @returns 治疗结果
  */
 export function healDamage(healer: PieceInstance, target: PieceInstance, baseHeal: number, battle: BattleState, skillId?: string) {
+  // 触发即将造成治疗前的触发器
+  const beforeHealDealtResult = globalTriggerSystem.checkTriggers(battle, {
+    type: "beforeHealDealt",
+    sourcePiece: healer,
+    targetPiece: target,
+    heal: baseHeal,
+    skillId
+  });
+  
+  // 检查是否有规则阻止了治疗
+  if (beforeHealDealtResult.blocked) {
+    // 记录阻止信息到战斗日志
+    const healerName = healer.name || healer.templateId;
+    const targetName = target.name || target.templateId;
+    
+    if (!battle.actions) {
+      battle.actions = [];
+    }
+    
+    battle.actions.push({
+      type: "triggerEffect",
+      playerId: healer.ownerPlayerId,
+      turn: battle.turn.turnNumber,
+      payload: {
+        message: `${healerName}的治疗被规则阻止`
+      }
+    });
+    
+    return {
+      success: false,
+      heal: 0,
+      targetHp: target.currentHp,
+      message: "治疗被规则阻止"
+    };
+  }
+  
+  // 触发即将受到治疗前的触发器
+  const beforeHealTakenResult = globalTriggerSystem.checkTriggers(battle, {
+    type: "beforeHealTaken",
+    sourcePiece: target,
+    targetPiece: healer,
+    heal: baseHeal,
+    skillId
+  });
+  
+  // 检查是否有规则阻止了治疗
+  if (beforeHealTakenResult.blocked) {
+    // 记录阻止信息到战斗日志
+    const healerName = healer.name || healer.templateId;
+    const targetName = target.name || target.templateId;
+    
+    if (!battle.actions) {
+      battle.actions = [];
+    }
+    
+    battle.actions.push({
+      type: "triggerEffect",
+      playerId: healer.ownerPlayerId,
+      turn: battle.turn.turnNumber,
+      payload: {
+        message: `${targetName}受到的治疗被规则阻止`
+      }
+    });
+    
+    return {
+      success: false,
+      heal: 0,
+      targetHp: target.currentHp,
+      message: "治疗被规则阻止"
+    };
+  }
+  
   // 计算最终治疗值
   const finalHeal = Math.max(0, Math.round(baseHeal));
   
@@ -724,16 +1162,20 @@ export function healDamage(healer: PieceInstance, target: PieceInstance, baseHea
     skillId
   });
   
+  // 尝试获取治疗者和目标的名字
+  const healerName = healer.name || healer.templateId;
+  const targetName = target.name || target.templateId;
+  
   return {
     success: true,
     heal: actualHeal,
     targetHp: target.currentHp,
-    message: `${healer.templateId}为${target.templateId}回复${actualHeal}点生命值`
+    message: `${healerName}为${targetName}回复${actualHeal}点生命值`
   };
 }
 
 // 执行技能函数
-  export function executeSkillFunction(skillDef: SkillDefinition, context: SkillExecutionContext, battle: BattleState): SkillExecutionResult {
+export function executeSkillFunction(skillDef: SkillDefinition, context: SkillExecutionContext, battle: BattleState): SkillExecutionResult {
   try {
     console.log('=== executeSkillFunction called ===');
     console.log('Skill ID:', skillDef.id);
@@ -785,41 +1227,148 @@ export function healDamage(healer: PieceInstance, target: PieceInstance, baseHea
     addStatusEffect: (targetPiece: PieceInstance, statusEffect: StatusEffect) => {
       return statusEffectSystem.addStatusEffect(targetPiece.instanceId, statusEffect);
     },
-    addStatusEffectById: (targetPieceId: string, statusId: string, duration?: number) => {
-      return statusEffectSystem.addStatusEffectById(targetPieceId, statusId, duration);
+    addStatusEffectById: (targetPieceId: string, statusObject: any) => {
+      // 找到目标棋子
+      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+      if (targetPiece) {
+        // 确保statusTags数组存在
+        if (!targetPiece.statusTags) {
+          targetPiece.statusTags = [];
+        }
+        
+        // 创建状态对象
+        const newStatus = {
+          id: statusObject.id,
+          type: statusObject.type,
+          currentDuration: statusObject.currentDuration,
+          currentUses: statusObject.currentUses,
+          intensity: statusObject.intensity,
+          stacks: statusObject.stacks,
+          value: statusObject.value, // 添加数值属性值
+          relatedRules: [] // 添加关联规则数组
+        };
+        
+        // 添加到状态标签数组
+        targetPiece.statusTags.push(newStatus);
+        return true;
+      }
+      return false;
     },
-    addBleeding: (targetPiece: PieceInstance, intensity: number = 5) => {
-      const bleedingEffect = predefinedStatusEffects.bleeding(intensity);
-      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, bleedingEffect);
+    removeStatusEffectById: (targetPieceId: string, statusId: string) => {
+      // 找到目标棋子
+      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+      if (targetPiece && targetPiece.statusTags) {
+        // 找到要移除的状态标签
+        const statusTagIndex = targetPiece.statusTags.findIndex(tag => tag.id === statusId);
+        if (statusTagIndex === -1) {
+          return false;
+        }
+        
+        const statusTag = targetPiece.statusTags[statusTagIndex];
+        
+        // 检查并清理相关规则
+        if (statusTag.relatedRules && statusTag.relatedRules.length > 0) {
+          statusTag.relatedRules.forEach(ruleId => {
+            // 检查是否有其他状态标签关联此规则
+            let hasOtherRelatedStatus = false;
+            
+            targetPiece.statusTags.forEach(otherStatusTag => {
+              if (otherStatusTag.id !== statusId && 
+                  otherStatusTag.relatedRules && 
+                  otherStatusTag.relatedRules.includes(ruleId)) {
+                hasOtherRelatedStatus = true;
+              }
+            });
+            
+            // 如果没有其他状态标签关联此规则，移除规则
+            if (!hasOtherRelatedStatus && targetPiece.rules) {
+              const ruleIndex = targetPiece.rules.findIndex(rule => rule.id === ruleId);
+              if (ruleIndex !== -1) {
+                console.log(`Removing rule ${ruleId} because no other status tags are related to it`);
+                targetPiece.rules.splice(ruleIndex, 1);
+              }
+            }
+          });
+        }
+        
+        // 从状态标签数组中移除指定状态
+        targetPiece.statusTags.splice(statusTagIndex, 1);
+        return true;
+      }
+      return false;
     },
-    addPoison: (targetPiece: PieceInstance, intensity: number = 3) => {
-      const poisonEffect = predefinedStatusEffects.poison(intensity);
-      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, poisonEffect);
+    // 规则管理函数
+    addRuleById: (targetPieceId: string, ruleId: string) => {
+      // 找到目标棋子
+      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+      if (targetPiece) {
+        // 从文件中加载规则
+        const rule = loadRuleById(ruleId);
+        if (rule) {
+          // 创建规则对象的副本并添加关联状态标签数组
+          const newRule = {
+            ...rule,
+            relatedStatusTags: [] // 添加关联状态标签数组
+          };
+          
+          // 找到相关的状态标签并建立关联
+          if (targetPiece.statusTags) {
+            targetPiece.statusTags.forEach(statusTag => {
+              // 根据规则ID和状态类型判断关联关系
+              if (ruleId.includes(statusTag.type) || statusTag.id.includes(ruleId)) {
+                // 添加关联关系
+                newRule.relatedStatusTags.push(statusTag.id);
+                if (!statusTag.relatedRules) {
+                  statusTag.relatedRules = [];
+                }
+                statusTag.relatedRules.push(ruleId);
+              }
+            });
+          }
+          
+          // 添加到棋子的规则列表
+          if (!targetPiece.rules) {
+            targetPiece.rules = [];
+          }
+          targetPiece.rules.push(newRule);
+          return true;
+        }
+      }
+      return false;
     },
-    addBurn: (targetPiece: PieceInstance, intensity: number = 8) => {
-      const burnEffect = predefinedStatusEffects.burn(intensity);
-      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, burnEffect);
+    removeRuleById: (targetPieceId: string, ruleId: string) => {
+      // 找到目标棋子
+      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+      if (targetPiece && targetPiece.rules) {
+        // 从棋子的规则列表中移除
+        targetPiece.rules = targetPiece.rules.filter(rule => rule.id !== ruleId);
+        return true;
+      }
+      return false;
     },
-    addBuffAttack: (targetPiece: PieceInstance, intensity: number = 2) => {
-      const buffEffect = predefinedStatusEffects.buffAttack(intensity);
-      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, buffEffect);
+    // 技能管理函数
+    addSkillById: (targetPieceId: string, skillId: string) => {
+      // 找到目标棋子
+      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+      if (targetPiece) {
+        // 检查技能是否已经存在
+        const existingSkill = targetPiece.skills.find(skill => skill.skillId === skillId);
+        if (!existingSkill) {
+          // 创建新技能对象
+          const newSkill = {
+            skillId: skillId,
+            currentCooldown: 0
+          };
+          // 添加到棋子的技能列表
+          targetPiece.skills.push(newSkill);
+          return true;
+        }
+      }
+      return false;
     },
-    addBuffDefense: (targetPiece: PieceInstance, intensity: number = 2) => {
-      const buffEffect = predefinedStatusEffects.buffDefense(intensity);
-      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, buffEffect);
-    },
-    addRegeneration: (targetPiece: PieceInstance, intensity: number = 4) => {
-      const regenEffect = predefinedStatusEffects.regeneration(intensity);
-      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, regenEffect);
-    },
-    addStun: (targetPiece: PieceInstance, intensity: number = 1) => {
-      const stunEffect = predefinedStatusEffects.stun(intensity);
-      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, stunEffect);
-    },
-    addFreeze: (targetPiece: PieceInstance, intensity: number = 1) => {
-      const freezeEffect = predefinedStatusEffects.freeze(intensity);
-      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, freezeEffect);
-    },
+    // 状态效果添加函数已移除，现在使用addStatusEffectById函数添加状态效果
+    // 所有状态效果都通过JSON文件定义，不再使用硬编码的预定义状态效果
+    
     
     // 辅助函数
     getAllEnemiesInRange: (range: number) => getAllEnemiesInRange(context, range, battle),
@@ -892,20 +1441,16 @@ export function healDamage(healer: PieceInstance, target: PieceInstance, baseHea
               const statusEffectSystem = environment.statusEffectSystem;
               const addStatusEffect = environment.addStatusEffect;
               const addStatusEffectById = environment.addStatusEffectById;
-              const addBleeding = environment.addBleeding;
-              const addPoison = environment.addPoison;
-              const addBurn = environment.addBurn;
-              const addBuffAttack = environment.addBuffAttack;
-              const addBuffDefense = environment.addBuffDefense;
-              const addRegeneration = environment.addRegeneration;
-              const addStun = environment.addStun;
-              const addFreeze = environment.addFreeze;
               const getAllEnemiesInRange = environment.getAllEnemiesInRange;
               const getAllAlliesInRange = environment.getAllAlliesInRange;
               const calculateDistance = environment.calculateDistance;
               const isTargetInRange = environment.isTargetInRange;
               const dealDamage = environment.dealDamage;
               const healDamage = environment.healDamage;
+              const addRuleById = environment.addRuleById;
+              const removeRuleById = environment.removeRuleById;
+              const removeStatusEffectById = environment.removeStatusEffectById;
+              const addSkillById = environment.addSkillById;
               const Math = environment.Math;
               const console = environment.console;
               
@@ -920,8 +1465,11 @@ export function healDamage(healer: PieceInstance, target: PieceInstance, baseHea
           // 执行技能代码
           let result = eval(fullSkillCode);
           
+          console.log('Skill execution result:', result);
+          
           // 检查是否需要目标选择
           if (result && result.needsTargetSelection) {
+            console.log('Need target selection:', result);
             // 直接返回需要目标选择的结果
             // 目标选择完全由selectTarget函数控制
             // 当用户选择目标后，前端会重新发送请求，selectTarget函数会处理目标信息
@@ -965,129 +1513,17 @@ export function healDamage(healer: PieceInstance, target: PieceInstance, baseHea
         }
       } catch (error) {
         console.error('Error executing skill code:', error);
-        // 执行失败时，使用默认技能逻辑
+        // 执行失败时，直接报错，不使用默认技能
+        throw new Error('技能执行失败: ' + (error instanceof Error ? error.message : '未知错误'));
       }
     }
 
-    // 默认技能逻辑（作为fallback）
-    // 找到最近的敌人
-    const nearestEnemy = effects.select.getNearestEnemy();
-    if (nearestEnemy) {
-      // 计算伤害值
-      const damageValue = sourcePiece.attack * skillDef.powerMultiplier;
-      // 应用伤害
-      const originalHp = nearestEnemy.currentHp;
-      nearestEnemy.currentHp = Math.max(0, nearestEnemy.currentHp - damageValue);
-      
-      // 检查是否击杀了敌人
-      if (originalHp > 0 && nearestEnemy.currentHp === 0) {
-        // 击杀敌人后，为击杀者添加充能点
-        const playerMeta = battle.players.find(p => p.playerId === sourcePiece.ownerPlayerId);
-        if (playerMeta) {
-          playerMeta.chargePoints += 1; // 每次击杀获得1点充能
-        }
-
-        // 触发伤害和击杀的规则
-        globalTriggerSystem.checkTriggers(battle, {
-          type: "afterDamageDealt",
-          sourcePiece,
-          targetPiece: nearestEnemy,
-          damage: damageValue,
-          skillId: skillDef.id
-        });
-
-        globalTriggerSystem.checkTriggers(battle, {
-          type: "afterPieceKilled",
-          sourcePiece,
-          targetPiece: nearestEnemy,
-          skillId: skillDef.id
-        });
-
-        // 触发技能使用后的规则
-        const skillUsedResult = globalTriggerSystem.checkTriggers(battle, {
-          type: "afterSkillUsed",
-          sourcePiece,
-          skillId: skillDef.id
-        });
-
-        let message = `对最近的敌人造成${Math.round(damageValue)}点伤害，击杀敌人获得1点充能`;
-        if (skillUsedResult.success && skillUsedResult.messages.length > 0) {
-          message += "。" + skillUsedResult.messages.join("。");
-        }
-
-        return {
-          message,
-          success: true
-        };
-      } else if (originalHp > nearestEnemy.currentHp) {
-        // 只造成伤害，未击杀
-        // 触发伤害的规则
-        globalTriggerSystem.checkTriggers(battle, {
-          type: "afterDamageDealt",
-          sourcePiece,
-          targetPiece: nearestEnemy,
-          damage: damageValue,
-          skillId: skillDef.id
-        });
-
-        // 触发技能使用后的规则
-        const skillUsedResult = globalTriggerSystem.checkTriggers(battle, {
-          type: "afterSkillUsed",
-          sourcePiece,
-          skillId: skillDef.id
-        });
-
-        let message = `对最近的敌人造成${Math.round(damageValue)}点伤害`;
-        if (skillUsedResult.success && skillUsedResult.messages.length > 0) {
-          message += "。" + skillUsedResult.messages.join("。");
-        }
-
-        return {
-          message,
-          success: true
-        };
-      }
-      
-      // 触发技能使用后的规则
-      const skillUsedResult = globalTriggerSystem.checkTriggers(battle, {
-        type: "afterSkillUsed",
-        sourcePiece,
-        skillId: skillDef.id
-      });
-
-      let message = `对最近的敌人造成${Math.round(damageValue)}点伤害`;
-      if (skillUsedResult.success && skillUsedResult.messages.length > 0) {
-        message += "。" + skillUsedResult.messages.join("。");
-      }
-
-      return {
-        message,
-        success: true
-      };
-    } else {
-      // 触发技能使用后的规则
-      const skillUsedResult = globalTriggerSystem.checkTriggers(battle, {
-        type: "afterSkillUsed",
-        sourcePiece,
-        skillId: skillDef.id
-      });
-
-      let message = '范围内没有可攻击的敌人';
-      if (skillUsedResult.success && skillUsedResult.messages.length > 0) {
-        message += "。" + skillUsedResult.messages.join("。");
-      }
-
-      return {
-        message,
-        success: false
-      };
-    }
+    // 没有默认技能逻辑，技能必须有有效的代码
+    throw new Error('技能没有有效的执行代码');
+    
   } catch (error) {
     console.error('Error executing skill:', error)
-    return {
-      message: '技能执行失败: ' + (error instanceof Error ? error.message : 'Unknown error'),
-      success: false
-    }
+    throw error;
   }
 }
 

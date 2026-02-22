@@ -1088,6 +1088,16 @@ export default function PieceSelectionPage() {
                                     <span className="text-white">{skillDefinition.kind === 'active' ? '主动' : '被动'}</span>
                                   </div>
                                 )}
+                                {skillDefinition.type && (
+                                  <div>
+                                    <span className="text-zinc-400">技能类型:</span>
+                                    <span className="text-white">
+                                      {skillDefinition.type === 'super' ? '充能' : 
+                                       skillDefinition.type === 'ultimate' ? '终极' : '普通'}
+                                      {skill.usesRemaining === 1 && ' (限定技)'}
+                                    </span>
+                                  </div>
+                                )}
                                 {skillDefinition.description && (
                                   <div>
                                     <span className="text-zinc-400">描述:</span>

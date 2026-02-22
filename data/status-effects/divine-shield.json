@@ -1,0 +1,10 @@
+{
+  "id": "divine-shield",
+  "name": "圣盾",
+  "description": "抵挡一次伤害",
+  "type": "divine-shield",
+  "duration": -1,
+  "maxStacks": 1,
+  "isDebuff": false,
+  "code": "function EffectTrigger(battle, context) { if (context.damage > 0) { const targetPiece = context.sourcePiece; if (targetPiece && targetPiece.statusTags) { const statusTagIndex = targetPiece.statusTags.findIndex(tag => tag.id === 'divine-shield'); if (statusTagIndex !== -1) { targetPiece.statusTags.splice(statusTagIndex, 1); return { success: true, blocked: true, message: '圣盾破碎，抵挡了来自 ' + context.targetPiece.name + ' 的伤害' }; } } } return { success: true, blocked: false }; }"
+}

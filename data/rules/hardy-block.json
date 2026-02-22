@@ -3,21 +3,11 @@
   "name": "悍猛格挡",
   "description": "当拥有悍猛格挡状态时，受到伤害将50%伤害转化为攻击力（向下取整）",
   "trigger": {
-    "type": "afterDamageTaken",
-    "conditions": {
-      "minDamage": 1,
-      "hasStatusEffect": "hardy-block"
-    }
+    "type": "afterDamageTaken"
   },
   "effect": {
-    "type": "triggerEffect",
-    "effectId": "hardy-block",
-    "functionName": "onDamageReceived",
+    "type": "triggerSkill",
+    "skillId": "hardy-block-effect",
     "message": "${source.templateId}触发了悍猛格挡效果"
-  },
-  "limits": {
-    "cooldownTurns": 0,
-    "maxUses": 0,
-    "duration": 1
   }
 }

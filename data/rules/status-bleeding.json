@@ -6,12 +6,8 @@
     "type": "beginTurn"
   },
   "effect": {
-    "type": "triggerStatusEffect",
-    "statusId": "bleeding",
+    "type": "triggerSkill",
+    "skillId": "bleeding-effect",
     "message": "流血状态触发"
-  },
-  "limits": {
-    "cooldownTurns": 0,
-    "maxUses": 0
   }
 }

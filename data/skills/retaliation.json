@@ -7,7 +7,5 @@
   "cooldownTurns": 1,
   "maxCharges": 0,
   "powerMultiplier": 1,
-  "code": "function executeSkill(context) { return { message: '反击被动技能已激活', success: true } }",
-  "range": "area",
-  "areaSize": 3
+  "code": "function executeSkill(context) { return { message: '反击被动技能已激活', success: true } }"
 }

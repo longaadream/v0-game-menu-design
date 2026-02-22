@@ -34,6 +34,7 @@ export interface PieceTemplate {
 export interface PieceInstance {
   instanceId: string
   templateId: PieceId
+  name: string
   ownerPlayerId: string
   faction: Faction
   currentHp: number
@@ -48,7 +49,18 @@ export interface PieceInstance {
   debuffs: PieceDebuff[]
   shield?: number
   ruleTags: string[] // 存储相关的规则ID数组
-  statusTags: string[] // 存储状态变量的标签数组，如"bleeding-duration"
+  statusTags: Array<{
+    id: string
+    type: string
+    currentDuration?: number
+    currentUses?: number
+    intensity?: number
+    stacks?: number
+    value?: number
+    relatedRules?: string[]
+    visible?: boolean
+  }> // 存储状态变量的标签数组，如"bleeding-duration"
+  rules: any[] // 存储对该棋子生效的规则
 }
 
 export interface PieceBuff {

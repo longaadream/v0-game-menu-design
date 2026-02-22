@@ -6,12 +6,8 @@
     "type": "beginTurn"
   },
   "effect": {
-    "type": "triggerStatusEffect",
-    "statusId": "poison",
+    "type": "triggerSkill",
+    "skillId": "poison-effect",
     "message": "中毒状态触发"
-  },
-  "limits": {
-    "cooldownTurns": 0,
-    "maxUses": 0
   }
 }

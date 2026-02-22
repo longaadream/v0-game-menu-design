@@ -1,4 +1,4 @@
-# 游戏技能系统教程
+游戏技能系统教程
 
 ## 目录
 
@@ -45,7 +45,6 @@
   "maxCharges": 0,
   "powerMultiplier": 1,
   "code": "function executeSkill(context) { \n  // 技能执行逻辑\n  const piece = context.piece;\n  // 在这里实现具体的技能效果\n  return { message: '技能已激活', success: true };\n}",
-  "range": "self",
   "actionPointCost": 1 // 行动点消耗
 }
 ```
@@ -60,7 +59,7 @@
 - `cooldownTurns`：冷却回合数，0表示无冷却
 - `actionPointCost`：行动点消耗，使用技能时会扣除相应的行动点
 - `code`：技能执行代码，**所有技能效果都必须通过代码实现**，包括主动技能和被动技能
-- `range`：技能范围，`self`（自身）、`single`（单体）、`area`（范围）
+
 
 ## 技能执行上下文 (Context)
 
@@ -72,6 +71,7 @@
   piece: {
     instanceId: "棋子实例ID",
     templateId: "棋子模板ID",
+    name: "棋子名称",
     ownerPlayerId: "所有者玩家ID",
     currentHp: 当前生命值,
     maxHp: 最大生命值,
@@ -109,6 +109,8 @@
 |---------|-------------------|-------------------|
 | `afterDamageDealt` | `piece`（攻击者）, `target`（被攻击者）, `damage`（伤害值） | `context.piece`（攻击者）, `context.target`（被攻击者）, `context.damage`（伤害值） |
 | `afterDamageTaken` | `piece`（被攻击者）, `target`（攻击者）, `damage`（伤害值） | `context.piece`（被攻击者）, `context.target`（攻击者）, `context.damage`（伤害值） |
+| `beforeDamageDealt` | `piece`（攻击者）, `target`（被攻击者）, `damage`（伤害值） | `context.piece`（攻击者）, `context.target`（被攻击者）, `context.damage`（伤害值） |
+| `beforeDamageTaken` | `piece`（被攻击者）, `target`（攻击者）, `damage`（伤害值） | `context.piece`（被攻击者）, `context.target`（攻击者）, `context.damage`（伤害值） |
 | `afterPieceKilled` | `piece`（击杀者）, `target`（被杀者） | `context.piece`（击杀者）, `context.target`（被杀者） |
 | `beforePieceKilled` | `piece`（即将被杀者）, `target`（攻击者） | `context.piece`（即将被杀者）, `context.target`（攻击者） |
 | `afterPieceSummoned` | `piece`（召唤者）, `target`（被召唤者） | `context.piece`（召唤者）, `context.target`（被召唤者） |
@@ -120,6 +122,10 @@
 | `beforeSkillUse` | `piece`（即将释放技能的棋子）, `skillId`（技能ID） | `context.piece`（即将释放技能的棋子）, `context.skillId`（技能ID） |
 | `beforeAttack` | `piece`（即将攻击的棋子） | `context.piece`（即将攻击的棋子） |
 | `afterSkillUsed` | `piece`（使用技能的棋子）, `skillId`（技能ID）, `playerId`（玩家ID） | `context.piece`（使用技能的棋子）, `context.skillId`（技能ID）, `context.playerId`（玩家ID） |
+| `afterHealDealt` | `piece`（治疗者）, `target`（被治疗者）, `heal`（治疗值） | `context.piece`（治疗者）, `context.target`（被治疗者）, `context.heal`（治疗值） |
+| `afterHealTaken` | `piece`（被治疗者）, `target`（治疗者）, `heal`（治疗值） | `context.piece`（被治疗者）, `context.target`（治疗者）, `context.heal`（治疗值） |
+| `beforeHealDealt` | `piece`（治疗者）, `target`（被治疗者）, `heal`（治疗值） | `context.piece`（治疗者）, `context.target`（被治疗者）, `context.heal`（治疗值） |
+| `beforeHealTaken` | `piece`（被治疗者）, `target`（治疗者）, `heal`（治疗值） | `context.piece`（被治疗者）, `context.target`（治疗者）, `context.heal`（治疗值） |
 | `whenever` | 根据触发时机不同，可能包含上述所有信息 | 根据具体情况获取相应信息 |
 
 ### 详细示例：如何在技能中获取死亡玩家信息
@@ -136,7 +142,7 @@ function executeSkill(context) {
   killer.defense += bonus;
   
   return { 
-    message: killer.templateId + '击杀了敌人，获得了' + bonus + '点攻击力和防御力', 
+    message: killer.name + '击杀了敌人，获得了' + bonus + '点攻击力和防御力', 
     success: true 
   };
 }
@@ -281,6 +287,7 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
 ## 触发规则
 
 ### 规则文件格式
+
 在 `data/rules/` 目录下创建 `.json` 文件，格式如下：
 
 ```json
@@ -289,11 +296,7 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
   "name": "规则名称",
   "description": "规则描述",
   "trigger": {
-    "type": "触发类型",
-    "conditions": {
-      "条件1": "值1",
-      "条件2": "值2"
-    }
+    "type": "触发类型"
   },
   "effect": {
     "type": "效果类型",
@@ -301,11 +304,307 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
     "属性1": "值1",
     "属性2": "值2",
     "message": "效果消息"
-  },
-  "limits": {
-    "cooldownTurns": 冷却回合数,
-    "maxUses": 最大使用次数
   }
+}
+```
+
+### 规则与棋子实例绑定
+
+**重要更新**：根据新的实现，规则现在与棋子实例绑定，而不是全局加载。这意味着：
+
+- 规则只在需要时为特定棋子加载
+- 游戏进行时可以动态添加和移除规则
+- 规则与棋子生命周期绑定，棋子离场时规则也会被清理
+- 减少了内存占用，提高了系统性能
+
+### 规则管理函数
+
+在技能代码中，可以使用以下函数来管理规则：
+
+1. **添加规则**：`addRuleById(targetPieceId, ruleId)`
+   - `targetPieceId`：目标棋子的实例ID
+   - `ruleId`：要添加的规则ID
+   - 用于为棋子实例添加规则
+
+2. **移除规则**：`removeRuleById(targetPieceId, ruleId)`
+   - `targetPieceId`：目标棋子的实例ID
+   - `ruleId`：要移除的规则ID
+   - 用于从棋子实例移除规则
+
+### 条件判断规范
+
+**重要更新**：根据新的标准，所有的除了时机以外的判断都应该在技能代码里面用if语句实现，而不是在规则的trigger.conditions中定义。
+
+**原因**：
+- 提高代码的灵活性和可读性
+- 便于实现复杂的条件逻辑
+- 统一条件判断的处理方式
+- 减少规则文件的复杂度
+
+**正确的做法**：
+1. 在规则文件中只定义触发时机（trigger.type）
+2. 在技能代码中使用if语句实现所有条件判断
+3. 如果条件不满足，返回success: false
+
+**示例**：
+
+#### 规则文件（只定义时机）
+```json
+{
+  "id": "rule-counter-attack",
+  "name": "反击规则",
+  "description": "当受到伤害时，发动反击",
+  "trigger": {
+    "type": "afterDamageTaken"
+  },
+  "effect": {
+    "type": "triggerSkill",
+    "skillId": "counter-attack",
+    "message": "${source.name}触发了反击技能"
+  }
+}
+```
+
+#### 技能文件（在代码中实现条件判断）
+```javascript
+function executeSkill(context) {
+  // 获取被攻击者信息
+  const defender = context.piece;
+  // 获取攻击者信息
+  const attacker = context.target;
+  // 获取伤害值
+  const damage = context.damage;
+  
+  // 条件判断：只有当伤害大于0且攻击者存在时才发动反击
+  if (damage <= 0 || !attacker || attacker.currentHp <= 0) {
+    return { message: '反击条件不满足', success: false };
+  }
+  
+  // 计算反击伤害
+  const counterDamage = Math.floor(defender.attack * 0.8);
+  
+  // 应用反击伤害
+  attacker.currentHp = Math.max(0, attacker.currentHp - counterDamage);
+  
+  return { 
+    message: defender.name + '发动反击，对' + attacker.name + '造成' + counterDamage + '点伤害', 
+    success: true 
+  };
+}
+```
+
+### 示例：为棋子添加圣盾规则
+
+#### 技能文件（添加圣盾状态和规则）
+```javascript
+function executeSkill(context) {
+  const sourcePiece = context.piece;
+  const targetAlly = selectTarget({ type: 'piece', range: 7, filter: 'ally' });
+  
+  if (!targetAlly || targetAlly.needsTargetSelection) {
+    return targetAlly;
+  }
+  
+  // 添加圣盾状态
+  if (typeof addStatusEffectById === 'function') {
+    addStatusEffectById(targetAlly.instanceId, {
+      id: 'divine-shield',
+      type: 'divine-shield',
+      currentDuration: -1,
+      currentUses: -1,
+      intensity: 1,
+      stacks: 1
+    });
+  }
+  
+  // 添加对应的规则
+  if (typeof addRuleById === 'function') {
+    addRuleById(targetAlly.instanceId, 'rule-divine-shield');
+  }
+  
+  return {
+    message: sourcePiece.name + '为' + targetAlly.name + '施加了圣盾',
+    success: true
+  };
+}
+```
+
+#### 技能文件（圣盾防御效果）
+```javascript
+function executeSkill(context) {
+  const piece = context.piece;
+  const damage = context.damage;
+  
+  let hasDivineShield = false;
+  if (piece.statusTags) {
+    hasDivineShield = piece.statusTags.some(tag => tag.type === 'divine-shield');
+  }
+  
+  if (!hasDivineShield) {
+    if (typeof removeSkillById === 'function') {
+      removeSkillById(piece.instanceId, 'divine-shield-defense');
+    }
+    return { success: true, blocked: false, message: '' };
+  }
+  
+  if (!damage || damage <= 0) {
+    return { success: true, blocked: false, message: '没有伤害需要抵挡' };
+  }
+  
+  // 移除圣盾状态
+  if (typeof removeStatusEffectById === 'function') {
+    removeStatusEffectById(piece.instanceId, 'divine-shield');
+  }
+  
+  // 移除对应的规则，防止内存占用过大
+  if (typeof removeRuleById === 'function') {
+    removeRuleById(piece.instanceId, 'rule-divine-shield');
+  }
+  
+  const attacker = context.target ? context.target.name : '未知敌人';
+  return {
+    success: true,
+    blocked: true,
+    message: piece.name + '的圣盾破裂，抵挡了来自于' + attacker + '的伤害'
+  };
+}
+```
+
+## 阻止行动的规则
+
+### 概述
+
+规则系统现在支持通过返回 `blocked: true` 来阻止特定的游戏行动，如移动、技能使用、伤害和治疗。这提供了一种灵活的方式来实现各种限制效果，如冰冻、沉默等状态。
+
+### 如何使用
+
+在规则的技能代码中，通过在返回对象中添加 `blocked: true` 来阻止行动：
+
+```javascript
+function executeSkill(context) {
+  // 检查条件
+  if (context.piece.statusTags.includes('frozen')) {
+    // 阻止行动
+    return {
+      message: context.piece.name + '被冰冻，无法行动',
+      success: true,
+      blocked: true
+    };
+  }
+  return {
+    message: '行动允许',
+    success: true
+  };
+}
+```
+
+### 可阻止的行动类型
+
+| 触发类型 | 可阻止的行动 |
+|---------|------------|
+| `beforeMove` | 移动行动 |
+| `beforeSkillUse` | 技能使用行动 |
+| `beforeDamageDealt` | 造成伤害行动 |
+| `beforeDamageTaken` | 受到伤害行动 |
+| `beforeHealDealt` | 造成治疗行动 |
+| `beforeHealTaken` | 受到治疗行动 |
+
+### 示例：冰冻状态阻止行动
+
+#### 步骤1：创建技能文件
+
+创建 `data/skills/freeze-prevent.json`：
+
+```json
+{
+  "id": "freeze-prevent",
+  "name": "冰冻阻止",
+  "description": "被冰冻时无法行动",
+  "kind": "passive",
+  "type": "normal",
+  "cooldownTurns": 0,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "code": "function executeSkill(context) { if (context.piece.statusTags && context.piece.statusTags.some(tag => tag.type === 'frozen')) { return { message: context.piece.name + '被冰冻，无法行动', success: true, blocked: true }; } return { message: '行动允许', success: true }; }",
+  "actionPointCost": 0
+}
+```
+
+#### 步骤2：创建规则文件
+
+创建 `data/rules/freeze-prevent-move.json`：
+
+```json
+{
+  "id": "rule-freeze-prevent-move",
+  "name": "冰冻阻止移动",
+  "description": "被冰冻时无法移动",
+  "trigger": {
+    "type": "beforeMove"
+  },
+  "effect": {
+    "type": "triggerSkill",
+    "skillId": "freeze-prevent",
+    "message": "${source.name}被冰冻，无法移动"
+  }
+}
+```
+
+创建 `data/rules/freeze-prevent-skill.json`：
+
+```json
+{
+  "id": "rule-freeze-prevent-skill",
+  "name": "冰冻阻止技能",
+  "description": "被冰冻时无法使用技能",
+  "trigger": {
+    "type": "beforeSkillUse"
+  },
+  "effect": {
+    "type": "triggerSkill",
+    "skillId": "freeze-prevent",
+    "message": "${source.name}被冰冻，无法使用技能"
+  }
+}
+```
+
+#### 步骤3：在技能中添加冰冻状态和规则
+
+```javascript
+function executeSkill(context) {
+  const sourcePiece = context.piece;
+  const targetEnemy = selectTarget({ type: 'piece', range: 5, filter: 'enemy' });
+  
+  if (!targetEnemy || targetEnemy.needsTargetSelection) {
+    return targetEnemy;
+  }
+  
+  // 计算伤害
+  const damageValue = sourcePiece.attack * context.skill.powerMultiplier;
+  const damageResult = dealDamage(sourcePiece, targetEnemy, damageValue, 'magical', context.battle, context.skill.id);
+  
+  // 添加冰冻状态
+  if (typeof addStatusEffectById === 'function' && damageResult.success) {
+    addStatusEffectById(targetEnemy.instanceId, {
+      id: 'freeze',
+      type: 'freeze',
+      currentDuration: 1,
+      currentUses: -1,
+      intensity: 1,
+      stacks: 1
+    });
+  }
+  
+  // 添加对应的规则
+  if (typeof addRuleById === 'function' && damageResult.success) {
+    addRuleById(targetEnemy.instanceId, 'rule-freeze-prevent-move');
+    addRuleById(targetEnemy.instanceId, 'rule-freeze-prevent-skill');
+  }
+  
+  return {
+    message: sourcePiece.name + '对' + targetEnemy.name + '造成' + damageResult.damage + '点伤害并使其冰冻',
+    success: damageResult.success
+  };
 }
 ```
 
@@ -344,8 +643,8 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
 ### 消息模板
 
 消息可以使用模板字符串，例如：
-- `${source.templateId}`：源角色的模板ID
-- `${target.templateId}`：目标角色的模板ID
+- `${source.name}`：源角色的名称
+- `${target.name}`：目标角色的名称
 - `${source.attack}`：源角色的攻击力
 - `${target.maxHp}`：目标角色的最大生命值
 
@@ -356,14 +655,15 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
 1. 在 `data/skills/` 目录下创建技能JSON文件
 2. 填写技能的基本信息
 3. 设置为被动技能（`kind: "passive"`）
+4. 在 `code` 字段中实现所有条件判断和技能效果
 
 ### 步骤2：创建规则文件
 
 1. 在 `data/rules/` 目录下创建规则JSON文件
 2. 填写规则的基本信息
-3. 定义触发条件
+3. 只定义触发时机（`trigger.type`）
 4. 定义效果
-5. 设置限制（如冷却）
+5. **移除所有 limits 标签**，所有条件判断都在技能代码中用if语句实现
 
 ### 步骤3：装备技能
 
@@ -398,38 +698,93 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
   "cooldownTurns": 2,
   "maxCharges": 0,
   "powerMultiplier": 1.5,
-  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetEnemy = selectTarget({ type: 'piece', range: 5, filter: 'enemy' }); if (!targetEnemy || targetEnemy.needsTargetSelection) { return targetEnemy; } const damageValue = sourcePiece.attack * context.skill.powerMultiplier; const damageResult = dealDamage(sourcePiece, targetEnemy, damageValue, 'magical', context.battle, context.skill.id); return { message: sourcePiece.templateId + '对' + targetEnemy.templateId + '造成' + damageResult.damage + '点伤害', success: true }; }",
-  "range": "single"
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetEnemy = selectTarget({ type: 'piece', range: 5, filter: 'enemy' }); if (!targetEnemy || targetEnemy.needsTargetSelection) { return targetEnemy; } const damageValue = sourcePiece.attack * context.skill.powerMultiplier; const damageResult = dealDamage(sourcePiece, targetEnemy, damageValue, 'magical', context.battle, context.skill.id); return { message: sourcePiece.name + '对' + targetEnemy.name + '造成' + damageResult.damage + '点伤害', success: true }; }"
 }
 ```
 
-### 示例2：主动技能 - 圣光闪耀
+### 示例2：主动技能 - 圣光术
 
-实现"为7格内一个友军回复5点生命值"的主动治疗技能。
+实现"为7格内一个友军施加圣盾，抵挡一次伤害"的主动技能。
 
 #### 步骤1：创建技能文件
 
-创建 `data/skills/light-of-the-light.json`：
+创建 `data/skills/shield-of-light.json`：
 
 ```json
 {
-  "id": "light-of-the-light",
-  "name": "圣光闪耀",
-  "description": "为7格内一个友军回复5点生命值",
+  "id": "shield-of-light",
+  "name": "圣光术",
+  "description": "为7格内一个友军施加圣盾，抵挡一次伤害",
   "icon": "✨",
   "kind": "active",
   "type": "normal",
-  "cooldownTurns": 1,
+  "cooldownTurns": 2,
   "maxCharges": 0,
   "powerMultiplier": 1,
   "actionPointCost": 2,
-  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetAlly = selectTarget({ type: 'piece', range: 7, filter: 'ally' }); if (!targetAlly || targetAlly.needsTargetSelection) { return targetAlly; } const healValue = 5; const healResult = healDamage(sourcePiece, targetAlly, healValue, context.battle, context.skill.id); return { message: sourcePiece.templateId + '为' + targetAlly.templateId + '回复' + healResult.heal + '点生命值', success: true }; }",
-  "previewCode": "function calculatePreview(piece, skillDef) { const healValue = 5; return { description: '为7格内一个友军回复' + healValue + '点生命值', expectedValues: { heal: healValue } }; }",
-  "range": "single"
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetAlly = selectTarget({ type: 'piece', range: 7, filter: 'ally' }); if (!targetAlly || targetAlly.needsTargetSelection) { return targetAlly; } if (typeof addStatusEffectById === 'function') { addStatusEffectById(targetAlly.instanceId, { id: 'divine-shield', type: 'divine-shield', currentDuration: -1, currentUses: -1, intensity: 1, stacks: 1 }); } if (typeof addRuleById === 'function') { addRuleById(targetAlly.instanceId, 'rule-divine-shield'); } return { message: sourcePiece.name + '为' + targetAlly.name + '施加了圣盾', success: true }; }",
+  "previewCode": "function calculatePreview(piece, skillDef) { return { description: '为7格内一个友军施加圣盾，抵挡一次伤害', expectedValues: {} }; }"
 }
 ```
 
-### 步骤2：装备技能
+### 步骤2：创建圣盾状态效果文件
+
+创建 `data/status-effects/divine-shield.json`：
+
+```json
+{
+  "id": "divine-shield",
+  "type": "divine-shield",
+  "name": "圣盾",
+  "description": "抵挡一次伤害",
+  "intensity": 1,
+  "isDebuff": false,
+  "canStack": false,
+  "maxStacks": 1,
+  "code": "function EffectTrigger(context) { const piece = context.piece; const damage = context.damage; if (!damage || damage <= 0) { return { success: true, blocked: false, message: '没有伤害需要抵挡' }; } if (typeof removeStatusEffectById === 'function') { removeStatusEffectById(piece.instanceId, 'divine-shield'); } const attacker = context.target ? context.target.name : '未知敌人'; return { success: true, blocked: true, message: piece.name + '的圣盾破裂，抵挡了来自于' + attacker + '的伤害' }; }"
+}
+```
+
+### 步骤3：创建圣盾规则文件
+
+创建 `data/rules/divine-shield-effect.json`：
+
+```json
+{
+  "id": "rule-divine-shield",
+  "name": "圣盾效果",
+  "description": "当受到伤害时触发圣盾效果",
+  "trigger": {
+    "type": "beforeDamageTaken"
+  },
+  "effect": {
+    "type": "triggerSkill",
+    "skillId": "divine-shield-defense",
+    "message": ""
+  }
+}
+```
+
+### 步骤4：创建圣盾防御技能文件
+
+创建 `data/skills/divine-shield-defense.json`：
+
+```json
+{
+  "id": "divine-shield-defense",
+  "name": "圣盾防御",
+  "description": "圣盾抵挡伤害的效果",
+  "kind": "passive",
+  "type": "normal",
+  "cooldownTurns": 0,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "code": "function executeSkill(context) { const piece = context.piece; let hasDivineShield = false; if (piece.statusTags) { hasDivineShield = piece.statusTags.some(tag => tag.type === 'divine-shield'); } if (!hasDivineShield) { if (typeof removeRuleById === 'function') { removeRuleById(piece.instanceId, 'rule-divine-shield'); } return { success: true, blocked: false, message: '' }; } const damage = context.damage; if (!damage || damage <= 0) { return { success: true, blocked: false, message: '没有伤害需要抵挡' }; } if (typeof removeStatusEffectById === 'function') { removeStatusEffectById(piece.instanceId, 'divine-shield'); } if (typeof removeRuleById === 'function') { removeRuleById(piece.instanceId, 'rule-divine-shield'); } const attacker = context.target ? context.target.name : '未知敌人'; return { success: true, blocked: true, message: piece.name + '的圣盾破裂，抵挡了来自于' + attacker + '的伤害' }; }",
+  "actionPointCost": 0
+}
+```
+
+### 步骤5：装备技能
 
 将技能分配给角色，在角色的 `skills` 数组中添加技能：
 
@@ -440,7 +795,7 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
     "level": 1
   },
   {
-    "skillId": "light-of-the-light",
+    "skillId": "shield-of-light",
     "level": 1
   }
 ]
@@ -464,9 +819,7 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
   "cooldownTurns": 1,
   "maxCharges": 0,
   "powerMultiplier": 1,
-  "code": "function executeSkill(context) { const piece = context.piece; // 寻找3格内的敌人 const enemies = context.battle.pieces.filter(enemy => { if (enemy.ownerPlayerId === piece.ownerPlayerId || enemy.currentHp <= 0) return false; const distance = Math.abs(enemy.x - piece.x) + Math.abs(enemy.y - piece.y); return distance <= 3; }); if (enemies.length > 0) { // 选择第一个敌人并造成伤害 const target = enemies[0]; const damage = piece.attack; target.currentHp = Math.max(0, target.currentHp - damage); return { message: piece.templateId + '发动反击，对' + target.templateId + '造成' + damage + '点伤害', success: true }; } return { message: '没有敌人可以反击', success: false }; }",
-  "range": "area",
-  "areaSize": 3
+  "code": "function executeSkill(context) { const piece = context.piece; // 条件判断：只有当受到伤害时才发动反击 if (!context.damage || context.damage <= 0) { return { message: '反击条件不满足', success: false }; } // 寻找3格内的敌人 const enemies = context.battle.pieces.filter(enemy => { if (enemy.ownerPlayerId === piece.ownerPlayerId || enemy.currentHp <= 0) return false; const distance = Math.abs(enemy.x - piece.x) + Math.abs(enemy.y - piece.y); return distance <= 3; }); if (enemies.length > 0) { // 选择第一个敌人并造成伤害 const target = enemies[0]; const damage = piece.attack; target.currentHp = Math.max(0, target.currentHp - damage); return { message: piece.name + '发动反击，对' + target.name + '造成' + damage + '点伤害', success: true }; } return { message: '没有敌人可以反击', success: false }; }"
 }
 ```
 
@@ -476,28 +829,37 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
 
 ```json
 {
-  "id": "rule-4",
+  "id": "rule-retaliation",
   "name": "反击",
   "description": "当受到伤害时，选择一个3格内的目标，造成100%攻击力的伤害",
   "trigger": {
-    "type": "afterDamageTaken",
-    "conditions": {
-      "minDamage": 1
-    }
+    "type": "afterDamageTaken"
   },
   "effect": {
     "type": "triggerSkill",
     "skillId": "retaliation",
-    "message": "${source.templateId}触发了反击技能"
-  },
-  "limits": {
-    "cooldownTurns": 1,
-    "maxUses": 0
+    "message": "${source.name}触发了反击技能"
   }
 }
 ```
 
-### 步骤3：装备技能
+#### 步骤3：为角色添加规则
+
+对于被动技能，规则通常在角色创建时通过技能系统自动添加。但如果需要手动为角色添加规则，可以使用以下方式：
+
+```javascript
+// 在角色创建或技能学习时
+if (typeof addRuleById === 'function') {
+  addRuleById(piece.instanceId, 'rule-retaliation');
+}
+
+// 在角色死亡或技能移除时
+if (typeof removeRuleById === 'function') {
+  removeRuleById(piece.instanceId, 'rule-retaliation');
+}
+```
+
+### 步骤4：装备技能
 
 在角色的JSON文件中添加技能：
 
@@ -538,25 +900,75 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
 }
 ```
 
+### 无限持续时间和无限触发次数的编写标准
+
+为了支持永久效果，我们引入了以下标准：
+
+- **无限持续时间**：使用 `-1` 表示无限持续时间
+- **无限触发次数**：使用 `-1` 表示无限触发次数
+
+当使用这些值时，状态效果将：
+- 不会因持续时间耗尽而自动移除
+- 不会因触发次数耗尽而自动移除
+- 仍然可以通过代码手动移除
+
+### 状态标签格式
+
+状态系统会在棋子的 `statusTags` 数组中添加状态对象，每个对象包含唯一的id和状态参数：
+
+#### 状态对象格式
+
+```json
+[
+  {
+    "id": "bleeding-123",       // 状态唯一ID
+    "type": "bleeding",        // 状态类型
+    "remainingDuration": 3,      // 剩余持续时间
+    "name": "bleeding",          // 状态类型名称
+    "remainingUses": 3,          // 剩余触发次数
+    "stacks": 2,                 // 叠加层数
+    "intensity": 5               // 强度
+  }
+]
+```
+
+#### 访问状态对象
+
+在代码中，你可以通过id直接访问特定的状态对象：
+
+```javascript
+// 通过id查找状态对象
+const statusTag = piece.statusTags.find(tag => tag.id === 'bleeding-123');
+
+if (statusTag) {
+  // 访问状态参数
+  console.log('剩余持续时间:', statusTag.remainingDuration);
+  console.log('剩余触发次数:', statusTag.remainingUses);
+  console.log('叠加层数:', statusTag.stacks);
+  console.log('强度:', statusTag.intensity);
+}
+```
+
 ### 代码编写规范
 
 1. **主要效果函数**：
    - 必须使用 `EffectTrigger(context)` 函数来表示状态的主要效果
-   - 该函数将在回合开始时被调用
+   - 该函数将在对应触发时机被调用（根据规则定义的trigger.type）
    - 返回对象应包含 `success` 和 `message` 属性
-   - 可以在函数中访问和修改状态的剩余持续时间
+   - 可以包含 `blocked` 属性来阻止特定行动（如伤害、移动等）
+   - 可以在函数中访问状态的剩余持续时间和剩余触发次数
 
 2. **与Rule系统联动**：
-   - 状态系统会自动创建一个规则，在回合开始时触发
-   - 规则会检查状态的剩余持续时间
-   - 如果持续时间 > 0，执行 `EffectTrigger` 函数，然后减少持续时间
-   - 如果持续时间 <= 0，自动移除状态效果和对应的规则
+   - 状态效果通常需要通过手动创建规则来触发
+   - 规则定义了状态效果的触发时机（如受到伤害时、回合开始时等）
+   - 当规则触发时，会执行对应的技能，进而执行状态效果
+   - 状态效果可以通过代码手动移除，或由系统根据持续时间和触发次数自动移除
 
 3. **状态标签管理**：
-   - 状态系统会自动在棋子的 `statusTags` 数组中添加状态相关标签
-   - 状态类型标签：如 "bleeding"、"poison" 等
-   - 状态持续时间标签：如 "bleeding-duration-{effectId}" 等
+   - 状态系统会在棋子的 `statusTags` 数组中添加状态对象
+   - 每个状态对象包含完整的状态信息：id、type、currentDuration、currentUses、intensity、stacks 等
    - 可以在代码中通过访问 `context.piece.statusTags` 来获取和管理状态标签
+   - 可以使用 `removeStatusEffectById` 函数手动移除状态效果
 
 ### 状态效果上下文
 
@@ -564,28 +976,87 @@ dealDamage(context.piece, targetEnemy, baseDamage, 'true', context.battle, 'true
 
 - `context.piece`：当前棋子实例（包含 `statusTags` 数组，存储状态相关标签）
 - `context.battleState`：当前战斗状态
-- `context.statusEffect`：当前状态效果（包含剩余持续时间、叠加层数等信息）
 - `context.gameContext`：游戏上下文
 
-### 访问和修改持续时间
+### 通过 statusTags 访问状态参数
 
-在 `EffectTrigger` 函数中，你可以直接访问和修改状态效果的剩余持续时间：
+所有状态效果的参数都存储在棋子的 `statusTags` 数组中，你可以通过id直接访问任何状态效果的参数，包括当前状态和其他状态的参数。
+
+#### 访问当前状态的参数
+
+在 `EffectTrigger` 函数中，你可以通过id直接访问当前状态的参数：
 
 ```javascript
 function EffectTrigger(context) {
-  // 访问当前剩余持续时间
-  console.log('剩余持续时间:', context.statusEffect.remainingDuration);
+  const piece = context.piece;
   
-  // 修改持续时间（例如，延长1回合）
-  context.statusEffect.remainingDuration += 1;
+  // 查找当前状态的对象（通过状态ID）
+  // 注意：在实际使用中，你需要知道状态的唯一ID
+  const statusTag = piece.statusTags.find(tag => tag.id === 'bleeding-123');
+  let remainingDuration = 0;
+  let remainingUses = 0;
+  let currentStacks = 1;
+  let intensity = 1;
+  
+  if (statusTag) {
+    // 直接访问状态参数
+    remainingDuration = statusTag.remainingDuration || 0;
+    remainingUses = statusTag.remainingUses || 0;
+    currentStacks = statusTag.stacks || 1;
+    intensity = statusTag.intensity || 1;
+  }
   
   // 执行状态效果
-  const damage = context.statusEffect.intensity * context.statusEffect.currentStacks;
-  context.piece.currentHp = Math.max(0, context.piece.currentHp - damage);
+  const damage = intensity * currentStacks;
+  piece.currentHp = Math.max(0, piece.currentHp - damage);
   
-  return { success: true, message: context.piece.templateId + '受到伤害' };
+  console.log('剩余持续时间:', remainingDuration);
+  console.log('剩余触发次数:', remainingUses);
+  
+  return { success: true, message: piece.name + '受到流血伤害' };
 }
 ```
+
+#### 访问其他状态的参数
+
+你也可以通过id直接访问其他状态效果的参数：
+
+```javascript
+function EffectTrigger(context) {
+  const piece = context.piece;
+  
+  // 访问当前状态的参数（流血）
+  // 通过状态ID查找
+  const bleedingTag = piece.statusTags.find(tag => tag.id === 'bleeding-123');
+  let bleedingDuration = 0;
+  
+  if (bleedingTag) {
+    // 直接访问状态参数
+    bleedingDuration = bleedingTag.remainingDuration || 0;
+  }
+  
+  // 访问其他状态的参数（中毒）
+  // 通过状态ID查找
+  const poisonTag = piece.statusTags.find(tag => tag.id === 'poison-456');
+  let poisonDuration = 0;
+  let poisonIntensity = 1;
+  
+  if (poisonTag) {
+    // 直接访问状态参数
+    poisonDuration = poisonTag.remainingDuration || 0;
+    poisonIntensity = poisonTag.intensity || 1;
+  }
+  
+  // 基于其他状态的参数执行效果
+  const bonusDamage = poisonDuration > 0 ? poisonIntensity : 0;
+  const totalDamage = 5 + bonusDamage;
+  piece.currentHp = Math.max(0, piece.currentHp - totalDamage);
+  
+  return { success: true, message: piece.name + '受到伤害，其中包含中毒效果的额外伤害' };
+}
+```
+
+
 
 ### 示例：流血状态
 
@@ -601,7 +1072,7 @@ function EffectTrigger(context) {
   "isDebuff": true,
   "canStack": true,
   "maxStacks": 5,
-  "code": "// 流血状态效果函数\nfunction EffectTrigger(context) {\n  const damage = context.statusEffect.intensity * context.statusEffect.currentStacks;\n  context.piece.currentHp = Math.max(0, context.piece.currentHp - damage);\n  console.log(context.piece.templateId + '受到流血伤害，失去' + damage + '点生命值');\n  return { success: true, message: context.piece.templateId + '受到流血伤害' };\n}\n"
+  "code": "// 流血状态效果代码\nfunction EffectTrigger(context) {\n  const piece = context.piece;\n  \n  // 查找流血状态的对象\n  // 注意：在实际使用中，你需要知道状态的唯一ID\n  // 这里为了示例，我们遍历所有状态对象，查找流血状态\n  let intensity = 5;\n  let currentStacks = 1;\n  \n  for (const tag of piece.statusTags) {\n    // 检查标签是否是流血状态标签\n    if (tag.type === 'bleeding') {\n      intensity = tag.intensity || 5;\n      currentStacks = tag.stacks || 1;\n      break;\n    }\n  }\n  \n  // 计算伤害\n  const damage = intensity * currentStacks;\n  piece.currentHp = Math.max(0, piece.currentHp - damage);\n  \n  console.log(piece.name + '受到流血伤害，失去' + damage + '点生命值');\n  return { success: true, message: piece.name + '受到流血伤害' };\n}\n"
 }
 ```
 
@@ -623,9 +1094,27 @@ function EffectTrigger(context) {
   "cooldownTurns": 2,
   "maxCharges": 0,
   "powerMultiplier": 1.2,
-  "code": "function executeSkill(context) { const caster = context.piece; const target = selectTarget({ type: 'piece', range: 5, filter: 'enemy' }); if (!target || target.needsTargetSelection) { return target; } // 计算伤害 const damage = Math.round(caster.attack * context.skill.powerMultiplier); const damageResult = dealDamage(caster, target, damage, 'physical', context.battle, context.skill.id); if (damageResult.success) { addStatusEffectById(target.instanceId, 'bleeding'); } return { message: caster.templateId + '使用出血之刃，对' + target.templateId + '造成' + damage + '点伤害，并施加了流血状态', success: true }; }",
-  "range": "single",
+  "code": "function executeSkill(context) { const caster = context.piece; const target = selectTarget({ type: 'piece', range: 5, filter: 'enemy' }); if (!target || target.needsTargetSelection) { return target; } // 计算伤害 const damage = Math.round(caster.attack * context.skill.powerMultiplier); const damageResult = dealDamage(caster, target, damage, 'physical', context.battle, context.skill.id); if (damageResult.success) { addStatusEffectById(target.instanceId, { id: 'bleeding', type: 'bleeding', currentDuration: 3, currentUses: 3, intensity: 1, stacks: 1 }); } return { message: caster.name + '使用出血之刃，对' + target.name + '造成' + damage + '点伤害，并施加了流血状态', success: true }; }",
   "actionPointCost": 2
+}
+```
+
+#### 示例：永久增益技能
+
+**文件**：`data/skills/permanent-buff.json`
+
+```json
+{
+  "id": "permanent-buff",
+  "name": "永久增益",
+  "description": "为目标施加永久的攻击力增益",
+  "kind": "active",
+  "type": "normal",
+  "cooldownTurns": 0,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "code": "function executeSkill(context) { const caster = context.piece; const target = selectTarget({ type: 'piece', range: 5, filter: 'ally' }); if (!target || target.needsTargetSelection) { return target; } // 施加永久增益状态 addStatusEffectById(target.instanceId, { id: 'buff-attack', type: 'buff-attack', currentDuration: -1, currentUses: -1, intensity: 1, stacks: 1 }); return { message: caster.name + '为' + target.name + '施加了永久攻击力增益', success: true }; }",
+  "actionPointCost": 3
 }
 ```
 
@@ -691,7 +1180,7 @@ function executeSkill(context) {
   const damageResult = dealDamage(sourcePiece, targetEnemy, damageValue, 'magical', context.battle, context.skill.id);
   
   return {
-    message: sourcePiece.templateId + '对' + targetEnemy.templateId + '造成' + damageResult.damage + '点伤害',
+    message: sourcePiece.name + '对' + targetEnemy.name + '造成' + damageResult.damage + '点伤害',
     success: true
   };
 }
@@ -716,7 +1205,7 @@ function executeSkill(context) {
   sourcePiece.y = targetPos.y;
   
   return {
-    message: sourcePiece.templateId + '传送到了(' + targetPos.x + ',' + targetPos.y + ')',
+    message: sourcePiece.name + '传送到了(' + targetPos.x + ',' + targetPos.y + ')',
     success: true
   };
 }
@@ -745,7 +1234,7 @@ function executeSkill(context) {
 ### 完整示例：冰霜箭技能
 
 ```json
-{"id":"frostbolt","name":"冰霜箭","description":"对5格内一个敌人造成当前攻击力的伤害和1回合冰冻","icon":"❄️","kind":"active","type":"normal","cooldownTurns":1,"maxCharges":0,"powerMultiplier":1,"actionPointCost":2,"code":"function executeSkill(context) { const sourcePiece = context.piece; const targetEnemy = selectTarget({ type: 'piece', range: 5, filter: 'enemy' }); if (!targetEnemy || targetEnemy.needsTargetSelection) { return targetEnemy; } const damageValue = sourcePiece.attack * context.skill.powerMultiplier; const damageResult = dealDamage(sourcePiece, targetEnemy, damageValue, 'magical', context.battle, context.skill.id); if (typeof addStatusEffectById === 'function' && damageResult.success) { addStatusEffectById(targetEnemy.instanceId, 'freeze', 1); } return { message: sourcePiece.templateId + '对' + targetEnemy.templateId + '造成' + damageResult.damage + '点伤害并使其冰冻', success: true }; }","previewCode":"function calculatePreview(piece, skillDef) { const damageValue = Math.round(piece.attack * skillDef.powerMultiplier); return { description: '对5格内一个敌人造成' + damageValue + '点伤害（相当于攻击力100%）和1回合冰冻', expectedValues: { damage: damageValue } }; }","range":"single"}
+{"id":"frostbolt","name":"冰霜箭","description":"对5格内一个敌人造成当前攻击力的伤害和1回合冰冻","icon":"❄️","kind":"active","type":"normal","cooldownTurns":1,"maxCharges":0,"powerMultiplier":1,"actionPointCost":2,"code":"function executeSkill(context) { const sourcePiece = context.piece; const targetEnemy = selectTarget({ type: 'piece', range: 5, filter: 'enemy' }); if (!targetEnemy || targetEnemy.needsTargetSelection) { return targetEnemy; } const damageValue = sourcePiece.attack * context.skill.powerMultiplier; const damageResult = dealDamage(sourcePiece, targetEnemy, damageValue, 'magical', context.battle, context.skill.id); if (typeof addStatusEffectById === 'function' && damageResult.success) { addStatusEffectById(targetEnemy.instanceId, { id: 'freeze', type: 'freeze', currentDuration: 1, currentUses: -1, intensity: 1, stacks: 1 }); } return { message: sourcePiece.name + '对' + targetEnemy.name + '造成' + damageResult.damage + '点伤害并使其冰冻', success: true }; }","previewCode":"function calculatePreview(piece, skillDef) { const damageValue = Math.round(piece.attack * skillDef.powerMultiplier); return { description: '对5格内一个敌人造成' + damageValue + '点伤害和1回合冰冻', expectedValues: { damage: damageValue } }; }"}
 ```
 
 ## 故障排除
@@ -753,10 +1242,11 @@ function executeSkill(context) {
 ### 技能不触发的原因
 
 1. **规则文件不存在**：确保在 `data/rules/` 目录下创建了对应的规则文件
-2. **触发条件不匹配**：检查触发类型和条件是否正确
+2. **触发时机不正确**：检查触发类型是否正确
 3. **冷却未就绪**：检查规则的冷却是否已结束
 4. **目标不存在**：确保目标类型和范围设置正确
 5. **技能未装备**：确保角色已装备该技能
+6. **条件判断不满足**：检查技能代码中的if语句条件是否正确
 
 ### 常见错误
 
@@ -784,7 +1274,6 @@ function executeSkill(context) {
   "maxCharges": 0,
   "powerMultiplier": 1,
   "code": "function executeSkill(context) { \n  // 技能执行逻辑\n  return { message: '技能已激活', success: true };\n}",
-  "range": "single", // 技能范围：self=自身, single=单体, area=范围
   "actionPointCost": 1 // 行动点消耗
 }
 ```
@@ -803,7 +1292,6 @@ function executeSkill(context) {
 - **cooldownTurns**：冷却回合数，0表示无冷却
 - **powerMultiplier**：威力系数，用于计算技能伤害
 - **code**：技能执行代码，必须使用 `executeSkill(context)` 函数
-- **range**：技能范围
 - **actionPointCost**：行动点消耗
 
 ### 代码编写规范
@@ -822,13 +1310,30 @@ function executeSkill(context) {
    - 使用 `dealDamage` 函数处理所有伤害，确保触发器正确触发
    - 正确设置伤害类型：`'physical'`、`'magical'` 或 `'true'`
 
-4. **状态效果**：
-   - 使用 `addStatusEffectById` 函数添加状态效果
-   - 正确处理状态效果的参数
+4.3. **状态标签管理**：
+   - 使用 `addStatusEffectById` 函数添加状态效果，参数为：`addStatusEffectById(pieceId, statusObject)`
+   - `statusObject`：状态对象，包含以下属性：
+     - `id`：状态ID
+     - `type`：状态类型
+     - `currentDuration`：当前持续时间，-1表示无限
+     - `currentUses`：当前触发次数，-1表示无限
+     - `intensity`：强度
+     - `stacks`：叠加层数
    - **所有状态效果必须通过rule和effect来处理**，在合适的时机触发
+
+4. **规则管理**：
+   - 使用 `addRuleById` 函数添加规则，参数为：`addRuleById(targetPieceId, ruleId)`
+   - `targetPieceId`：目标棋子的实例ID
+   - `ruleId`：要添加的规则ID
+   - 用于为棋子实例添加规则，使规则与棋子绑定
+   - 使用 `removeRuleById` 函数移除规则，参数为：`removeRuleById(targetPieceId, ruleId)`
+   - `targetPieceId`：目标棋子的实例ID
+   - `ruleId`：要移除的规则ID
+   - 用于在状态效果生效后清理对应的规则，防止内存占用过大
 
 5. **效果处理**：
    - **所有效果都必须通过code标签执行**，禁止使用JSON硬编码
+   - **所有条件判断都必须在code标签中使用if语句实现**，禁止在规则文件中使用conditions字段
    - 灵活性优先：设计技能时应考虑扩展性，避免硬编码固定值
 
 6. **治疗处理**：
@@ -853,11 +1358,137 @@ function executeSkill(context) {
   "cooldownTurns": 2,
   "maxCharges": 0,
   "powerMultiplier": 1.5,
-  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetEnemy = selectTarget({ type: 'piece', range: 5, filter: 'enemy' }); if (!targetEnemy || targetEnemy.needsTargetSelection) { return targetEnemy; } const damageValue = sourcePiece.attack * context.skill.powerMultiplier; const damageResult = dealDamage(sourcePiece, targetEnemy, damageValue, 'magical', context.battle, context.skill.id); return { message: sourcePiece.templateId + '对敌人造成' + damageResult.damage + '点伤害', success: true }; }",
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetEnemy = selectTarget({ type: 'piece', range: 5, filter: 'enemy' }); if (!targetEnemy || targetEnemy.needsTargetSelection) { return targetEnemy; } const damageValue = sourcePiece.attack * context.skill.powerMultiplier; const damageResult = dealDamage(sourcePiece, targetEnemy, damageValue, 'magical', context.battle, context.skill.id); return { message: sourcePiece.name + '对敌人造成' + damageResult.damage + '点伤害', success: true }; }",
   "range": "single",
   "actionPointCost": 2
 }
 ```
+
+## 战斗日志标准
+
+### 概述
+
+战斗日志是游戏中记录战斗过程的重要组成部分，它可以帮助玩家了解战斗的详细情况，包括技能释放、伤害计算、状态效果等信息。为了提供更清晰、更详细的战斗记录，我们制定了以下战斗日志标准。
+
+### 日志格式
+
+战斗日志采用以下格式：
+
+```
+[回合数] 棋子模板ID: 详细的战斗事件描述
+```
+
+### 日志内容标准
+
+#### 1. 技能释放日志
+
+当棋子释放技能时，日志应包含以下信息：
+- 释放技能的棋子名称
+- 技能名称
+- 目标信息（如果有）
+- 技能类型（如充能技能）
+- 技能消耗（如充能点消耗）
+
+**示例**：
+```
+[7] 尼拉塞克: 尼拉塞克使用了基础攻击，目标是安度因，造成2点物理伤害
+[7] 安度因: 安度因使用了圣光闪耀（充能技能，消耗1点充能），目标是蓝方战士，为蓝方战士回复5点生命值
+```
+
+#### 2. 伤害日志
+
+当造成伤害时，日志应包含以下信息：
+- 攻击者名称
+- 目标名称
+- 伤害值
+- 伤害类型（物理、魔法、真实）
+- 击杀信息（如果有）
+
+**示例**：
+```
+[7] 尼拉塞克: 尼拉塞克对安度因造成2点物理伤害
+[7] 安度因: 安度因对尼拉塞克造成3点魔法伤害，击杀敌人获得1点充能
+```
+
+#### 3. 治疗日志
+
+当进行治疗时，日志应包含以下信息：
+- 治疗者名称
+- 目标名称
+- 治疗值
+
+**示例**：
+```
+[7] 安度因: 安度因为蓝方战士回复5点生命值
+```
+
+#### 4. 状态效果日志
+
+当状态效果触发时，日志应包含以下信息：
+- 状态效果名称
+- 目标名称
+- 效果描述
+
+**示例**：
+```
+[7] 尼拉塞克: 尼拉塞克受到流血伤害，失去2点生命值
+[7] 安度因: 安度因触发了反击技能，对尼拉塞克造成1点物理伤害
+```
+
+### 实现要求
+
+1. **技能代码中的消息格式**：
+   - 技能代码中应返回详细的消息，包含技能释放、伤害、治疗等信息
+   - 伤害消息应包含伤害类型
+   - 技能释放消息应包含目标信息
+
+2. **dealDamage函数**：
+   - 应返回包含伤害类型的详细消息
+   - 应在消息中包含击杀信息
+
+3. **turn.ts中的日志处理**：
+   - 应构建详细的技能释放消息，包含技能名称、目标信息等
+   - 应将技能执行结果消息添加到技能释放消息中
+
+### 示例实现
+
+#### 1. dealDamage函数返回消息格式
+
+```javascript
+// 正确的消息格式
+return {
+  success: true,
+  damage: finalDamage,
+  isKilled,
+  targetHp: target.currentHp,
+  message: `${attacker.name}对${target.name}造成${finalDamage}点${damageType === 'physical' ? '物理' : damageType === 'magical' ? '魔法' : '真实'}伤害${isKilled ? '，击杀敌人获得1点充能' : ''}`
+};
+```
+
+#### 2. 技能代码中的消息格式
+
+```javascript
+// 正确的消息格式
+function executeSkill(context) {
+  const sourcePiece = context.piece;
+  const targetEnemy = selectTarget({ type: 'piece', range: 1, filter: 'enemy' });
+  if (!targetEnemy || targetEnemy.needsTargetSelection) {
+    return targetEnemy;
+  }
+  const attack = Number(sourcePiece.attack) || 0;
+  const powerMultiplier = Number(context.skill.powerMultiplier) || 1;
+  const damageValue = attack * powerMultiplier;
+  const damageResult = dealDamage(sourcePiece, targetEnemy, damageValue, 'physical', context.battle, context.skill.id);
+  return { 
+    message: `${sourcePiece.name}使用了${context.skill.name}，目标是${targetEnemy.name}，${damageResult.message}`, 
+    success: true 
+  };
+}
+```
+
+### 总结
+
+通过遵循以上战斗日志标准，可以为玩家提供更清晰、更详细的战斗记录，增强游戏的可玩性和透明度。同时，统一的日志格式也便于开发人员调试和排查问题。
 
 ## 总结
 
@@ -865,7 +1496,8 @@ function executeSkill(context) {
 
 1. **条件技能系统**：
    - 创建技能文件：定义技能的基本属性和执行逻辑
-   - 创建规则文件：定义触发条件和效果
+   - 创建规则文件：只定义触发时机，不定义条件
+   - 在技能代码中使用if语句实现所有条件判断
    - 装备技能：将技能分配给角色
 
 2. **状态系统**：
@@ -889,7 +1521,13 @@ function executeSkill(context) {
    - **仅在特定触发事件中**可以使用 `context.target`，如 `afterDamageDealt`、`afterDamageTaken`
    - **禁止**使用 `context.targetPosition`
    - **所有效果都必须通过code标签执行**，禁止使用JSON硬编码
-   - **所有状态效果必须通过rule和effect来处理**，在合适的时机触发
+   - **所有条件判断都必须在code标签中使用if语句实现**，禁止在规则文件中使用conditions字段
+
+5. **战斗日志标准**：
+   - 使用统一的日志格式
+   - 包含详细的战斗事件描述
+   - 区分不同类型的战斗事件
+   - 提供清晰、准确的战斗信息
 
 现在你可以尝试创建自己的技能、规则、状态效果和目标选择系统了！例如：
 

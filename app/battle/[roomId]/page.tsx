@@ -105,19 +105,27 @@ export default function BattlePage() {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
+        console.log('Response error data:', data);
         // 检查是否是需要目标选择的情况
         if (data.needsTargetSelection) {
+          console.log('Need target selection:', data);
           // 进入目标选择模式
-          setIsSelectingSkillTarget(true)
-          setSelectedSkillId(action.skillId!)
-          setTargetSelectionType(data.targetType || 'piece')
-          setTargetSelectionRange(data.range || 5)
-          setTargetSelectionFilter(data.filter || 'enemy')
-          return
+          setIsSelectingSkillTarget(true);
+          setSelectedSkillId(action.skillId!);
+          setTargetSelectionType(data.targetType || 'piece');
+          setTargetSelectionRange(data.range || 5);
+          setTargetSelectionFilter(data.filter || 'enemy');
+          console.log('Entered target selection mode:', {
+            skillId: action.skillId!,
+            targetType: data.targetType || 'piece',
+            range: data.range || 5,
+            filter: data.filter || 'enemy'
+          });
+          return;
         }
         // 使用toast通知显示错误信息，而不是设置错误状态
-        toast.error(data.error || "操作失败")
-        return
+        toast.error(data.error || "操作失败");
+        return;
       }
       setBattle(data as BattleState)
     } catch (err) {
@@ -540,29 +548,35 @@ export default function BattlePage() {
               </CardContent>
             </Card>
 
-            {myPieces.length > 0 && (
+            {/* 显示所有棋子，包括存活的和死亡的（从墓地中获取） */}
+            {battle && (battle.pieces.filter(p => p.ownerPlayerId.toLowerCase() === currentPlayerId?.toLowerCase()).length + (battle.graveyard?.filter(p => p.ownerPlayerId.toLowerCase() === currentPlayerId?.toLowerCase()).length || 0)) > 0 && (
               <Card className="bg-zinc-900/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm">我的棋子</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {myPieces.map((piece) => (
+                  {/* 筛选出当前玩家的所有存活棋子 */}
+                  {battle.pieces.filter(p => p.ownerPlayerId.toLowerCase() === currentPlayerId?.toLowerCase() && p.currentHp > 0).map((piece) => (
                       <div 
                         key={piece.instanceId} 
                         className={`group relative flex items-center gap-4 cursor-pointer rounded-md p-2 transition-colors ${
                           selectedPieceId === piece.instanceId 
                             ? 'bg-zinc-800/80 border-l-4 border-green-500' 
-                            : 'hover:bg-zinc-800/50'
+                            : piece.currentHp <= 0 
+                              ? 'bg-zinc-900/50 opacity-70' 
+                              : 'hover:bg-zinc-800/50'
                         }`}
                         onClick={() => setSelectedPieceId(piece.instanceId)}
                       >
                         {(() => {
                           const pieceTemplate = getPieceById(piece.templateId)
                           const image = pieceTemplate?.image
+                          // 为死亡的棋子添加灰色效果
+                          const isDead = piece.currentHp <= 0;
+                          const deadClass = isDead ? "opacity-50 grayscale" : "";
+                          
                           return (
-                            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${
-                              piece.faction === "red" ? "bg-red-600" : "bg-blue-600"
-                            }`}>
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${piece.faction === "red" ? "bg-red-600" : "bg-blue-600"} ${deadClass}`}>
                               {image && image.startsWith("http") ? (
                                 <img 
                                   src={image} 
@@ -590,6 +604,10 @@ export default function BattlePage() {
                                 const pieceTemplate = getPieceById(piece.templateId)
                                 return pieceTemplate?.name || piece.templateId
                               })()}
+                              {/* 为死亡的棋子添加阵亡标记 */}
+                              {piece.currentHp <= 0 && (
+                                <span className="ml-2 text-xs font-bold text-red-500">[阵亡]</span>
+                              )}
                             </span>
                             <span className={`text-sm ${
                               piece.faction === "red" ? "text-red-400" : "text-blue-400"
@@ -621,6 +639,18 @@ export default function BattlePage() {
                               防御: {piece.defense || 0}
                             </span>
                           </div>
+                          {/* 状态标签显示 */}
+                          {piece.statusTags && piece.statusTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {piece.statusTags.filter(tag => tag.visible !== false).map((tag, index) => (
+                                <span key={index} className="px-2 py-0.5 rounded-full text-xs bg-zinc-800 text-zinc-300">
+                                  {tag.id}
+                                  {tag.currentDuration && ` (${tag.currentDuration})`}
+                                  {tag.stacks && ` x${tag.stacks}`}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         
                         {/* 技能信息悬停显示 */}
@@ -652,9 +682,12 @@ export default function BattlePage() {
                                             {skillDef.name || skill.skillId}
                                           </span>
                                           <span className={`text-xs ${
-                                            skillDef.type === "super" ? "text-yellow-400" : "text-green-400"
+                                            skillDef.type === "super" ? "text-yellow-400" : 
+                                            skillDef.type === "ultimate" ? "text-purple-400" : "text-green-400"
                                           }`}>
-                                            {skillDef.type === "super" ? "充能" : "普通"}
+                                            {skillDef.type === "super" ? "充能" : 
+                                             skillDef.type === "ultimate" ? "终极" : "普通"}
+                                            {pieceSkillState?.usesRemaining === 1 && ' (限定技)'}
                                           </span>
                                         </div>
                                         <p className="text-xs text-zinc-400">
@@ -698,38 +731,21 @@ export default function BattlePage() {
                         </div>
                       </div>
                     ))}
-                  <div className="text-xs text-zinc-400 border-t border-zinc-800 pt-2">
-                    <span className="flex items-center gap-1">
-                      <Swords className="h-3 w-3" />
-                      剩余棋子: {myPieces.length}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {(() => {
-              const opponentPieces = battle.pieces.filter(p => 
-                p.ownerPlayerId !== currentPlayerId && p.currentHp > 0
-              )
-              return opponentPieces.length > 0 ? (
-                <Card className="bg-zinc-900/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">对方棋子</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {opponentPieces.map((piece) => (
+                  {/* 筛选出当前玩家的所有死亡棋子（从墓地中获取） */}
+                  {battle.graveyard?.filter(p => p.ownerPlayerId.toLowerCase() === currentPlayerId?.toLowerCase()).map((piece) => (
                       <div 
                         key={piece.instanceId} 
-                        className="group relative flex items-center gap-4 rounded-md p-2 hover:bg-zinc-800/30"
+                        className={`group relative flex items-center gap-4 cursor-pointer rounded-md p-2 transition-colors ${'bg-zinc-900/50 opacity-70'}`}
                       >
                         {(() => {
                           const pieceTemplate = getPieceById(piece.templateId)
                           const image = pieceTemplate?.image
+                          // 为死亡的棋子添加灰色效果
+                          const isDead = true;
+                          const deadClass = isDead ? "opacity-50 grayscale" : "";
+                          
                           return (
-                            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${
-                              piece.faction === "red" ? "bg-red-600" : "bg-blue-600"
-                            }`}>
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${piece.faction === "red" ? "bg-red-600" : "bg-blue-600"} ${deadClass}`}>
                               {image && image.startsWith("http") ? (
                                 <img 
                                   src={image} 
@@ -757,6 +773,128 @@ export default function BattlePage() {
                                 const pieceTemplate = getPieceById(piece.templateId)
                                 return pieceTemplate?.name || piece.templateId
                               })()}
+                              {/* 为死亡的棋子添加阵亡标记 */}
+                              <span className="ml-2 text-xs font-bold text-red-500">[阵亡]</span>
+                            </span>
+                            <span className={`text-sm ${
+                              piece.faction === "red" ? "text-red-400" : "text-blue-400"
+                            }`}>
+                              {piece.faction === "red" ? "红方" : "蓝方"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-zinc-400">
+                            <span className="flex items-center gap-1">
+                              <Shield className="h-3 w-3" />
+                              HP: 0/{piece.maxHp}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Swords className="h-3 w-3" />
+                              攻击: {piece.attack}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Footprints className="h-3 w-3" />
+                              移动: {piece.moveRange}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-zinc-400">
+                            <span className="flex items-center gap-1">
+                              <Footprints className="h-3 w-3" />
+                              位置: ({piece.x}, {piece.y})
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Shield className="h-3 w-3" />
+                              防御: {piece.defense || 0}
+                            </span>
+                          </div>
+                          {/* 状态标签显示 */}
+                          {piece.statusTags && piece.statusTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {piece.statusTags.filter(tag => tag.visible !== false).map((tag, index) => (
+                                <span key={index} className="px-2 py-0.5 rounded-full text-xs bg-zinc-800 text-zinc-300">
+                                  {tag.id}
+                                  {tag.currentDuration && ` (${tag.currentDuration})`}
+                                  {tag.stacks && ` x${tag.stacks}`}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  <div className="text-xs text-zinc-400 border-t border-zinc-800 pt-2">
+                      <span className="flex items-center gap-1">
+                        <Swords className="h-3 w-3" />
+                        剩余棋子: {myPieces.length}
+                      </span>
+                    </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {(() => {
+              // 显示所有对方棋子，包括存活的和死亡的（从墓地中获取）
+              const opponentAlivePieces = battle.pieces.filter(p => 
+                p.ownerPlayerId.toLowerCase() !== currentPlayerId?.toLowerCase() && p.currentHp > 0
+              )
+              const opponentDeadPieces = battle.graveyard?.filter(p => 
+                p.ownerPlayerId.toLowerCase() !== currentPlayerId?.toLowerCase()
+              ) || []
+              const totalOpponentPieces = opponentAlivePieces.length + opponentDeadPieces.length
+              return totalOpponentPieces > 0 ? (
+                <Card className="bg-zinc-900/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">对方棋子</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {opponentAlivePieces.map((piece) => (
+                      <div 
+                        key={piece.instanceId} 
+                        className={`group relative flex items-center gap-4 rounded-md p-2 transition-colors ${
+                          piece.currentHp <= 0 
+                            ? 'bg-zinc-900/50 opacity-70' 
+                            : 'hover:bg-zinc-800/30'
+                        }`}
+                      >
+                        {(() => {
+                          const pieceTemplate = getPieceById(piece.templateId)
+                          const image = pieceTemplate?.image
+                          // 为死亡的棋子添加灰色效果
+                          const isDead = piece.currentHp <= 0;
+                          const deadClass = isDead ? "opacity-50 grayscale" : "";
+                          
+                          return (
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${piece.faction === "red" ? "bg-red-600" : "bg-blue-600"} ${deadClass}`}>
+                              {image && image.startsWith("http") ? (
+                                <img 
+                                  src={image} 
+                                  alt={pieceTemplate?.name || "Piece"} 
+                                  className="h-full w-full object-contain"
+                                />
+                              ) : image && (image.length <= 3 || image.includes("️")) ? (
+                                <span className="text-3xl font-bold text-white">{image}</span>
+                              ) : image ? (
+                                <img 
+                                  src={`/${image}`} 
+                                  alt={pieceTemplate?.name || "Piece"} 
+                                  className="h-full w-full object-contain"
+                                />
+                              ) : (
+                                <Swords className="h-6 w-6 text-white" />
+                              )}
+                            </div>
+                          )
+                        })()}
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-zinc-200">
+                              {(() => {
+                                const pieceTemplate = getPieceById(piece.templateId)
+                                return pieceTemplate?.name || piece.templateId
+                              })()}
+                              {/* 为死亡的棋子添加阵亡标记 */}
+                              {piece.currentHp <= 0 && (
+                                <span className="ml-2 text-xs font-bold text-red-500">[阵亡]</span>
+                              )}
                             </span>
                             <span className={`text-sm ${
                               piece.faction === "red" ? "text-red-400" : "text-blue-400"
@@ -788,6 +926,18 @@ export default function BattlePage() {
                               防御: {piece.defense || 0}
                             </span>
                           </div>
+                          {/* 状态标签显示 */}
+                          {piece.statusTags && piece.statusTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {piece.statusTags.filter(tag => tag.visible !== false).map((tag, index) => (
+                                <span key={index} className="px-2 py-0.5 rounded-full text-xs bg-zinc-800 text-zinc-300">
+                                  {tag.id}
+                                  {tag.currentDuration && ` (${tag.currentDuration})`}
+                                  {tag.stacks && ` x${tag.stacks}`}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         
                         {/* 技能信息悬停显示 */}
@@ -819,9 +969,12 @@ export default function BattlePage() {
                                             {skillDef.name || skill.skillId}
                                           </span>
                                           <span className={`text-xs ${
-                                            skillDef.type === "super" ? "text-yellow-400" : "text-green-400"
+                                            skillDef.type === "super" ? "text-yellow-400" : 
+                                            skillDef.type === "ultimate" ? "text-purple-400" : "text-green-400"
                                           }`}>
-                                            {skillDef.type === "super" ? "充能" : "普通"}
+                                            {skillDef.type === "super" ? "充能" : 
+                                             skillDef.type === "ultimate" ? "终极" : "普通"}
+                                            {pieceSkillState?.usesRemaining === 1 && ' (限定技)'}
                                           </span>
                                         </div>
                                         <p className="text-xs text-zinc-400">
@@ -862,13 +1015,103 @@ export default function BattlePage() {
                               </div>
                             )
                           })()}
+                        </div>
+                      </div>
+                    ))}
+                    {/* 筛选出对方玩家的所有死亡棋子（从墓地中获取） */}
+                    {opponentDeadPieces.map((piece) => (
+                      <div 
+                        key={piece.instanceId} 
+                        className={`group relative flex items-center gap-4 rounded-md p-2 transition-colors ${'bg-zinc-900/50 opacity-70'}`}
+                      >
+                        {(() => {
+                          const pieceTemplate = getPieceById(piece.templateId)
+                          const image = pieceTemplate?.image
+                          // 为死亡的棋子添加灰色效果
+                          const isDead = true;
+                          const deadClass = isDead ? "opacity-50 grayscale" : "";
+                          
+                          return (
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${piece.faction === "red" ? "bg-red-600" : "bg-blue-600"} ${deadClass}`}>
+                              {image && image.startsWith("http") ? (
+                                <img 
+                                  src={image} 
+                                  alt={pieceTemplate?.name || "Piece"} 
+                                  className="h-full w-full object-contain"
+                                />
+                              ) : image && (image.length <= 3 || image.includes("️")) ? (
+                                <span className="text-3xl font-bold text-white">{image}</span>
+                              ) : image ? (
+                                <img 
+                                  src={`/${image}`} 
+                                  alt={pieceTemplate?.name || "Piece"} 
+                                  className="h-full w-full object-contain"
+                                />
+                              ) : (
+                                <Swords className="h-6 w-6 text-white" />
+                              )}
+                            </div>
+                          )
+                        })()}
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-zinc-200">
+                              {(() => {
+                                const pieceTemplate = getPieceById(piece.templateId)
+                                return pieceTemplate?.name || piece.templateId
+                              })()}
+                              {/* 为死亡的棋子添加阵亡标记 */}
+                              <span className="ml-2 text-xs font-bold text-red-500">[阵亡]</span>
+                            </span>
+                            <span className={`text-sm ${
+                              piece.faction === "red" ? "text-red-400" : "text-blue-400"
+                            }`}>
+                              {piece.faction === "red" ? "红方" : "蓝方"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-zinc-400">
+                            <span className="flex items-center gap-1">
+                              <Shield className="h-3 w-3" />
+                              HP: 0/{piece.maxHp}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Swords className="h-3 w-3" />
+                              攻击: {piece.attack}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Footprints className="h-3 w-3" />
+                              移动: {piece.moveRange}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-zinc-400">
+                            <span className="flex items-center gap-1">
+                              <Footprints className="h-3 w-3" />
+                              位置: ({piece.x}, {piece.y})
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Shield className="h-3 w-3" />
+                              防御: {piece.defense || 0}
+                            </span>
+                          </div>
+                          {/* 状态标签显示 */}
+                          {piece.statusTags && piece.statusTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {piece.statusTags.filter(tag => tag.visible !== false).map((tag, index) => (
+                                <span key={index} className="px-2 py-0.5 rounded-full text-xs bg-zinc-800 text-zinc-300">
+                                  {tag.id}
+                                  {tag.currentDuration && ` (${tag.currentDuration})`}
+                                  {tag.stacks && ` x${tag.stacks}`}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
                     <div className="text-xs text-zinc-400 border-t border-zinc-800 pt-2">
                       <span className="flex items-center gap-1">
                         <Swords className="h-3 w-3" />
-                        剩余棋子: {opponentPieces.length}
+                        剩余棋子: {opponentAlivePieces.length}
                       </span>
                     </div>
                   </CardContent>
@@ -992,7 +1235,7 @@ export default function BattlePage() {
                     ) : isSelectingSkillTarget ? (
                       <>
                         <p className="text-xs text-muted-foreground text-center">
-                          请点击棋盘上的敌人棋子选择技能目标
+                          {targetSelectionType === 'grid' ? '请点击棋盘上的格子选择技能目标' : '请点击棋盘上的敌人棋子选择技能目标'}
                         </p>
                         <Button
                           className="w-full"
@@ -1058,23 +1301,13 @@ export default function BattlePage() {
                               disabled={loading || isSelectingMoveTarget}
                               onClick={() => {
                                 if (selectedPiece) {
-                                  if (skill.id === "teleport") {
-                                    // 进入传送目标选择模式
-                                    setSelectedSkillId(skill.id)
-                                    setIsSelectingTeleportTarget(true)
-                                  } else if (skill.requiresTarget) {
-                                    // 进入技能目标选择模式
-                                    setSelectedSkillId(skill.id)
-                                    setIsSelectingSkillTarget(true)
-                                  } else {
-                                    // 直接使用不需要目标的技能
-                                    sendBattleAction({
-                                      type: skill.type === "normal" ? "useBasicSkill" : "useChargeSkill",
-                                      playerId: currentPlayerId!,
-                                      pieceId: selectedPiece.instanceId,
-                                      skillId: skill.id,
-                                    })
-                                  }
+                                  // 直接调用sendBattleAction，让后端决定是否需要目标选择
+                                  sendBattleAction({
+                                    type: skill.type === "normal" ? "useBasicSkill" : "useChargeSkill",
+                                    playerId: currentPlayerId!,
+                                    pieceId: selectedPiece.instanceId,
+                                    skillId: skill.id,
+                                  })
                                 }
                               }}
                             >
@@ -1127,7 +1360,7 @@ export default function BattlePage() {
               <CardContent className="space-y-2">
                 {battle.players.map((player) => {
                   const isCurrentPlayer = player.playerId.toLowerCase() === currentPlayerId?.toLowerCase()
-                  const playerPiece = battle.pieces.find(p => p.ownerPlayerId === player.playerId)
+                  const playerPiece = battle.pieces.find(p => p.ownerPlayerId.toLowerCase() === player.playerId.toLowerCase())
                   // 从 room.players 中获取玩家的昵称
                   const playerName = room?.players.find(p => p.id === player.playerId)?.name || player.playerId
                   return (
@@ -1152,7 +1385,7 @@ export default function BattlePage() {
                       <div className="flex items-center gap-2 text-xs">
                         <span className="flex items-center gap-1 text-zinc-300">
                           <Swords className="h-3 w-3" />
-                          {battle.pieces.filter(p => p.ownerPlayerId === player.playerId && p.currentHp > 0).length}
+                          {battle.pieces.filter(p => p.ownerPlayerId.toLowerCase() === player.playerId.toLowerCase() && p.currentHp > 0).length}
                         </span>
                         <span className="flex items-center gap-1 text-yellow-400">
                           <Zap className="h-3 w-3" />

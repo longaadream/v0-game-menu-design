@@ -1,15 +1,1 @@
-{
-  "id": "buff-attack",
-  "name": "攻击强化",
-  "description": "提升自身攻击力1点，增强后续攻击效果",
-  "icon": "💪",
-  "kind": "active",
-  "type": "normal",
-  "cooldownTurns": 4,
-  "maxCharges": 0,
-  "powerMultiplier": 1.0,
-  "actionPointCost": 1,
-  "code": "function executeSkill(context) {\n  // 直接修改自身的攻击力\nsourcePiece.attack = sourcePiece.attack + 1;\n  \n  return {\n    message: sourcePiece.templateId + '的攻击力提升至' + sourcePiece.attack + '点',\n    success: true\n  };\n}",
-  "previewCode": "function calculatePreview(piece, skillDef) {\n  // 固定增益值\n  const buffValue = 1;\n  \n  return {\n    description: \"提升自身攻击力\" + buffValue + \"点，增强后续攻击效果\",\n    expectedValues: {\n      buff: buffValue\n    }\n  };\n}",
-  "range": "self"
-}
+{"id":"buff-attack","name":"攻击力增强","description":"提升自身攻击力","icon":"💪","kind":"active","type":"normal","cooldownTurns":0,"maxCharges":0,"powerMultiplier":1.0,"actionPointCost":1,"code":"function executeSkill(context) {\n  // 直接修改自身的攻击力\nsourcePiece.attack = sourcePiece.attack + 1;\n  \n  return {\n    message: sourcePiece.name + '的攻击力提升至' + sourcePiece.attack + '点',\n    success: true\n  };\n}","previewCode":"function calculatePreview(piece, skillDef) { return { description: '提升自身攻击力', expectedValues: { buff: 1 } }; }"}

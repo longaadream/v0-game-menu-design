@@ -430,7 +430,8 @@ export default function CharacterEncyclopediaPage() {
                                 <h5 className="font-semibold mb-1">{skillData.name}</h5>
                                 <p className="text-sm text-gray-400 mb-2">{skillData.description}</p>
                                 <div className="text-xs text-gray-500">
-                                  <div>类型: {skillData.type === 'super' ? '充能技能' : skillData.type === 'ultimate' ? '终极技能' : '普通技能'}</div>
+                                  <div>类型: {skillData.kind === 'active' ? '主动' : '被动'}</div>
+                                  <div>技能类型: {skillData.type === 'super' ? '充能' : skillData.type === 'ultimate' ? '终极' : '普通'}{skillData.usesRemaining === 1 && ' (限定技)'}</div>
                                   {skillData.kind === 'active' && (
                                     <div>行动点消耗: {skillData.actionPointCost || 0}</div>
                                   )}

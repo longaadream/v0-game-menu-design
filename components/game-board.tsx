@@ -233,10 +233,10 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
               }
             }}
           >
-            {/* 棋子显示 */}
-            {pieces && pieces.some(p => p.x === tile.x && p.y === tile.y) && (
+            {/* 棋子显示 - 只显示存活的棋子 */}
+            {pieces && pieces.some(p => p.x === tile.x && p.y === tile.y && p.currentHp > 0) && (
               (() => {
-                const piece = pieces.find(p => p.x === tile.x && p.y === tile.y)
+                const piece = pieces.find(p => p.x === tile.x && p.y === tile.y && p.currentHp > 0)
                 if (!piece) return null
                 
                 // 通过templateId获取棋子模板
@@ -277,9 +277,15 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
                 const hoverBorderClass = `hover:border-2 ${borderColor} hover:border-4`
                 console.log('Hover border class:', hoverBorderClass)
                 
+                // 检查棋子是否死亡
+                const isDead = piece.currentHp <= 0;
+                
+                // 为死亡的棋子添加灰色效果
+                const deadClass = isDead ? "opacity-50 grayscale" : "";
+                
                 return (
                   <div 
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-200 cursor-pointer ${isSelected ? "border-4 border-green-500" : hoverBorderClass}`}
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-200 cursor-pointer ${isSelected ? "border-4 border-green-500" : hoverBorderClass} ${deadClass}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (onPieceClick) {
@@ -294,7 +300,7 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
                         className="w-full h-full object-contain"
                       />
                     ) : image && (image.length <= 3 || image.includes("️")) ? (
-                      <span className={`text-4xl font-bold ${faction === "red" ? "text-red-500" : "text-blue-500"}`}>
+                      <span className={`text-4xl font-bold ${faction === "red" ? "text-red-500" : "text-blue-500"} ${isDead ? "opacity-50" : ""}`}>
                         {image}
                       </span>
                     ) : image ? (
@@ -304,9 +310,16 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
                         className="w-full h-full object-contain"
                       />
                     ) : (
-                      <span className={`text-3xl font-bold ${faction === "red" ? "text-red-500" : "text-blue-500"}`}>
+                      <span className={`text-3xl font-bold ${faction === "red" ? "text-red-500" : "text-blue-500"} ${isDead ? "opacity-50" : ""}`}>
                         {faction === "red" ? "⚔" : "🛡"}
                       </span>
+                    )}
+                    
+                    {/* 为死亡的棋子添加阵亡标记 */}
+                    {isDead && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-red-900/30">
+                        <span className="text-2xl font-bold text-red-500">✖️</span>
+                      </div>
                     )}
                   </div>
                 )

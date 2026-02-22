@@ -1,1 +1,0 @@
-{"id":"holy-shield","name":"圣盾","description":"抵挡一次伤害","icon":"🛡️","type":"holy-shield","intensity":1,"isDebuff":false,"canStack":false,"maxStacks":1,"code":"function EffectTrigger(context) { return { success: true, message: context.piece.templateId + '的圣盾效果触发' }; }"}
