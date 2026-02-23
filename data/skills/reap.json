@@ -1,0 +1,15 @@
+{
+  "id": "reap",
+  "name": "收割",
+  "description": "（被动）造成伤害时，对自己造成伤害量50%的治疗",
+  "icon": "💀",
+  "kind": "passive",
+  "type": "normal",
+  "cooldownTurns": 0,
+  "maxCharges": 0,
+  "powerMultiplier": 0.5,
+  "actionPointCost": 0,
+  "range": "self",
+  "requiresTarget": false,
+  "code": "function executeSkill(context) { return { message: '收割被动技能已激活', success: true } }"
+}

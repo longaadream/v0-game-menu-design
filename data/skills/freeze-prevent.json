@@ -1,1 +1,13 @@
-{"id":"freeze-prevent","name":"冰冻阻止","description":"阻止被冰冻目标的移动和使用技能","kind":"passive","type":"normal","cooldownTurns":0,"maxCharges":0,"powerMultiplier":1,"actionPointCost":0,"code":"function executeSkill(context) { if (!context.piece) { return { message: '没有目标', success: false }; } // 检查棋子是否有冰冻状态 const isFrozen = context.piece.statusEffects && context.piece.statusEffects.some(effect => effect.type === 'freeze'); // 或者检查statusTags if (!isFrozen && context.piece.statusTags) { const hasFreezeTag = context.piece.statusTags.some(tag => tag === 'freeze' || tag.includes('freeze-duration-')); if (hasFreezeTag) { return { message: context.piece.name + '被冰冻，无法执行该操作', success: false, preventAction: true, showUIEffect: true }; } } if (isFrozen) { // 根据触发类型确定行动类型 let actionType = '执行该操作'; if (context.type === 'beforeMove') { actionType = '移动'; } else if (context.type === 'beforeSkillUse') { actionType = '使用技能'; } return { message: context.piece.name + '被冰冻，无法' + actionType, success: false, preventAction: true, showUIEffect: true }; } return { message: '目标未被冰冻或行动未被阻止', success: true }; }","showInUI":false}
+{
+  "id": "freeze-prevent",
+  "name": "冰冻阻止",
+  "description": "阻止被冰冻目标的移动和使用技能",
+  "kind": "passive",
+  "type": "normal",
+  "cooldownTurns": 0,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "actionPointCost": 0,
+  "code": "function executeSkill(context) {\n  if (!context.piece) {\n    return { message: '没有目标', success: false };\n  }\n  // 检查棋子是否有冰冻状态\n  const isFrozen = context.piece.statusEffects && context.piece.statusEffects.some(effect => effect.type === 'freeze');\n  // 或者检查statusTags中的对象type\n  if (!isFrozen && context.piece.statusTags) {\n    const hasFreezeTag = context.piece.statusTags.some(tag => {\n      if (typeof tag === 'string') {\n        return tag === 'freeze';\n      }\n      if (typeof tag === 'object' && tag !== null) {\n        return tag.type === 'freeze';\n      }\n      return false;\n    });\n    if (hasFreezeTag) {\n      return { message: context.piece.name + '被冰冻，无法执行该操作', success: false, preventAction: true, showUIEffect: true };\n    }\n  }\n  if (isFrozen) {\n    // 根据触发类型确定行动类型\n    let actionType = '执行该操作';\n    if (context.type === 'beforeMove') {\n      actionType = '移动';\n    } else if (context.type === 'beforeSkillUse') {\n      actionType = '使用技能';\n    }\n    return { message: context.piece.name + '被冰冻，无法' + actionType, success: false, preventAction: true, showUIEffect: true };\n  }\n  return { message: '目标未被冰冻或行动未被阻止', success: true };\n}",
+  "showInUI": false
+}

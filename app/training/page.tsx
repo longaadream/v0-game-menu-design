@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Loader2, Swords, Shield, Zap, Footprints, Plus, Settings, Map as MapIcon, RefreshCw } from "lucide-react"
+import { ArrowLeft, Loader2, Swords, Shield, Zap, Footprints, Plus, Settings, Map as MapIcon, RefreshCw, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
@@ -68,6 +68,7 @@ export default function TrainingPage() {
   const [resourcePlayerId, setResourcePlayerId] = useState<string>(TRAINING_PLAYER_1)
   const [resourceActionPoints, setResourceActionPoints] = useState<number>(10)
   const [resourceChargePoints, setResourceChargePoints] = useState<number>(10)
+  const [isPlacingPiece, setIsPlacingPiece] = useState(false)
 
   // 初始化训练营
   useEffect(() => {
@@ -131,6 +132,7 @@ export default function TrainingPage() {
       if (!res.ok) {
         if (data.needsTargetSelection) {
           setIsSelectingSkillTarget(true)
+          setIsPlacingPiece(false)
           // skillId only exists on useBasicSkill or useChargeSkill actions
           if ('skillId' in action) {
             setSelectedSkillId(action.skillId!)
@@ -205,6 +207,34 @@ export default function TrainingPage() {
       toast.success("资源更新成功")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "更新资源失败")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function removePiece(instanceId: string) {
+    if (!battle) return
+    try {
+      setLoading(true)
+      const res = await fetch("/api/training", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "removePiece",
+          instanceId,
+          battleState: battle,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || "Failed to remove piece")
+      }
+      const data = (await res.json()) as BattleState
+      setBattle(data)
+      if (selectedPieceId === instanceId) setSelectedPieceId(undefined)
+      toast.success("棋子已删除")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "删除棋子失败")
     } finally {
       setLoading(false)
     }
@@ -412,6 +442,43 @@ export default function TrainingPage() {
                   <div className="mb-2 text-xs text-zinc-400">回合数: {battle.turn.turnNumber}</div>
                 </div>
 
+                {/* 双方资源显示 */}
+                <div className="space-y-2">
+                  <div className="text-xs text-zinc-400">双方资源</div>
+                  {battle.players.map((player) => {
+                    const isRed = player.playerId === TRAINING_PLAYER_1
+                    return (
+                      <div
+                        key={player.playerId}
+                        className={`rounded-md p-2 ${
+                          isRed ? "bg-red-950/30 border border-red-900/50" : "bg-blue-950/30 border border-blue-900/50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={`text-xs font-medium ${isRed ? "text-red-400" : "text-blue-400"}`}>
+                            {isRed ? "红方" : "蓝方"}
+                          </span>
+                          {battle.turn.currentPlayerId === player.playerId && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-600/80 text-white">
+                              当前回合
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="flex items-center gap-1 text-zinc-300">
+                            <Footprints className="h-3 w-3 text-blue-400" />
+                            AP: {player.actionPoints}/{player.maxActionPoints}
+                          </span>
+                          <span className="flex items-center gap-1 text-zinc-300">
+                            <Zap className="h-3 w-3 text-yellow-400" />
+                            CP: {player.chargePoints}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+
                 {battle.turn.phase === "action" && isMyTurn && (
                   <div className="space-y-2">
                     {!selectedPiece && (
@@ -456,7 +523,7 @@ export default function TrainingPage() {
                         className="w-full"
                         size="sm"
                         disabled={!selectedPiece}
-                        onClick={() => setIsSelectingMoveTarget(true)}
+                        onClick={() => { setIsSelectingMoveTarget(true); setIsPlacingPiece(false) }}
                       >
                         <Footprints className="mr-2 h-4 w-4" />
                         移动
@@ -543,7 +610,56 @@ export default function TrainingPage() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm">管理工具</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-3">
+                {/* 快速放置区域 */}
+                <div className="space-y-2 rounded-md border border-zinc-700 p-2">
+                  <p className="text-xs text-zinc-400">快速放置棋子</p>
+                  <Select
+                    value={newPieceFaction}
+                    onValueChange={(v: "red" | "blue") => { setNewPieceFaction(v); setNewPieceTemplateId("") }}
+                  >
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="red">红方</SelectItem>
+                      <SelectItem value="blue">蓝方</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={newPieceTemplateId}
+                    onValueChange={setNewPieceTemplateId}
+                  >
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder="选择棋子类型" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availablePieces
+                        .filter((piece) => piece.faction === newPieceFaction || piece.faction === "neutral")
+                        .map((piece) => (
+                          <SelectItem key={piece.id} value={piece.id}>
+                            {piece.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    className="w-full"
+                    size="sm"
+                    variant={isPlacingPiece ? "default" : "outline"}
+                    disabled={!newPieceTemplateId}
+                    onClick={() => setIsPlacingPiece((v) => !v)}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    {isPlacingPiece ? "点击格子放置中…" : "点击格子放置"}
+                  </Button>
+                  {isPlacingPiece && (
+                    <p className="text-center text-[10px] text-yellow-400">
+                      点击棋盘空格放置，再次点击按钮退出
+                    </p>
+                  )}
+                </div>
+
                 <Button
                   className="w-full"
                   variant="outline"
@@ -551,7 +667,7 @@ export default function TrainingPage() {
                   onClick={() => setShowAddPieceDialog(true)}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  添加棋子
+                  手动添加（输入坐标）
                 </Button>
                 <Button
                   className="w-full"
@@ -611,6 +727,8 @@ export default function TrainingPage() {
                       })
                       setIsSelectingSkillTarget(false)
                       setSelectedSkillId(undefined)
+                    } else if (isPlacingPiece && newPieceTemplateId) {
+                      void addPiece(newPieceFaction, newPieceTemplateId, x, y)
                     }
                   }}
                   onPieceClick={(pieceId) => {
@@ -634,6 +752,7 @@ export default function TrainingPage() {
                   selectedPieceId={selectedPieceId}
                   isSelectingMoveTarget={isSelectingMoveTarget}
                   isSelectingSkillTarget={isSelectingSkillTarget}
+                  isPlacingPiece={isPlacingPiece}
                   selectedSkillId={selectedSkillId}
                   teleportRange={battle.skillsById.teleport?.areaSize || 5}
                 />
@@ -756,14 +875,30 @@ export default function TrainingPage() {
                         <div className="flex flex-wrap gap-1 mt-2">
                           {piece.statusTags.filter(tag => tag.visible !== false).map((tag, index) => (
                             <span key={index} className="px-2 py-0.5 rounded-full text-xs bg-zinc-800 text-zinc-300">
-                              {tag.id}
-                              {tag.currentDuration && ` (${tag.currentDuration})`}
-                              {tag.stacks && ` x${tag.stacks}`}
+                              {tag.name || tag.type || tag.id}
+                              {(tag.remainingDuration !== undefined || tag.remainingUses !== undefined) && (
+                                <span className="text-zinc-400">
+                                  （持续时间：{tag.remainingDuration ?? '-'}，剩余次数：{tag.remainingUses ?? '-'}）
+                                </span>
+                              )}
+                              {tag.stacks && tag.stacks > 1 && ` x${tag.stacks}`}
                             </span>
                           ))}
                         </div>
                       )}
                     </div>
+
+                    {/* 删除按钮 */}
+                    <button
+                      className="ml-2 flex-shrink-0 rounded p-1 text-zinc-600 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
+                      title="删除棋子"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        void removePiece(piece.instanceId)
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
 
                     {/* 技能信息悬停显示 - 改为向下显示 */}
                     <div className="absolute left-0 top-full mt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
@@ -863,7 +998,7 @@ export default function TrainingPage() {
               <Label>阵营</Label>
               <Select
                 value={newPieceFaction}
-                onValueChange={(v: "red" | "blue") => setNewPieceFaction(v)}
+                onValueChange={(v: "red" | "blue") => { setNewPieceFaction(v); setNewPieceTemplateId("") }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -884,11 +1019,13 @@ export default function TrainingPage() {
                   <SelectValue placeholder="选择棋子" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availablePieces.map((piece) => (
-                    <SelectItem key={piece.id} value={piece.id}>
-                      {piece.name} ({piece.faction})
-                    </SelectItem>
-                  ))}
+                  {availablePieces
+                    .filter((piece) => piece.faction === newPieceFaction || piece.faction === "neutral")
+                    .map((piece) => (
+                      <SelectItem key={piece.id} value={piece.id}>
+                        {piece.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>

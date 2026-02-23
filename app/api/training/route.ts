@@ -318,6 +318,12 @@ export async function PATCH(req: NextRequest) {
         break
       }
 
+      case "removePiece": {
+        const { instanceId } = body as { instanceId: string }
+        newState.pieces = battleState.pieces.filter(p => p.instanceId !== instanceId)
+        break
+      }
+
       case "resetCooldowns": {
         newState.pieces = battleState.pieces.map(piece => ({
           ...piece,

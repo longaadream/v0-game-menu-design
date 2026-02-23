@@ -1,6 +1,6 @@
 export type TileId = string
 
-export type TileType = "floor" | "wall" | "spawn" | "cover" | "hole"
+export type TileType = "floor" | "wall" | "spawn" | "cover" | "hole" | "lava" | "spring" | "chargepad"
 
 export interface TileProperties {
   /** 是否可以走过去 */
@@ -11,7 +11,16 @@ export interface TileProperties {
   type: TileType
   /** 高度、伤害等可选信息 */
   height?: number
+  /** 每回合造成真实伤害（如熔岩格） */
   damagePerTurn?: number
+  /** 每回合回复HP（如治愈泉） */
+  healPerTurn?: number
+  /** 每回合给站在上面的棋子提供充能点（如充能台） */
+  chargePerTurn?: number
+  /** 是否是暗影步目标位置 */
+  shadowStepTarget?: boolean
+  /** 子弹是否可以穿过（别名） */
+  bullet?: boolean
 }
 
 export interface Tile {
@@ -97,6 +106,8 @@ export function createMapFromAscii(config: AsciiMapConfig): BoardMap {
           type: def.type,
           height: def.height,
           damagePerTurn: def.damagePerTurn,
+          healPerTurn: def.healPerTurn,
+          chargePerTurn: def.chargePerTurn,
         },
       })
     })

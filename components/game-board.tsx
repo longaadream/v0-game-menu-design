@@ -15,11 +15,16 @@ type GameBoardProps = {
   isSelectingMoveTarget?: boolean
   isSelectingTeleportTarget?: boolean
   isSelectingSkillTarget?: boolean
+  isPlacingPiece?: boolean
   selectedSkillId?: string
   teleportRange?: number
 }
 
 function tileColor(tile: Tile): string {
+  // 检查是否是暗影步目标格子
+  if (tile.props.shadowStepTarget) {
+    return "bg-purple-600"
+  }
   switch (tile.props.type) {
     case "wall":
       return "bg-zinc-800"
@@ -29,13 +34,19 @@ function tileColor(tile: Tile): string {
       return "bg-amber-500"
     case "hole":
       return "bg-sky-900"
+    case "lava":
+      return "bg-orange-700"
+    case "spring":
+      return "bg-teal-700"
+    case "chargepad":
+      return "bg-violet-700"
     case "floor":
     default:
       return "bg-zinc-600"
   }
 }
 
-export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selectedPieceId, isSelectingMoveTarget, isSelectingTeleportTarget, isSelectingSkillTarget, selectedSkillId, teleportRange = 5 }: GameBoardProps) {
+export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selectedPieceId, isSelectingMoveTarget, isSelectingTeleportTarget, isSelectingSkillTarget, isPlacingPiece, selectedSkillId, teleportRange = 5 }: GameBoardProps) {
   const maxSize = Math.max(map.width, map.height)
   // 根据地图大小动态计算格子大小，确保棋盘在容器中合理显示
   // 最小格子大小为 24px，最大为 48px
@@ -53,6 +64,10 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
     { type: "spawn", name: "出生点", color: "bg-emerald-500" },
     { type: "cover", name: "掩体", color: "bg-amber-500" },
     { type: "hole", name: "陷阱", color: "bg-sky-900" },
+    { type: "lava", name: "熔岩(-HP)", color: "bg-orange-700" },
+    { type: "spring", name: "治愈泉(+HP)", color: "bg-teal-700" },
+    { type: "chargepad", name: "充能台(+CP)", color: "bg-violet-700" },
+    { type: "shadow-step", name: "暗影步", color: "bg-purple-600" },
   ]
 
   // 获取选中的棋子
@@ -189,10 +204,14 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
     
     // 检查是否是技能目标选择模式
     if (isSelectingSkillTarget) {
-      // 对于技能目标选择，我们只需要让格子可点击，具体的目标验证由游戏逻辑处理
       return `${baseClass} cursor-pointer hover:bg-blue-500/30`
     }
-    
+
+    // 放置棋子模式
+    if (isPlacingPiece) {
+      return `${baseClass} cursor-crosshair hover:bg-yellow-500/30`
+    }
+
     return baseClass
   }
 
@@ -231,7 +250,7 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
               tile.props.walkable
             }  bullet=${tile.props.bulletPassable}`}
             onClick={() => {
-              if ((isSelectingMoveTarget || isSelectingTeleportTarget || isSelectingSkillTarget) && onTileClick) {
+              if ((isSelectingMoveTarget || isSelectingTeleportTarget || isSelectingSkillTarget || isPlacingPiece) && onTileClick) {
                 onTileClick(tile.x, tile.y)
               }
             }}

@@ -645,7 +645,11 @@ export default function BattlePage() {
                               {piece.statusTags.filter(tag => tag.visible !== false).map((tag, index) => (
                                 <span key={index} className="px-2 py-0.5 rounded-full text-xs bg-zinc-800 text-zinc-300">
                                   {tag.id}
-                                  {tag.currentDuration && ` (${tag.currentDuration})`}
+                                  {(tag.currentDuration !== undefined || tag.currentUses !== undefined) && (
+                                    <span className="text-zinc-400">
+                                      （持续时间：{tag.currentDuration ?? '-'}，剩余次数：{tag.currentUses ?? '-'}）
+                                    </span>
+                                  )}
                                   {tag.stacks && ` x${tag.stacks}`}
                                 </span>
                               ))}
@@ -812,7 +816,11 @@ export default function BattlePage() {
                               {piece.statusTags.filter(tag => tag.visible !== false).map((tag, index) => (
                                 <span key={index} className="px-2 py-0.5 rounded-full text-xs bg-zinc-800 text-zinc-300">
                                   {tag.id}
-                                  {tag.currentDuration && ` (${tag.currentDuration})`}
+                                  {(tag.currentDuration !== undefined || tag.currentUses !== undefined) && (
+                                    <span className="text-zinc-400">
+                                      （持续时间：{tag.currentDuration ?? '-'}，剩余次数：{tag.currentUses ?? '-'}）
+                                    </span>
+                                  )}
                                   {tag.stacks && ` x${tag.stacks}`}
                                 </span>
                               ))}
@@ -932,7 +940,11 @@ export default function BattlePage() {
                               {piece.statusTags.filter(tag => tag.visible !== false).map((tag, index) => (
                                 <span key={index} className="px-2 py-0.5 rounded-full text-xs bg-zinc-800 text-zinc-300">
                                   {tag.id}
-                                  {tag.currentDuration && ` (${tag.currentDuration})`}
+                                  {(tag.currentDuration !== undefined || tag.currentUses !== undefined) && (
+                                    <span className="text-zinc-400">
+                                      （持续时间：{tag.currentDuration ?? '-'}，剩余次数：{tag.currentUses ?? '-'}）
+                                    </span>
+                                  )}
                                   {tag.stacks && ` x${tag.stacks}`}
                                 </span>
                               ))}
@@ -1099,7 +1111,11 @@ export default function BattlePage() {
                               {piece.statusTags.filter(tag => tag.visible !== false).map((tag, index) => (
                                 <span key={index} className="px-2 py-0.5 rounded-full text-xs bg-zinc-800 text-zinc-300">
                                   {tag.id}
-                                  {tag.currentDuration && ` (${tag.currentDuration})`}
+                                  {(tag.currentDuration !== undefined || tag.currentUses !== undefined) && (
+                                    <span className="text-zinc-400">
+                                      （持续时间：{tag.currentDuration ?? '-'}，剩余次数：{tag.currentUses ?? '-'}）
+                                    </span>
+                                  )}
                                   {tag.stacks && ` x${tag.stacks}`}
                                 </span>
                               ))}
@@ -1156,37 +1172,39 @@ export default function BattlePage() {
                   </div>
                 </div>
 
+                {/* 当前回合玩家显示 */}
                 <div className="rounded-md bg-zinc-800 p-3">
-                  <div className="mb-2 text-xs text-zinc-400">本回合行动</div>
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-zinc-400">
-                        <Footprints className="h-3 w-3" />
-                        移动
-                      </span>
-                      <span className={battle.turn.actions.hasMoved ? "text-red-400" : "text-green-400"}>
-                        {battle.turn.actions.hasMoved ? "已使用" : "可用"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-zinc-400">
-                        <Zap className="h-3 w-3" />
-                        普通技能
-                      </span>
-                      <span className={battle.turn.actions.hasUsedBasicSkill ? "text-red-400" : "text-green-400"}>
-                        {battle.turn.actions.hasUsedBasicSkill ? "已使用" : "可用"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-zinc-400">
-                        <Swords className="h-3 w-3" />
-                        充能技能
-                      </span>
-                      <span className={battle.turn.actions.hasUsedChargeSkill ? "text-red-400" : "text-green-400"}>
-                        {battle.turn.actions.hasUsedChargeSkill ? "已使用" : "可用"}
-                      </span>
-                    </div>
-                  </div>
+                  <div className="mb-2 text-xs text-zinc-400">当前回合</div>
+                  {(() => {
+                    const currentPlayer = battle.players.find(p => p.playerId === battle.turn.currentPlayerId)
+                    const isCurrentPlayer = currentPlayer?.playerId.toLowerCase() === currentPlayerId?.toLowerCase()
+                    const playerName = room?.players.find(p => p.id === currentPlayer?.playerId)?.name || currentPlayer?.playerId || "未知"
+                    const playerPiece = battle.pieces.find(p => p.ownerPlayerId === currentPlayer?.playerId)
+                    const isRed = playerPiece?.faction === "red"
+                    return (
+                      <div className={`flex items-center justify-between p-2 rounded ${
+                        isRed ? "bg-red-950/30 border border-red-900/50" : "bg-blue-950/30 border border-blue-900/50"
+                      }`}>
+                        <div className="flex items-center gap-2">
+                          <div className={`h-2 w-2 rounded-full animate-pulse ${
+                            isRed ? "bg-red-500" : "bg-blue-500"
+                          }`} />
+                          <span className={`text-sm font-medium ${
+                            isRed ? "text-red-400" : "text-blue-400"
+                          }`}>
+                            {isRed ? "红方" : "蓝方"}
+                          </span>
+                          <span className="text-sm text-zinc-200">
+                            {playerName}
+                            {isCurrentPlayer && " (你)"}
+                          </span>
+                        </div>
+                        <span className="text-xs px-2 py-0.5 rounded bg-green-600/80 text-white">
+                          行动中
+                        </span>
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 {battle.turn.phase === "action" && isMyTurn && (

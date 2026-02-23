@@ -228,8 +228,22 @@ export class TriggerSystem {
       // 执行棋子匹配的规则
       for (const rule of pieceMatchingRules) {
         if (typeof rule.effect !== 'function') {
-          console.warn(`Skipping rule ${rule.id}: effect is not a function (may have been lost during JSON serialization)`)
-          continue
+          console.warn(`Rule ${rule.id}: effect is not a function, attempting to reload...`)
+          // 尝试重新加载规则以恢复 effect 函数
+          try {
+            const { loadRuleById } = require('./skills')
+            const reloadedRule = loadRuleById(rule.id)
+            if (reloadedRule && typeof reloadedRule.effect === 'function') {
+              console.log(`Successfully reloaded rule ${rule.id}, restoring effect function`)
+              rule.effect = reloadedRule.effect
+            } else {
+              console.warn(`Failed to reload rule ${rule.id}: effect still not a function`)
+              continue
+            }
+          } catch (reloadError) {
+            console.error(`Error reloading rule ${rule.id}:`, reloadError)
+            continue
+          }
         }
         
         try {

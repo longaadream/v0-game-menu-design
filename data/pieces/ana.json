@@ -1,0 +1,29 @@
+{
+  "id": "ana",
+  "name": "安娜",
+  "faction": "blue",
+  "description": "支援型狙击手，可以治疗队友并控制敌人",
+  "rarity": "epic",
+  "image": "ana.jpg",
+  "stats": {
+    "maxHp": 9,
+    "attack": 2,
+    "defense": 1,
+    "moveRange": 3
+  },
+  "skills": [
+    {
+      "skillId": "biotic-grenade",
+      "level": 1
+    },
+    {
+      "skillId": "sleep-dart",
+      "level": 1
+    },
+    {
+      "skillId": "nano-boost",
+      "level": 1
+    }
+  ],
+  "isDefault": true
+}

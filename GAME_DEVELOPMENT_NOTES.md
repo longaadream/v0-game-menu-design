@@ -1415,3 +1415,47 @@ function calculatePreview(piece, skillDef) {
       - `data/skills/divine-shield-defense.json`：使用 `removeSkillById` 移除自身技能
       - `app/api/rooms/[roomId]/battle/route.ts`：改进 `rehydrateBattleRules` 函数，处理加载失败的情况
       - `lib/game/triggers.ts`：添加规则有效性检查和错误处理
+
+39. **训练营快速放置棋子 + 删除棋子功能**：
+    - **需求**：训练营原先添加棋子需要在弹窗里手动输入 X/Y 坐标，体验繁琐
+    - **快速放置实现**：
+      - `app/training/page.tsx`：新增 `isPlacingPiece: boolean` 状态；管理工具卡片新增内联的阵营选择器（Select）和棋子选择器，旁边的"点击格子放置"切换按钮激活/退出放置模式
+      - `components/game-board.tsx`：新增 `isPlacingPiece?: boolean` prop，在 tile 的 `onClick` 条件中加入 `|| isPlacingPiece`，放置模式下格子悬停样式改为黄色准心（`cursor-crosshair hover:bg-yellow-500/30`）；原代码只在 `isSelectingMoveTarget || isSelectingTeleportTarget || isSelectingSkillTarget` 时才调用 `onTileClick`，这是放置模式点击无效的根本原因
+      - `app/training/page.tsx`：`onTileClick` 里新增第三个分支：若处于放置模式且已选棋子类型，直接调用 `addPiece()`，放置后保持模式不退出，支持连续放置
+      - 进入移动/技能目标选择模式时自动退出放置模式（互斥）
+    - **删除棋子实现**：
+      - `app/api/training/route.ts`：PATCH handler 新增 `removePiece` case，按 `instanceId` 从 `pieces` 数组过滤
+      - `app/training/page.tsx`：新增 `removePiece(instanceId)` 异步函数（PATCH 请求）；"所有棋子"列表每张卡片右侧加垃圾桶图标按钮（`Trash2`），hover 时显示，点击时 `stopPropagation` 防止触发选中逻辑，调用 `removePiece`；删除当前选中棋子后同步清空 `selectedPieceId`
+    - **阵营过滤**：
+      - 快速放置选择器和手动添加弹窗的棋子列表均按 `piece.faction === newPieceFaction || piece.faction === "neutral"` 过滤，红方只能选红方棋子，蓝方只能选蓝方棋子
+      - 切换阵营时自动清空 `newPieceTemplateId`，防止跨阵营残留
+
+40. **特殊地形格子系统（lava / spring / chargepad）**：
+    - **需求**：支持在地图上放置有运行时效果的特殊格子
+    - **类型扩展（`lib/game/map.ts`）**：
+      - `TileType` 新增 `"lava" | "spring" | "chargepad"`
+      - `TileProperties` 新增三个可选字段：`damagePerTurn?: number`（熔岩每回合伤害）、`healPerTurn?: number`（治愈泉每回合回血）、`chargePerTurn?: number`（充能台每回合充能）
+      - `createMapFromAscii` 中将新字段从 legend 复制到 tile.props（原先只复制了 `damagePerTurn`，新增了 `healPerTurn` 和 `chargePerTurn` 的复制）
+    - **效果触发（`lib/game/turn.ts`）**：
+      - 触发时机：`beginPhase` 处理器的 `start → action` 阶段，在 beginTurn 触发器之后、`phase = "action"` 之前
+      - 只对当前玩家的存活棋子生效（过滤 `ownerPlayerId === currentPlayerId && currentHp > 0`）
+      - 遍历开始前做快照（`filter` 返回新数组），避免熔岩致死修改 `pieces` 数组影响当前循环
+      - 熔岩：调用 `dealDamage(piece, piece, damagePerTurn, "true", next, "lava-terrain")`
+      - 治愈泉：调用 `healDamage(piece, piece, healPerTurn, next, "spring-terrain")`
+      - 充能台：直接操作 `playerMeta.chargePoints += chargePerTurn`，手动写日志（无护盾/触发器概念）
+      - 关于循环依赖：`skills.ts` 对 `turn.ts` 仅有 `import type`（运行时已擦除），故 `turn.ts` 中 `import { dealDamage, healDamage } from "./skills"` 不产生运行时循环依赖
+    - **视觉（`components/game-board.tsx`）**：
+      - `tileColor()`：`"lava"` → `bg-orange-700`，`"spring"` → `bg-teal-700`，`"chargepad"` → `bg-violet-700`
+      - `tileTypes` 图例数组新增三条：熔岩(-HP)、治愈泉(+HP)、充能台(+CP)
+    - **内置地图（`data/maps/medium-lava-temple.json`）**：
+      - 12×9 中型对称地图，名称"熔岩神殿"
+      - 布局：四角出生点、中部掩体、双侧充能台（`chargePerTurn: 1`）、两条熔岩带（`damagePerTurn: 1`）、中心四格治愈泉（`healPerTurn: 2`）被内墙隔成窄道
+    - **战斗日志**：所有三种地形效果触发后均写入 `type: "tileEffect"` 日志（由 `dealDamage`/`healDamage` 内部处理，或充能台手动 push）
+
+41. **地形效果重构：dealDamage / healDamage 联动**：
+    - **问题**：特殊地形最初直接修改 `piece.currentHp`，绕过了护盾（`beforeDamageTaken`）、反伤（`afterDamageTaken`）、反治疗（`beforeHealTaken`）等所有触发器，与战斗系统其他效果完全脱节
+    - **解决方案**：改为调用 `lib/game/skills.ts` 中已有的 `dealDamage` / `healDamage` 函数
+    - **熔岩**：`dealDamage(piece, piece, tile.props.damagePerTurn, "true", next, "lava-terrain")` — attacker 和 target 同为该棋子（环境伤害语义），`damageType: "true"` 无视防御，`skillId: "lava-terrain"` 用于日志区分
+    - **治愈泉**：`healDamage(piece, piece, tile.props.healPerTurn, next, "spring-terrain")` — 函数内部自动做 `Math.min(heal, maxHp - currentHp)` 溢出保护，无需外部处理
+    - **联动效果**：神圣护盾可格挡熔岩伤害；反治疗规则可阻止治愈泉回血；熔岩致死时正常触发 `onPieceDied` 和 `afterPieceKilled`，并从 `pieces` 中 `splice` 移入墓地
+    - **`turn.ts` 导入**：顶部新增 `import { dealDamage, healDamage } from "./skills"`

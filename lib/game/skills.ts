@@ -139,11 +139,24 @@ export function loadRuleById(ruleId: string): TriggerRule | null {
                         if (!targetPiece.statusTags) {
                           targetPiece.statusTags = [];
                         }
+                        // 状态名称映射表
+                        const statusNameMap: Record<string, string> = {
+                          'anti-heal': '禁疗',
+                          'sleep': '睡眠',
+                          'freeze': '冰冻',
+                          'bleeding': '流血',
+                          'divine-shield': '圣盾',
+                          'nano-boost': '纳米强化',
+                          'immobilize': '定身',
+                          'hardy-block': '悍猛格挡',
+                          'bone-storm': '白骨风暴',
+                        };
                         const newStatus = {
                           id: statusObject.id,
                           type: statusObject.type,
-                          currentDuration: statusObject.currentDuration,
-                          currentUses: statusObject.currentUses,
+                          name: statusObject.name || statusNameMap[statusObject.type] || statusObject.type,
+                          remainingDuration: statusObject.currentDuration ?? statusObject.remainingDuration,
+                          remainingUses: statusObject.currentUses ?? statusObject.remainingUses,
                           intensity: statusObject.intensity,
                           stacks: statusObject.stacks,
                           value: statusObject.value,
@@ -187,6 +200,33 @@ export function loadRuleById(ruleId: string): TriggerRule | null {
                       }
                       return false;
                     },
+                    addSkillById: (targetPieceId, skillId) => {
+                      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+                      if (targetPiece) {
+                        if (!targetPiece.skills) {
+                          targetPiece.skills = [];
+                        }
+                        const existingSkill = targetPiece.skills.find(skill => skill.skillId === skillId);
+                        if (!existingSkill) {
+                          const newSkill = {
+                            skillId: skillId,
+                            currentCooldown: 0
+                          };
+                          targetPiece.skills.push(newSkill);
+                          return true;
+                        }
+                      }
+                      return false;
+                    },
+                    removeSkillById: (targetPieceId, skillId) => {
+                      const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
+                      if (targetPiece && targetPiece.skills) {
+                        const originalLength = targetPiece.skills.length;
+                        targetPiece.skills = targetPiece.skills.filter(skill => skill.skillId !== skillId);
+                        return targetPiece.skills.length < originalLength;
+                      }
+                      return false;
+                    },
                     getAllEnemiesInRange: (range) => [],
                     getAllAlliesInRange: (range) => [],
                     calculateDistance: (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2),
@@ -216,6 +256,8 @@ export function loadRuleById(ruleId: string): TriggerRule | null {
                       const addRuleById = environment.addRuleById;
                       const removeRuleById = environment.removeRuleById;
                       const removeStatusEffectById = environment.removeStatusEffectById;
+                      const addSkillById = environment.addSkillById;
+                      const removeSkillById = environment.removeSkillById;
                       const Math = environment.Math;
                       const console = environment.console;
                       
@@ -1267,19 +1309,33 @@ export function executeSkillFunction(skillDef: SkillDefinition, context: SkillEx
         if (!targetPiece.statusTags) {
           targetPiece.statusTags = [];
         }
-        
+
+        // 状态名称映射表
+        const statusNameMap: Record<string, string> = {
+          'anti-heal': '禁疗',
+          'sleep': '睡眠',
+          'freeze': '冰冻',
+          'bleeding': '流血',
+          'divine-shield': '圣盾',
+          'nano-boost': '纳米强化',
+          'immobilize': '定身',
+          'hardy-block': '悍猛格挡',
+          'bone-storm': '白骨风暴',
+        };
+
         // 创建状态对象
         const newStatus = {
           id: statusObject.id,
           type: statusObject.type,
-          currentDuration: statusObject.currentDuration,
-          currentUses: statusObject.currentUses,
+          name: statusObject.name || statusNameMap[statusObject.type] || statusObject.type,
+          remainingDuration: statusObject.currentDuration ?? statusObject.remainingDuration,
+          remainingUses: statusObject.currentUses ?? statusObject.remainingUses,
           intensity: statusObject.intensity,
           stacks: statusObject.stacks,
           value: statusObject.value, // 添加数值属性值
           relatedRules: [] // 添加关联规则数组
         };
-        
+
         // 添加到状态标签数组
         targetPiece.statusTags.push(newStatus);
         // 触发状态施加后事件

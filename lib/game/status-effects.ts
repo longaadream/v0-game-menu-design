@@ -188,23 +188,38 @@ export class StatusEffectSystem {
     return { remainingDuration, currentStacks, intensity, remainingUses };
   }
 
+  // 状态名称映射表
+  private statusNameMap: Map<string, string> = new Map([
+    ['anti-heal', '禁疗'],
+    ['sleep', '睡眠'],
+    ['freeze', '冰冻'],
+    ['bleeding', '流血'],
+    ['divine-shield', '圣盾'],
+    ['nano-boost', '纳米强化'],
+  ]);
+
+  // 获取状态名称
+  private getStatusName(type: string): string {
+    return this.statusNameMap.get(type) || type;
+  }
+
   // 更新statusTags中的状态数据
-  private updateStatusDataTags(piece: any, effectId: string, type: string, remainingDuration: number, currentStacks: number, intensity: number, remainingUses: number): void {
+  private updateStatusDataTags(piece: any, effectId: string, type: string, remainingDuration: number, currentStacks: number, intensity: number, remainingUses: number, name?: string): void {
     if (!piece.statusTags) {
       piece.statusTags = [];
     }
-    
+
     // 创建状态对象
     const statusObj = {
       id: effectId,
       type,
       remainingDuration,
-      name: type,
+      name: name || this.getStatusName(type),
       remainingUses,
       stacks: currentStacks,
       intensity
     };
-    
+
     // 查找并更新或添加状态对象
     const existingIndex = piece.statusTags.findIndex((tag: any) => tag.id === effectId);
     if (existingIndex >= 0) {

@@ -15,6 +15,7 @@
 11. [故障排除](#故障排除)
 12. [总结](#总结)
 13. [训练营使用教程](#训练营使用教程)
+14. [地图设计教程](#地图设计教程)
 
 ## 基础概念
 
@@ -1802,8 +1803,11 @@ function safeCloneBattleState(state: BattleState): BattleState {
   - 灰色：地板（可行走）
   - 深灰色：墙壁（不可通行）
   - 绿色：出生点
-  - 橙色：掩体
-  - 深蓝色：洞口
+  - 橙色（亮）：掩体（阻挡子弹）
+  - 深蓝色：洞口（不可行走）
+  - **橙红色：熔岩**（每回合受到伤害）
+  - **青绿色：治愈泉**（每回合回复HP）
+  - **紫色：充能台**（每回合获得充能点）
 - 显示所有棋子位置
 - 选中棋子时显示可移动范围（蓝色）
 
@@ -1876,6 +1880,395 @@ function safeCloneBattleState(state: BattleState): BattleState {
 - 验证技能效果是否正确
 - 测试不同地图配置
 - 调试战斗逻辑问题
+
+---
+
+# 地图设计教程
+
+## 概述
+
+地图以 ASCII 字符画的形式定义，保存为 `data/maps/` 目录下的 `.json` 文件。游戏启动时会自动扫描并加载该目录下的所有地图，无需手动注册。
+
+---
+
+## 文件结构
+
+```json
+{
+  "id": "my-map",
+  "name": "我的地图",
+  "layout": [
+    "########",
+    "#S....S#",
+    "#......#",
+    "########"
+  ],
+  "legend": [
+    { "char": "#", "type": "wall",  "walkable": false, "bulletPassable": false },
+    { "char": ".", "type": "floor", "walkable": true,  "bulletPassable": true  },
+    { "char": "S", "type": "spawn", "walkable": true,  "bulletPassable": true  }
+  ],
+  "rules": []
+}
+```
+
+### 字段说明
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | string | 地图唯一 ID，需与文件名一致，用于代码中引用 |
+| `name` | string | 显示给玩家的地图名称 |
+| `layout` | string[] | ASCII 字符画，每行长度必须相同 |
+| `legend` | 数组 | 字符到格子属性的映射，每个字符必须在此定义 |
+| `rules` | string[] | 地图级别触发规则 ID 列表，目前可留空 `[]` |
+
+**重要**：`layout` 中出现的每个字符都必须在 `legend` 中有对应条目，否则加载时会报错。
+
+---
+
+## 格子类型（TileType）
+
+### 基础类型
+
+| 类型 | 推荐字符 | `walkable` | `bulletPassable` | 说明 |
+|------|---------|-----------|-----------------|------|
+| `floor` | `.` | `true` | `true` | 普通地板，可自由行走 |
+| `wall` | `#` | `false` | `false` | 墙壁，完全阻挡 |
+| `spawn` | `S` | `true` | `true` | 出生点，仅影响初始摆放，无运行时效果 |
+| `cover` | `C` | `true` | `false` | 掩体，可行走但阻挡子弹/投射物 |
+| `hole` | `H` | `false` | `true` | 洞口，不可行走但子弹可穿过 |
+
+### 特殊效果类型
+
+以下三种类型会在**每个玩家回合开始时**（start → action 阶段）对站在该格子上的棋子自动触发效果。
+
+#### 熔岩（lava）
+
+```json
+{
+  "char": "L",
+  "type": "lava",
+  "walkable": true,
+  "bulletPassable": true,
+  "damagePerTurn": 1
+}
+```
+
+- **颜色**：橙红色
+- **效果**：每回合开始时对站在上面的棋子造成 `damagePerTurn` 点**真实伤害**（无视防御，可致死；推荐值 1–5）
+- **策略意义**：形成危险区域，迫使玩家快速通过或绕行
+
+#### 治愈泉（spring）
+
+```json
+{
+  "char": "W",
+  "type": "spring",
+  "walkable": true,
+  "bulletPassable": true,
+  "healPerTurn": 2
+}
+```
+
+- **颜色**：青绿色
+- **效果**：每回合开始时为站在上面的棋子恢复 `healPerTurn` 点HP（不超过最大HP；推荐值 1–5）
+- **策略意义**：争夺治愈泉成为核心战术目标，持续占领可以反转血量劣势
+
+#### 充能台（chargepad）
+
+```json
+{
+  "char": "E",
+  "type": "chargepad",
+  "walkable": true,
+  "bulletPassable": true,
+  "chargePerTurn": 1
+}
+```
+
+- **颜色**：紫色
+- **效果**：每回合开始时为棋子所属玩家提供 `chargePerTurn` 点充能点（CP；推荐值 1）
+- **策略意义**：加速充能技能的积累，鼓励前压式打法
+
+---
+
+## 特殊格子效果的实现代码
+
+特殊地形效果在 `lib/game/turn.ts` 的 `applyBattleAction` 函数中处理，触发时机是**每个玩家回合的 start → action 阶段**（即玩家点击"继续"推进到行动阶段时）。
+
+### 触发位置（`lib/game/turn.ts`）
+
+地形效果通过调用 `lib/game/skills.ts` 中的 `dealDamage` / `healDamage` 函数实现，而不是直接修改 `piece.currentHp`。这样可以完整联动护盾、反伤、触发器等所有现有效果。
+
+```typescript
+// 文件顶部需要导入
+import { dealDamage, healDamage } from "./skills"
+
+// ── beginPhase 处理器内部 ────────────────────────────────────────────────────
+case "beginPhase": {
+  const next = safeCloneBattleState(state)
+  if (next.turn.phase === "start") {
+
+    // …（beginTurn 触发器、冷却更新等已有逻辑）…
+
+    // ── 特殊地形效果 ─────────────────────────────────────────────────────
+    // 快照避免熔岩致死后影响当前遍历
+    const tileEffectPieces = next.pieces.filter(
+      (p) => p.ownerPlayerId === next.turn.currentPlayerId && p.currentHp > 0,
+    )
+    for (const piece of tileEffectPieces) {
+      if (piece.x == null || piece.y == null) continue
+      const tile = next.map.tiles.find((t) => t.x === piece.x && t.y === piece.y)
+      if (!tile) continue
+
+      // 熔岩伤害：调用 dealDamage（true 伤害），完整联动触发器和护盾等效果
+      if (tile.props.damagePerTurn && tile.props.damagePerTurn > 0) {
+        dealDamage(piece, piece, tile.props.damagePerTurn, "true", next, "lava-terrain")
+      }
+
+      // 治愈泉回复：调用 healDamage，完整联动触发器和反治疗等效果
+      // 伤害结算后再检查存活，避免对已死棋子治疗
+      if (tile.props.healPerTurn && tile.props.healPerTurn > 0 && piece.currentHp > 0) {
+        healDamage(piece, piece, tile.props.healPerTurn, next, "spring-terrain")
+      }
+
+      // 充能台：直接给玩家加充能点（无护盾/触发器概念，简单累加）
+      if (tile.props.chargePerTurn && tile.props.chargePerTurn > 0 && piece.currentHp > 0) {
+        const playerMeta = next.players.find((p) => p.playerId === piece.ownerPlayerId)
+        if (playerMeta) {
+          playerMeta.chargePoints += tile.props.chargePerTurn
+          if (!next.actions) next.actions = []
+          next.actions.push({
+            type: "tileEffect",
+            playerId: piece.ownerPlayerId,
+            turn: next.turn.turnNumber,
+            payload: {
+              message: `${piece.name || piece.templateId} 在充能台上获得了 ${tile.props.chargePerTurn} 充能点`,
+              pieceId: piece.instanceId,
+            },
+          })
+        }
+      }
+    }
+    // ── 特殊地形效果 END ─────────────────────────────────────────────────
+
+    next.turn.phase = "action"
+    return next
+  }
+  // …
+}
+```
+
+### 关键设计说明
+
+**1. 为何用 `dealDamage` / `healDamage` 而不是直接改 HP**
+
+直接修改 `piece.currentHp` 会绕过游戏中所有已有的效果联动：
+
+| 如果直接改 HP | 使用 dealDamage / healDamage |
+|---|---|
+| 无视神圣护盾（`holy-shield`）等防伤规则 | 触发 `beforeDamageTaken`，护盾可正常格挡 |
+| 无法触发反伤（`retaliation`）等触发器 | 触发 `afterDamageTaken`，所有规则正常响应 |
+| 死亡后不执行 `onPieceDied`、不移入墓地 | 自动处理死亡、触发器、墓地转移 |
+| 治疗无法被"反治疗"类效果阻止 | 触发 `beforeHealTaken`，反治疗规则可拦截 |
+
+**2. 熔岩的调用方式**
+
+```typescript
+dealDamage(piece, piece, tile.props.damagePerTurn, "true", next, "lava-terrain")
+//         ↑攻击者  ↑目标    ↑伤害值                ↑真实伤害  ↑战局  ↑技能ID（用于日志）
+```
+
+攻击者和目标都是 `piece` 自身，表示"环境伤害"。`damageType: "true"` 表示真实伤害，无视防御力。`skillId` 填 `"lava-terrain"` 使日志可区分来源。
+
+**3. 治愈泉的调用方式**
+
+```typescript
+healDamage(piece, piece, tile.props.healPerTurn, next, "spring-terrain")
+//         ↑治疗者  ↑目标  ↑回复量               ↑战局  ↑技能ID
+```
+
+`healDamage` 内部会自动用 `Math.min` 保证回复量不超过（`maxHp - currentHp`），不需要在地形代码里再做限制。
+
+**4. 熔岩致死后继续循环的安全性**
+
+遍历开始前先做快照：
+```typescript
+const tileEffectPieces = next.pieces.filter(
+  (p) => p.ownerPlayerId === next.turn.currentPlayerId && p.currentHp > 0,
+)
+```
+`dealDamage` 致死时会把棋子从 `next.pieces` 中移除（`splice`），但循环变量 `tileEffectPieces` 已经是独立数组，不会受影响。循环结束后再检查 `piece.currentHp > 0` 来跳过治愈泉对已死棋子的处理。
+
+**5. 充能台不走函数**
+
+充能点没有"被格挡"的概念，也没有相关触发器，因此充能台直接操作 `playerMeta.chargePoints`，并手动写入日志，行为与原来一致。
+
+**6. 只对当前玩家的棋子生效**
+
+每个玩家的回合开始时，只处理该玩家拥有的棋子，红蓝双方的地形效果在各自回合分别结算，保证对称公平。
+
+### 如何新增一种地形效果
+
+以新增"毒雾格"（每回合对站在上面的**敌方**棋子施加中毒状态）为例：
+
+**第一步**：在 `lib/game/map.ts` 的 `TileType` 里添加新类型：
+```typescript
+export type TileType = "floor" | "wall" | "spawn" | "cover" | "hole"
+  | "lava" | "spring" | "chargepad"
+  | "poison"   // ← 新增
+```
+
+**第二步**：在 `TileProperties` 里添加属性（如有需要）：
+```typescript
+poisonStacks?: number  // 每回合施加的中毒层数
+```
+
+**第三步**：在 `lib/game/map.ts` 的 `createMapFromAscii` 中将新属性复制到 tile：
+```typescript
+props: {
+  // …已有字段…
+  poisonStacks: def.poisonStacks,  // ← 新增
+}
+```
+
+**第四步**：在 `lib/game/turn.ts` 的地形效果循环中添加处理逻辑：
+```typescript
+if (tile.props.poisonStacks && tile.props.poisonStacks > 0 && piece.currentHp > 0) {
+  // 调用状态系统施加中毒
+  // …
+}
+```
+
+**第五步**：在 `components/game-board.tsx` 的 `tileColor()` 和 `tileTypes` 图例数组中添加颜色与说明：
+```typescript
+case "poison": return "bg-green-900"
+// 图例：{ type: "poison", name: "毒雾(-HP/叠层)", color: "bg-green-900" }
+```
+
+**第六步**：在地图 JSON 的 `legend` 中定义字符：
+```json
+{
+  "char": "P",
+  "type": "poison",
+  "walkable": true,
+  "bulletPassable": true,
+  "poisonStacks": 1
+}
+```
+
+---
+
+## 格子属性（TileProperties）完整参考
+
+```json
+{
+  "char": "X",
+  "type": "floor",
+  "walkable": true,
+  "bulletPassable": true,
+  "damagePerTurn": 0,
+  "healPerTurn": 0,
+  "chargePerTurn": 0,
+  "height": 0
+}
+```
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `walkable` | boolean | 棋子能否移动到该格子 |
+| `bulletPassable` | boolean | 投射物/远程攻击能否穿过 |
+| `damagePerTurn` | number? | 每回合真实伤害值（`lava` 专用） |
+| `healPerTurn` | number? | 每回合回复HP值（`spring` 专用） |
+| `chargePerTurn` | number? | 每回合提供充能点（`chargepad` 专用） |
+| `height` | number? | 高度信息，预留字段，暂无运行时效果 |
+
+未填写的可选属性可以省略，系统默认为 `undefined`（等同于 0 或不触发）。
+
+---
+
+## 地图尺寸建议
+
+| 规模 | 宽 × 高 | 适用场景 |
+|------|---------|---------|
+| 小型 | 8×6 | 快节奏对决，快速测试 |
+| 中型 | 12×9 | 标准对战，有走位空间 |
+| 大型 | 20×16 | 多棋子战役，复杂战术 |
+
+地图四周应以 `wall` 格子包围，防止棋子越界。内部可行走区域（除去外墙）即为实际战斗空间。
+
+---
+
+## 设计原则
+
+### 1. 对称性
+建议地图关于中轴线对称（水平或垂直），确保红蓝双方起始条件公平。
+
+```
+############
+#S..C..C..S#   ← 红方出生（左上）与蓝方出生（右上）对称
+#.E......E.#
+#.LL....LL.#
+#.#.HHHH.#.#   ← 中线对称的治愈泉
+#.LL....LL.#
+#.E......E.#
+#S..C..C..S#
+############
+```
+
+### 2. 走廊与开阔地配合
+避免全部开阔或全部狭窄。走廊（宽度1-2格）制造关键节点，开阔地（3格以上）适合范围技能。
+
+### 3. 特殊格子的密度控制
+- **熔岩**：不要超过地图可行走面积的 20%，否则伤害压力过大
+- **治愈泉**：建议放在地图中部作为争夺目标，数量 2-4 格为宜
+- **充能台**：建议放在侧翼，数量 2-4 格，过多会导致充能技能过于频繁
+
+### 4. 出生点位置
+出生点（`spawn`）仅作标记，实际摆放棋子时仍需手动指定坐标。建议在地图两端各设置 2 个，方便玩家快速定位初始位置。
+
+---
+
+## 示例：熔岩神殿（内置地图）
+
+文件：`data/maps/medium-lava-temple.json`
+
+```
+############
+#S..C..C..S#
+#.E......E.#
+#.LL....LL.#
+#.#.HHHH.#.#
+#.LL....LL.#
+#.E......E.#
+#S..C..C..S#
+############
+```
+
+**地图解读**：
+
+- **出生点**（`S`，四角）：红方默认占上排，蓝方占下排
+- **掩体**（`C`）：出生点附近各一块，提供开局保护
+- **充能台**（`E`，橙色）：两侧各两格，鼓励前压换取充能优势
+- **熔岩**（`L`，橙红）：中央两条熔岩带横跨地图，穿越需付出 HP 代价
+- **治愈泉**（`H`，青绿）：四格连续，位于地图正中，被墙壁隔开形成隘口
+- **内墙**（`#`，中行两侧）：进入治愈泉区域只有两个窄道，形成关键争夺点
+
+**战术要点**：
+1. 侧翼充能台→积累CP→打出充能技能爆发
+2. 强行穿熔岩推进→快速接敌但失血
+3. 抢占治愈泉→持续回血→拖垮对手
+
+---
+
+## 新建地图的步骤
+
+1. 在 `data/maps/` 目录下新建 `your-map-id.json`
+2. 填写 `id`（建议与文件名相同）、`name`、`layout`、`legend`
+3. `layout` 中每行字符数必须完全一致
+4. `legend` 中为 `layout` 用到的每个字符写好属性
+5. 保存后**重启开发服务器**（或触发热重载），地图会自动出现在"切换地图"列表中
+6. 在训练营中选择该地图进行测试
 
 ---
 

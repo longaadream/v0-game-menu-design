@@ -1,0 +1,16 @@
+{
+  "id": "shadow-step",
+  "name": "暗影步",
+  "description": "选择地图上一个未被遮挡的格子，在下个回合开始的时候传送",
+  "icon": "👤",
+  "kind": "active",
+  "type": "normal",
+  "cooldownTurns": 2,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "actionPointCost": 3,
+  "range": "single",
+  "requiresTarget": true,
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetPosition = selectTarget({ type: 'grid', range: 10, filter: 'all' }); if (!targetPosition || targetPosition.needsTargetSelection) { return targetPosition; } const tile = battle.map.tiles.find(t => t.x === targetPosition.x && t.y === targetPosition.y); if (!tile || !tile.props.walkable) { return { message: '目标位置不可行走', success: false }; } const pieceAtPos = battle.pieces.find(p => p.x === targetPosition.x && p.y === targetPosition.y && p.currentHp > 0); if (pieceAtPos) { return { message: '目标位置已被占用', success: false }; } if (!sourcePiece.statusTags) { sourcePiece.statusTags = []; } const existingShadowStep = sourcePiece.statusTags.find(tag => tag.type === 'shadow-step'); if (existingShadowStep) { const oldX = existingShadowStep.value; const oldY = existingShadowStep.intensity; const oldTile = battle.map.tiles.find(t => t.x === oldX && t.y === oldY); if (oldTile) { oldTile.props.walkable = true; oldTile.props.shadowStepTarget = false; } existingShadowStep.value = targetPosition.x; existingShadowStep.intensity = targetPosition.y; existingShadowStep.remainingDuration = 1; } else { sourcePiece.statusTags.push({ id: 'shadow-step-' + Date.now(), type: 'shadow-step', name: '暗影步', remainingDuration: 1, value: targetPosition.x, intensity: targetPosition.y, relatedRules: ['rule-shadow-step'] }); } tile.props.walkable = false; tile.props.shadowStepTarget = true; if (!sourcePiece.rules) { sourcePiece.rules = []; } const hasRule = sourcePiece.rules.some(r => r.id === 'rule-shadow-step'); if (!hasRule) { addRuleById(sourcePiece.instanceId, 'rule-shadow-step'); } return { message: sourcePiece.name + '标记了暗影步位置，将在下回合开始时传送到(' + targetPosition.x + ',' + targetPosition.y + ')', success: true }; }",
+  "previewCode": "function calculatePreview(piece, skillDef) { return { description: '选择地图上一个未被遮挡的格子，在下个回合开始时自动传送', expectedValues: {} }; }"
+}

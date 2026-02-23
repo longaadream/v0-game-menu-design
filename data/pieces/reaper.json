@@ -1,0 +1,38 @@
+{
+  "id": "reaper",
+  "name": "死神",
+  "faction": "red",
+  "description": "高机动性的刺客，擅长近距离爆发伤害和自我恢复",
+  "rarity": "epic",
+  "image": "reaper.jpg",
+  "stats": {
+    "maxHp": 11,
+    "attack": 4,
+    "defense": 0,
+    "moveRange": 4
+  },
+  "skills": [
+    {
+      "skillId": "basic-attack",
+      "level": 1
+    },
+    {
+      "skillId": "hellfire-shotgun",
+      "level": 1
+    },
+    {
+      "skillId": "shadow-step",
+      "level": 1
+    },
+    {
+      "skillId": "death-blossom",
+      "level": 1
+    },
+    {
+      "skillId": "reap",
+      "level": 1
+    }
+  ],
+  "rules": ["rule-reap"],
+  "isDefault": false
+}

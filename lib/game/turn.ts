@@ -1,6 +1,7 @@
 import type { BoardMap } from "./map"
 import type { PieceInstance, PieceStats } from "./piece"
 import type { SkillDefinition } from "./skills"
+import { dealDamage, healDamage } from "./skills"
 import { globalTriggerSystem } from "./triggers"
 import { statusEffectSystem, StatusEffectType } from "./status-effects"
 
@@ -275,58 +276,6 @@ export function applyBattleAction(
           }
         })
 
-        // 处理当前玩家棋子的状态效果持续时间
-        next.pieces.forEach(piece => {
-          // 只处理当前玩家棋子的状态效果
-          if (piece.ownerPlayerId === next.turn.currentPlayerId && piece.statusTags) {
-            // 遍历所有状态标签
-            for (let i = piece.statusTags.length - 1; i >= 0; i--) {
-              const statusTag = piece.statusTags[i];
-              // 检查状态标签是否有currentDuration属性且大于0
-              if (statusTag.currentDuration !== undefined && statusTag.currentDuration > 0) {
-                // 减少持续时间
-                statusTag.currentDuration--;
-                console.log(`Reduced duration for status ${statusTag.type} on piece ${piece.instanceId}: ${statusTag.currentDuration} turns remaining`);
-                
-                // 如果持续时间为0，清除状态标签
-                if (statusTag.currentDuration === 0) {
-                  console.log(`Status ${statusTag.type} expired on piece ${piece.instanceId}, removing status tag`);
-                  
-                  // 检查并清理相关规则
-                  if (statusTag.relatedRules && statusTag.relatedRules.length > 0) {
-                    statusTag.relatedRules.forEach(ruleId => {
-                      // 检查是否有其他状态标签关联此规则
-                      let hasOtherRelatedStatus = false;
-                      
-                      piece.statusTags.forEach(otherStatusTag => {
-                        if (otherStatusTag !== statusTag && 
-                            otherStatusTag.relatedRules && 
-                            otherStatusTag.relatedRules.includes(ruleId)) {
-                          hasOtherRelatedStatus = true;
-                        }
-                      });
-                      
-                      // 如果没有其他状态标签关联此规则，移除规则
-                      if (!hasOtherRelatedStatus && piece.rules) {
-                        const ruleIndex = piece.rules.findIndex(rule => rule.id === ruleId);
-                        if (ruleIndex !== -1) {
-                          console.log(`Removing rule ${ruleId} because no other status tags are related to it`);
-                          piece.rules.splice(ruleIndex, 1);
-                        }
-                      }
-                    });
-                  }
-                  
-                  // 从状态标签数组中移除
-                  piece.statusTags.splice(i, 1);
-                }
-              }
-            }
-            
-            // 规则清理逻辑已移至状态效果移除时处理
-          }
-        })
-
         // 更新所有状态效果
         statusEffectSystem.setBattleState(next);
         statusEffectSystem.updateStatusEffects()
@@ -353,6 +302,46 @@ export function applyBattleAction(
               }
             });
           });
+        }
+
+        // ── 特殊地形效果（每回合开始时，对当前玩家的棋子生效）────────────────
+        // 快照避免熔岩致死后影响当前遍历
+        const tileEffectPieces = next.pieces.filter(
+          (p) => p.ownerPlayerId === next.turn.currentPlayerId && p.currentHp > 0,
+        )
+        for (const piece of tileEffectPieces) {
+          if (piece.x == null || piece.y == null) continue
+          const tile = next.map.tiles.find((t) => t.x === piece.x && t.y === piece.y)
+          if (!tile) continue
+
+          // 熔岩伤害：调用 dealDamage（true 伤害），完整联动触发器和护盾等效果
+          if (tile.props.damagePerTurn && tile.props.damagePerTurn > 0) {
+            dealDamage(piece, piece, tile.props.damagePerTurn, "true", next, "lava-terrain")
+          }
+
+          // 治愈泉回复：调用 healDamage，完整联动触发器和反治疗等效果
+          // 伤害结算后再检查存活，避免对已死棋子治疗
+          if (tile.props.healPerTurn && tile.props.healPerTurn > 0 && piece.currentHp > 0) {
+            healDamage(piece, piece, tile.props.healPerTurn, next, "spring-terrain")
+          }
+
+          // 充能台：直接给玩家加充能点（无护盾/触发器概念，简单累加）
+          if (tile.props.chargePerTurn && tile.props.chargePerTurn > 0 && piece.currentHp > 0) {
+            const playerMeta = next.players.find((p) => p.playerId === piece.ownerPlayerId)
+            if (playerMeta) {
+              playerMeta.chargePoints += tile.props.chargePerTurn
+              if (!next.actions) next.actions = []
+              next.actions.push({
+                type: "tileEffect",
+                playerId: piece.ownerPlayerId,
+                turn: next.turn.turnNumber,
+                payload: {
+                  message: `${piece.name || piece.templateId} 在充能台上获得了 ${tile.props.chargePerTurn} 充能点`,
+                  pieceId: piece.instanceId,
+                },
+              })
+            }
+          }
         }
 
         next.turn.phase = "action"
@@ -483,7 +472,7 @@ export function applyBattleAction(
         playerId: action.playerId
       });
 
-      // 检查是否有规则阻止了移动
+      // 检查是否有规则触发了效果
       if (beforeMoveResult.success) {
         // 初始化actions数组
         if (!next.actions) {
@@ -499,10 +488,11 @@ export function applyBattleAction(
             }
           });
         });
-        // 检查是否有规则明确阻止了行动
-        if (beforeMoveResult.blocked) {
-          throw new BattleRuleError("行动被规则阻止");
-        }
+      }
+      
+      // 检查是否有规则明确阻止了行动（在添加消息之后检查）
+      if (beforeMoveResult.blocked) {
+        return next; // 返回包含消息的状态，不执行移动
       }
 
       validateMove(next, piece, action.toX, action.toY)
@@ -668,10 +658,11 @@ export function applyBattleAction(
             }
           });
         });
-        // 检查是否有规则明确阻止了行动
-        if (beforeSkillUseResult.blocked) {
-          throw new BattleRuleError("行动被规则阻止");
-        }
+      }
+      
+      // 检查是否有规则明确阻止了行动（在添加消息之后检查）
+      if (beforeSkillUseResult.blocked) {
+        return next; // 返回包含消息的状态，不执行技能
       }
 
       // 执行技能
@@ -712,6 +703,7 @@ export function applyBattleAction(
         piece: {
           instanceId: piece.instanceId,
           templateId: piece.templateId,
+          name: piece.name,
           ownerPlayerId: piece.ownerPlayerId,
           currentHp: piece.currentHp,
           maxHp: piece.maxHp,
@@ -965,10 +957,11 @@ export function applyBattleAction(
             }
           });
         });
-        // 检查是否有规则明确阻止了行动
-        if (beforeSkillUseResult.blocked) {
-          throw new BattleRuleError("行动被规则阻止");
-        }
+      }
+      
+      // 检查是否有规则明确阻止了行动（在添加消息之后检查）
+      if (beforeSkillUseResult.blocked) {
+        return next; // 返回包含消息的状态，不执行技能
       }
 
       const cost = skillDef.chargeCost ?? 0
@@ -1019,6 +1012,7 @@ export function applyBattleAction(
         piece: {
           instanceId: piece.instanceId,
           templateId: piece.templateId,
+          name: piece.name,
           ownerPlayerId: piece.ownerPlayerId,
           currentHp: piece.currentHp,
           maxHp: piece.maxHp,
@@ -1233,6 +1227,56 @@ export function applyBattleAction(
           });
         });
       }
+
+      // 在回合结束阶段的最后时刻，处理当前玩家棋子的状态效果持续时间扣除和规则移除
+      next.pieces.forEach(piece => {
+        // 只处理当前玩家棋子的状态效果
+        if (piece.ownerPlayerId === action.playerId && piece.statusTags) {
+          // 遍历所有状态标签
+          for (let i = piece.statusTags.length - 1; i >= 0; i--) {
+            const statusTag = piece.statusTags[i];
+            // 检查状态标签是否有currentDuration属性且大于0
+            if (statusTag.currentDuration !== undefined && statusTag.currentDuration > 0) {
+              // 减少持续时间
+              statusTag.currentDuration--;
+              console.log(`Reduced duration for status ${statusTag.type} on piece ${piece.instanceId}: ${statusTag.currentDuration} turns remaining`);
+              
+              // 如果持续时间为0，清除状态标签
+              if (statusTag.currentDuration === 0) {
+                console.log(`Status ${statusTag.type} expired on piece ${piece.instanceId}, removing status tag`);
+                
+                // 检查并清理相关规则
+                if (statusTag.relatedRules && statusTag.relatedRules.length > 0) {
+                  statusTag.relatedRules.forEach(ruleId => {
+                    // 检查是否有其他状态标签关联此规则
+                    let hasOtherRelatedStatus = false;
+                    
+                    piece.statusTags.forEach(otherStatusTag => {
+                      if (otherStatusTag !== statusTag && 
+                          otherStatusTag.relatedRules && 
+                          otherStatusTag.relatedRules.includes(ruleId)) {
+                        hasOtherRelatedStatus = true;
+                      }
+                    });
+                    
+                    // 如果没有其他状态标签关联此规则，移除规则
+                    if (!hasOtherRelatedStatus && piece.rules) {
+                      const ruleIndex = piece.rules.findIndex(rule => rule.id === ruleId);
+                      if (ruleIndex !== -1) {
+                        console.log(`Removing rule ${ruleId} because no other status tags are related to it`);
+                        piece.rules.splice(ruleIndex, 1);
+                      }
+                    }
+                  });
+                }
+                
+                // 从状态标签数组中移除
+                piece.statusTags.splice(i, 1);
+              }
+            }
+          }
+        }
+      });
 
       next.turn.phase = "end"
       return next

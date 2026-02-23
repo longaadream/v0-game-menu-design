@@ -1,0 +1,15 @@
+{
+  "id": "shadow-step-teleport",
+  "name": "暗影步传送",
+  "description": "回合开始时传送到预设位置",
+  "icon": "👤",
+  "kind": "passive",
+  "type": "normal",
+  "cooldownTurns": 0,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "actionPointCost": 0,
+  "range": "self",
+  "requiresTarget": false,
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; if (!sourcePiece.statusTags) { return { message: '', success: true }; } const shadowStepStatus = sourcePiece.statusTags.find(tag => tag.type === 'shadow-step'); if (!shadowStepStatus || shadowStepStatus.remainingDuration <= 0) { return { message: '', success: true }; } const targetX = shadowStepStatus.value; const targetY = shadowStepStatus.intensity; const targetTile = battle.map.tiles.find(t => t.x === targetX && t.y === targetY); const pieceAtPos = battle.pieces.find(p => p.x === targetX && p.y === targetY && p.currentHp > 0); if (pieceAtPos) { targetTile.props.walkable = true; targetTile.props.shadowStepTarget = false; const index = sourcePiece.statusTags.findIndex(tag => tag.type === 'shadow-step'); if (index !== -1) { sourcePiece.statusTags.splice(index, 1); } return { message: sourcePiece.name + '的暗影步目标位置已被占用', success: true }; } if (!targetTile) { const index = sourcePiece.statusTags.findIndex(tag => tag.type === 'shadow-step'); if (index !== -1) { sourcePiece.statusTags.splice(index, 1); } return { message: sourcePiece.name + '的暗影步目标位置已不存在', success: true }; } targetTile.props.walkable = true; targetTile.props.shadowStepTarget = false; sourcePiece.x = targetX; sourcePiece.y = targetY; shadowStepStatus.remainingDuration = 0; const index = sourcePiece.statusTags.findIndex(tag => tag.type === 'shadow-step'); if (index !== -1) { sourcePiece.statusTags.splice(index, 1); } return { message: sourcePiece.name + '通过暗影步传送到了(' + targetX + ',' + targetY + ')', success: true }; }"
+}

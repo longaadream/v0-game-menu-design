@@ -1,0 +1,18 @@
+{
+  "id": "death-blossom",
+  "name": "死亡绽放",
+  "description": "对三格内所有的敌人造成200%攻击力的伤害",
+  "icon": "🌸",
+  "kind": "active",
+  "type": "normal",
+  "form": "projectile",
+  "cooldownTurns": 3,
+  "maxCharges": 0,
+  "powerMultiplier": 2.0,
+  "actionPointCost": 3,
+  "range": "area",
+  "areaSize": 3,
+  "requiresTarget": false,
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const damageValue = Math.round(sourcePiece.attack * context.skill.powerMultiplier); const enemiesInRange = getAllEnemiesInRange(3); if (enemiesInRange.length === 0) { return { message: '范围内没有敌人', success: false }; } let totalDamage = 0; let killedCount = 0; let hitMessages = []; for (const enemy of enemiesInRange) { const dx = enemy.x - sourcePiece.x; const dy = enemy.y - sourcePiece.y; const stepX = dx === 0 ? 0 : dx > 0 ? 1 : -1; const stepY = dy === 0 ? 0 : dy > 0 ? 1 : -1; let currentX = sourcePiece.x + stepX; let currentY = sourcePiece.y + stepY; let blocked = false; while (currentX !== enemy.x || currentY !== enemy.y) { const tile = battle.map.tiles.find(t => t.x === currentX && t.y === currentY); if (!tile || tile.props.bullet === false) { blocked = true; break; } const pieceInPath = battle.pieces.find(p => p.x === currentX && p.y === currentY && p.currentHp > 0 && p.instanceId !== enemy.instanceId); if (pieceInPath) { blocked = true; break; } currentX += stepX; currentY += stepY; } if (blocked) { continue; } const enemyPiece = battle.pieces.find(p => p.instanceId === enemy.instanceId); if (enemyPiece) { const damageResult = dealDamage(sourcePiece, enemyPiece, damageValue, 'physical', battle, context.skill.id); totalDamage += damageResult.damage; if (damageResult.isKilled) { killedCount++; } hitMessages.push(enemyPiece.name + '受到' + damageResult.damage + '点伤害'); } } if (hitMessages.length === 0) { return { message: '所有敌人都被障碍物或棋子遮挡', success: false }; } let message = sourcePiece.name + '释放死亡绽放，'; message += hitMessages.join('，'); if (killedCount > 0) { message += '，击杀了' + killedCount + '个敌人'; } return { message: message, success: true }; }",
+  "previewCode": "function calculatePreview(piece, skillDef) { const damageValue = Math.round(piece.attack * skillDef.powerMultiplier); return { description: '对3格内所有未被遮挡的敌人造成' + damageValue + '点伤害（相当于攻击力200%）', expectedValues: { damage: damageValue } }; }"
+}

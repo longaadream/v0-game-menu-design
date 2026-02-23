@@ -1,0 +1,17 @@
+{
+  "id": "hellfire-shotgun",
+  "name": "地狱火霰弹枪",
+  "description": "选择一个格子，对相对方向发出一次攻击，对路径上第一个目标造成攻击力+(5-x)点伤害（x为距离）",
+  "icon": "🔫",
+  "kind": "active",
+  "type": "normal",
+  "form": "projectile",
+  "cooldownTurns": 1,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "actionPointCost": 1,
+  "range": "single",
+  "requiresTarget": true,
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const targetPosition = selectTarget({ type: 'grid', range: 5, filter: 'all' }); if (!targetPosition || targetPosition.needsTargetSelection) { return targetPosition; } const dx = targetPosition.x - sourcePiece.x; const dy = targetPosition.y - sourcePiece.y; if (dx !== 0 && dy !== 0) { return { message: '必须选择同行或同列的格子', success: false }; } let dirX = 0, dirY = 0; if (Math.abs(dx) > Math.abs(dy)) { dirX = dx > 0 ? 1 : -1; } else { dirY = dy > 0 ? 1 : -1; } let currentX = sourcePiece.x + dirX; let currentY = sourcePiece.y + dirY; let distance = 1; let hitPiece = null; while (currentX >= 0 && currentX < battle.map.width && currentY >= 0 && currentY < battle.map.height) { const tile = battle.map.tiles.find(t => t.x === currentX && t.y === currentY); if (!tile || tile.props.bullet === false) { return { message: '攻击被障碍物阻挡', success: false }; } const pieceAtPos = battle.pieces.find(p => p.x === currentX && p.y === currentY && p.currentHp > 0); if (pieceAtPos) { hitPiece = pieceAtPos; break; } currentX += dirX; currentY += dirY; distance++; if (distance > 5) break; } if (!hitPiece) { return { message: '路径上没有目标', success: false }; } const damageValue = sourcePiece.attack + (5 - distance); const damageResult = dealDamage(sourcePiece, hitPiece, damageValue, 'physical', battle, context.skill.id); return { message: sourcePiece.name + '使用地狱火霰弹枪对' + hitPiece.name + '造成' + damageResult.damage + '点伤害（距离' + distance + '格）', success: true }; }",
+  "previewCode": "function calculatePreview(piece, skillDef) { return { description: '选择方向发射攻击，对路径上第一个目标造成攻击力+(5-距离)点伤害，距离越近伤害越高', expectedValues: { damage: piece.attack + 4 } }; }"
+}
