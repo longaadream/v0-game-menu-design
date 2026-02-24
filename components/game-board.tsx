@@ -20,6 +20,23 @@ type GameBoardProps = {
   teleportRange?: number
 }
 
+// 暴风雪状态类型
+interface BlizzardStatus {
+  type: 'blizzard'
+  value: number  // 中心X坐标
+  extraValue: number  // 中心Y坐标
+}
+
+// 检查棋子是否有暴风雪状态
+function getBlizzardCenter(piece: PieceInstance): { x: number, y: number } | null {
+  if (!piece.statusTags) return null
+  const blizzardStatus = piece.statusTags.find((tag: any) => tag.type === 'blizzard') as BlizzardStatus | undefined
+  if (blizzardStatus && blizzardStatus.value !== undefined && blizzardStatus.extraValue !== undefined) {
+    return { x: blizzardStatus.value, y: blizzardStatus.extraValue }
+  }
+  return null
+}
+
 function tileColor(tile: Tile): string {
   // 检查是否是暗影步目标格子
   if (tile.props.shadowStepTarget) {
@@ -68,6 +85,7 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
     { type: "spring", name: "治愈泉(+HP)", color: "bg-teal-700" },
     { type: "chargepad", name: "充能台(+CP)", color: "bg-violet-700" },
     { type: "shadow-step", name: "暗影步", color: "bg-purple-600" },
+    { type: "blizzard", name: "暴风雪", color: "bg-blue-400/50" },
   ]
 
   // 获取选中的棋子
@@ -182,10 +200,35 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
     return false
   }
 
+  // 获取所有暴风雪区域
+  const getBlizzardAreas = (): { x: number, y: number }[] => {
+    const areas: { x: number, y: number }[] = []
+    pieces.forEach(piece => {
+      const center = getBlizzardCenter(piece)
+      if (center) {
+        // 3x3 区域
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            const x = center.x + dx
+            const y = center.y + dy
+            if (x >= 0 && x < map.width && y >= 0 && y < map.height) {
+              areas.push({ x, y })
+            }
+          }
+        }
+      }
+    })
+    return areas
+  }
+
   // 获取格子的额外类名
   const getTileClassName = (tile: typeof map.tiles[0]) => {
     const baseClass = tileColor(tile)
-    
+
+    // 检查是否是暴风雪区域
+    const blizzardAreas = getBlizzardAreas()
+    const isBlizzardTile = blizzardAreas.some(t => t.x === tile.x && t.y === tile.y)
+
     // 检查是否是可移动目标
     if (isSelectingMoveTarget) {
       const validTargets = getValidMoveTargets()
@@ -193,7 +236,7 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
         return `${baseClass} cursor-pointer hover:bg-green-500/30`
       }
     }
-    
+
     // 检查是否是可传送目标
     if (isSelectingTeleportTarget) {
       const validTargets = getValidTeleportTargets()
@@ -201,7 +244,7 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
         return `${baseClass} cursor-pointer hover:bg-purple-500/30`
       }
     }
-    
+
     // 检查是否是技能目标选择模式
     if (isSelectingSkillTarget) {
       return `${baseClass} cursor-pointer hover:bg-blue-500/30`
@@ -210,6 +253,11 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
     // 放置棋子模式
     if (isPlacingPiece) {
       return `${baseClass} cursor-crosshair hover:bg-yellow-500/30`
+    }
+
+    // 如果是暴风雪区域，添加半透明蓝色背景
+    if (isBlizzardTile) {
+      return `${baseClass} bg-blue-400/50 border border-blue-300/50`
     }
 
     return baseClass

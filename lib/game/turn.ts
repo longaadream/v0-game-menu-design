@@ -1,9 +1,33 @@
+// 从 battle-types 导入类型（避免客户端导入时加载服务器端代码）
+import type {
+  TurnPhase,
+  PlayerId,
+  PlayerTurnMeta,
+  PerTurnActionFlags,
+  TurnState,
+  BattleActionLog,
+  BattleState,
+  BattleAction,
+  BattleRuleError as BattleRuleErrorType
+} from "./battle-types"
+
+// 重新导出类型，保持向后兼容
+export type {
+  TurnPhase,
+  PlayerId,
+  PlayerTurnMeta,
+  PerTurnActionFlags,
+  TurnState,
+  BattleActionLog,
+  BattleState,
+  BattleAction
+}
+
 import type { BoardMap } from "./map"
 import type { PieceInstance, PieceStats } from "./piece"
 import type { SkillDefinition } from "./skills"
 import { dealDamage, healDamage, loadRuleById } from "./skills"
 import { globalTriggerSystem } from "./triggers"
-import { statusEffectSystem, StatusEffectType } from "./status-effects"
 import { getSkillById } from "./skill-repository"
 
 // ─── 辅助函数：恢复棋子规则的 effect 函数（用于 API 传输后重新加载）────────────────
@@ -59,30 +83,9 @@ function restorePieceRules(state: BattleState): void {
           })
         }
 
-        // 3. 根据状态类型自动添加对应的规则（如果没有 relatedRules）
-        const statusToRuleMap: Record<string, string> = {
-          'hardy-block': 'rule-hardy-block',
-          'divine-shield': 'rule-divine-shield',
-          'freeze': 'rule-freeze-prevent-move',
-          'sleep': 'rule-sleep-prevent-skill',
-          'bleeding': 'rule-bleeding-tick',
-        }
-
-        const expectedRuleId = statusToRuleMap[statusTag.type]
-        if (expectedRuleId) {
-          const existingRule = piece.rules!.find((r: any) => r.id === expectedRuleId)
-          if (!existingRule) {
-            try {
-              const reloadedRule = loadRuleById(expectedRuleId)
-              if (reloadedRule && typeof reloadedRule.effect === 'function') {
-                piece.rules!.push(reloadedRule)
-                console.log(`[RestoreRules] Added rule ${expectedRuleId} for status: ${statusTag.type}`)
-              }
-            } catch (error) {
-              console.error(`[RestoreRules] Error adding rule ${expectedRuleId}:`, error)
-            }
-          }
-        }
+        // 注意：规则应该通过 statusTag.relatedRules 来关联
+        // 不要在这里硬编码状态到规则的映射
+        // 每个技能在添加状态时应该自行设置 relatedRules
       })
     }
   })
@@ -375,10 +378,6 @@ export function applyBattleAction(
           }
         })
 
-        // 更新所有状态效果
-        statusEffectSystem.setBattleState(next);
-        statusEffectSystem.updateStatusEffects()
-
         // 触发whenever规则（每一步行动后检测）
         const wheneverResult = globalTriggerSystem.checkTriggers(next, {
           type: "whenever",
@@ -533,10 +532,6 @@ export function applyBattleAction(
           }
         })
 
-        // 更新所有状态效果
-        statusEffectSystem.setBattleState(next);
-        statusEffectSystem.updateStatusEffects()
-        
         // 触发whenever规则（每一步行动后检测）
         const wheneverResult = globalTriggerSystem.checkTriggers(next, {
           type: "whenever",
@@ -1363,6 +1358,8 @@ export function applyBattleAction(
       const next = safeCloneBattleState(state)
       // 获取当前玩家的所有棋子
       const currentPlayerPieces = next.pieces.filter(p => p.ownerPlayerId === action.playerId && p.currentHp > 0);
+      // 获取对方玩家的所有棋子（用于触发如暴风雪等对方回合结束时触发的规则）
+      const opponentPlayerPieces = next.pieces.filter(p => p.ownerPlayerId !== action.playerId && p.currentHp > 0);
       
       // 触发回合结束效果，为每个存活的棋子都触发一次
       currentPlayerPieces.forEach(piece => {
@@ -1388,6 +1385,38 @@ export function applyBattleAction(
               }
             });
           });
+        }
+      });
+
+      // 触发对方玩家棋子的回合结束规则（如暴风雪等）
+      // 暴风雪技能检查 context.playerId !== sourcePiece.ownerPlayerId
+      // 所以这里传递当前结束回合的玩家ID（对方玩家的ID）
+      opponentPlayerPieces.forEach(piece => {
+        // 检查棋子是否有 endTurn 类型的规则
+        if (piece.rules && piece.rules.some((rule: any) => rule.trigger && rule.trigger.type === "endTurn")) {
+          const endTurnResult = globalTriggerSystem.checkTriggers(next, {
+            type: "endTurn",
+            sourcePiece: piece,
+            turnNumber: next.turn.turnNumber,
+            playerId: action.playerId  // 使用当前结束回合的玩家ID
+          });
+
+          // 处理触发效果的消息
+          if (endTurnResult.success && endTurnResult.messages.length > 0) {
+            if (!next.actions) {
+              next.actions = [];
+            }
+            endTurnResult.messages.forEach(message => {
+              next.actions!.push({
+                type: "triggerEffect",
+                playerId: piece.ownerPlayerId,
+                turn: next.turn.turnNumber,
+                payload: {
+                  message
+                }
+              });
+            });
+          }
         }
       });
 

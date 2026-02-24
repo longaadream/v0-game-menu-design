@@ -1,7 +1,6 @@
 import type { BattleState } from "./turn"
 import type { PieceInstance } from "./piece"
 import { globalTriggerSystem } from "./triggers"
-import { statusEffectSystem, StatusEffect } from "./status-effects"
 
 // 效果函数类型
 type EffectFunction = (battle: BattleState, context: any) => { success: boolean; message?: string; blocked?: boolean }
@@ -97,7 +96,9 @@ export function loadRuleById(ruleId: string): TriggerRule | null {
                       type: skillDef.type,
                       powerMultiplier: skillDef.powerMultiplier
                     },
-                    damage: context.damage
+                    damage: context.damage,
+                    playerId: context.playerId,
+                    type: context.type
                   };
                   
                   // 构建技能执行环境
@@ -127,10 +128,6 @@ export function loadRuleById(ruleId: string): TriggerRule | null {
                     healDamage: (healer, target, heal, battleState, skillId) => {
                       // 直接调用全局的healDamage函数，确保使用正确的实现
                       return globalHealDamage(healer, target, heal, battle, skillId);
-                    },
-                    statusEffectSystem: statusEffectSystem,
-                    addStatusEffect: (targetPiece, statusEffect) => {
-                      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, statusEffect);
                     },
                     addStatusEffectById: (targetPieceId, statusObject) => {
                       const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
@@ -243,8 +240,6 @@ export function loadRuleById(ruleId: string): TriggerRule | null {
                       const select = environment.select;
                       const selectTarget = environment.selectTarget;
                       const teleport = environment.teleport;
-                      const statusEffectSystem = environment.statusEffectSystem;
-                      const addStatusEffect = environment.addStatusEffect;
                       const addStatusEffectById = environment.addStatusEffectById;
                       const getAllEnemiesInRange = environment.getAllEnemiesInRange;
                       const getAllAlliesInRange = environment.getAllAlliesInRange;
@@ -1330,12 +1325,8 @@ export function executeSkillFunction(skillDef: SkillDefinition, context: SkillEx
     teleport: effects.teleport,
     dealDamage: effects.dealDamage,
     healDamage: effects.healDamage,
-    
+
     // 状态效果函数
-    statusEffectSystem: statusEffectSystem,
-    addStatusEffect: (targetPiece: PieceInstance, statusEffect: StatusEffect) => {
-      return statusEffectSystem.addStatusEffect(targetPiece.instanceId, statusEffect);
-    },
     addStatusEffectById: (targetPieceId: string, statusObject: any) => {
       // 找到目标棋子
       const targetPiece = battle.pieces.find(p => p.instanceId === targetPieceId);
@@ -1368,7 +1359,9 @@ export function executeSkillFunction(skillDef: SkillDefinition, context: SkillEx
           intensity: statusObject.intensity,
           stacks: statusObject.stacks,
           value: statusObject.value, // 添加数值属性值
-          relatedRules: [] // 添加关联规则数组
+          extraValue: statusObject.extraValue, // 添加额外数值属性（如暴风雪的Y坐标）
+          damage: statusObject.damage, // 添加伤害值（如暴风雪的伤害）
+          relatedRules: statusObject.relatedRules || [] // 使用传入的关联规则数组，如果没有则默认为空数组
         };
 
         // 添加到状态标签数组
@@ -1526,10 +1519,6 @@ export function executeSkillFunction(skillDef: SkillDefinition, context: SkillEx
       }
       return false;
     },
-    // 状态效果添加函数已移除，现在使用addStatusEffectById函数添加状态效果
-    // 所有状态效果都通过JSON文件定义，不再使用硬编码的预定义状态效果
-    
-    
     // 辅助函数
     getAllEnemiesInRange: (range: number) => getAllEnemiesInRange(context, range, battle),
     getAllAlliesInRange: (range: number) => getAllAlliesInRange(context, range, battle),
@@ -1562,8 +1551,6 @@ export function executeSkillFunction(skillDef: SkillDefinition, context: SkillEx
               const selectTarget = environment.selectTarget;
               const selectOption = environment.selectOption;
               const teleport = environment.teleport;
-              const statusEffectSystem = environment.statusEffectSystem;
-              const addStatusEffect = environment.addStatusEffect;
               const addStatusEffectById = environment.addStatusEffectById;
               const getAllEnemiesInRange = environment.getAllEnemiesInRange;
               const getAllAlliesInRange = environment.getAllAlliesInRange;

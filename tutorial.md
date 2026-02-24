@@ -329,9 +329,12 @@ addStatusEffectById(target.instanceId, {
   currentDuration: 3,        // 持续回合数，-1 = 永久
   currentUses: -1,           // 最大触发次数，-1 = 无限
   intensity: 5,              // 状态强度（可在触发时读取）
-  stacks: 1                  // 叠加层数
+  stacks: 1,                 // 叠加层数
+  relatedRules: ['rule-bleeding-tick']  // 关联的规则ID数组（重要：用于API传输后恢复规则）
 })
 ```
+
+> **重要**：如果状态需要配合规则（被动技能）工作，必须在 `relatedRules` 字段中声明关联的规则ID。这样在API传输后，`restorePieceRules` 函数可以根据状态标签自动重新加载规则。
 
 #### `removeStatusEffectById(targetPieceId, statusId)`
 
@@ -897,9 +900,12 @@ addStatusEffectById(targetPieceId, {
   currentDuration: 3,     // 持续回合数（-1 = 永久）
   currentUses: -1,        // 最大触发次数（-1 = 无限次）
   intensity: 5,           // 强度值（可在触发技能中读取：tag.intensity）
-  stacks: 1               // 叠加层数（可在触发技能中读取：tag.stacks）
+  stacks: 1,              // 叠加层数（可在触发技能中读取：tag.stacks）
+  relatedRules: ['rule-bleeding-tick']  // 关联的规则ID数组（重要：用于API传输后恢复规则）
 })
 ```
+
+> **重要规范**：如果状态需要配合规则（被动技能）工作，必须在 `relatedRules` 字段中声明关联的规则ID。这样在API传输后，`restorePieceRules` 函数可以根据状态标签自动重新加载规则，无需硬编码映射。
 
 ### 读取棋子的状态
 
@@ -929,7 +935,7 @@ if (bleedTag) {
   "maxCharges": 0,
   "powerMultiplier": 1,
   "actionPointCost": 1,
-  "code": "function executeSkill(context) { const caster = context.piece; const target = selectTarget({ type: 'piece', range: 4, filter: 'enemy' }); if (!target || target.needsTargetSelection) return target; const dmg = Math.round(caster.attack * context.skill.powerMultiplier); const result = dealDamage(caster, target, dmg, 'physical', context.battle, context.skill.id); if (result.success) { addStatusEffectById(target.instanceId, { id: 'bleeding', type: 'bleeding', currentDuration: 3, currentUses: 3, intensity: 5, stacks: 1 }); addRuleById(target.instanceId, 'rule-bleeding-tick'); } return { success: true, message: caster.name + '划伤了' + target.name + '，造成' + result.damage + '点伤害并使其流血' }; }"
+  "code": "function executeSkill(context) { const caster = context.piece; const target = selectTarget({ type: 'piece', range: 4, filter: 'enemy' }); if (!target || target.needsTargetSelection) return target; const dmg = Math.round(caster.attack * context.skill.powerMultiplier); const result = dealDamage(caster, target, dmg, 'physical', context.battle, context.skill.id); if (result.success) { addStatusEffectById(target.instanceId, { id: 'bleeding', type: 'bleeding', currentDuration: 3, currentUses: 3, intensity: 5, stacks: 1, relatedRules: ['rule-bleeding-tick'] }); addRuleById(target.instanceId, 'rule-bleeding-tick'); } return { success: true, message: caster.name + '划伤了' + target.name + '，造成' + result.damage + '点伤害并使其流血' }; }"
 }
 ```
 
@@ -962,6 +968,84 @@ if (bleedTag) {
 }
 ```
 
+### 暴风雪完整示例（使用 relatedRules 的最佳实践）
+
+暴风雪是一个复杂的区域控制技能，展示了如何使用 `relatedRules` 来关联状态和规则。
+
+**技能效果**：选择全局任意格子，创造3×3暴风雪区域，对方回合结束时对区域内敌人造成伤害和冰冻。
+
+**文件1：`data/skills/blizzard.json`（主动技能）**
+
+```json
+{
+  "id": "blizzard",
+  "name": "暴风雪",
+  "description": "选择全局任意一个格子，以该格子为中心创造3*3格的暴风雪区域，对方的回合结束时对其中所有敌人造成当前攻击力1.5倍的伤害和1回合冰冻",
+  "icon": "🌪️",
+  "kind": "active",
+  "type": "super",
+  "cooldownTurns": 3,
+  "maxCharges": 3,
+  "chargeCost": 2,
+  "powerMultiplier": 1.5,
+  "actionPointCost": 2,
+  "range": "area",
+  "areaSize": 3,
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const damageValue = sourcePiece.attack * context.skill.powerMultiplier; const targetPosition = selectTarget({ type: 'grid', range: 10, filter: 'all' }); if (!targetPosition || targetPosition.needsTargetSelection) { return targetPosition; } if (typeof addStatusEffectById === 'function') { const statusId = 'blizzard-' + Date.now(); addStatusEffectById(sourcePiece.instanceId, { id: statusId, type: 'blizzard', currentDuration: 2, intensity: 1, value: targetPosition.x, extraValue: targetPosition.y, damage: damageValue, relatedRules: ['rule-blizzard-active'] }); } if (typeof addRuleById === 'function') { addRuleById(sourcePiece.instanceId, 'rule-blizzard-active'); } if (typeof addSkillById === 'function') { addSkillById(sourcePiece.instanceId, 'blizzard-damage'); } return { message: sourcePiece.name + '使用了暴风雪，在(' + targetPosition.x + ',' + targetPosition.y + ')创造了暴风雪区域，将在对方回合结束时对3x3格范围内的敌人造成' + damageValue + '点伤害并使其冰冻', success: true }; }",
+  "previewCode": "function calculatePreview(piece, skillDef) { const damageValue = Math.round(piece.attack * skillDef.powerMultiplier); return { description: '选择全局任意位置，创造3*3格的暴风雪区域，对方回合结束时对其中所有敌人造成' + damageValue + '点伤害（相当于攻击力150%）和1回合冰冻', expectedValues: { damage: damageValue } }; }"
+}
+```
+
+**要点说明**：
+- `currentDuration: 2` - 持续2回合（在对方回合结束时触发后还剩1回合）
+- `value` 和 `extraValue` - 存储暴风雪中心坐标
+- `damage` - 存储计算好的伤害值
+- **`relatedRules: ['rule-blizzard-active']`** - 关键！声明此状态关联的规则，API传输后可自动恢复
+
+**文件2：`data/rules/rule-blizzard-active.json`（触发规则）**
+
+```json
+{
+  "id": "rule-blizzard-active",
+  "name": "暴风雪激活",
+  "description": "在对方回合结束时，触发暴风雪效果对区域内敌人造成伤害和冰冻",
+  "trigger": {
+    "type": "endTurn"
+  },
+  "effect": {
+    "type": "triggerSkill",
+    "skillId": "blizzard-damage",
+    "message": "暴风雪效果触发"
+  }
+}
+```
+
+**文件3：`data/skills/blizzard-damage.json`（被动效果技能）**
+
+```json
+{
+  "id": "blizzard-damage",
+  "name": "暴风雪伤害",
+  "description": "对暴风雪区域内的所有敌人造成伤害和冰冻",
+  "kind": "passive",
+  "type": "normal",
+  "cooldownTurns": 0,
+  "maxCharges": 0,
+  "powerMultiplier": 1,
+  "actionPointCost": 0,
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; if (!sourcePiece.statusTags || sourcePiece.statusTags.length === 0) { return { message: '没有状态标签', success: false }; } const blizzardStatus = sourcePiece.statusTags.find(effect => effect.type === 'blizzard'); if (!blizzardStatus) { return { message: '没有暴风雪状态', success: false }; } const centerX = blizzardStatus.value; const centerY = blizzardStatus.extraValue; const damageValue = blizzardStatus.damage; if (centerX === undefined || centerY === undefined || damageValue === undefined) { return { message: '暴风雪状态数据不完整', success: false }; } if (context.playerId === sourcePiece.ownerPlayerId) { return { message: '暴风雪只在对方回合结束时触发', success: false }; } const radius = 1; let totalDamage = 0; let totalEnemies = 0; let enemyNames = []; const enemiesInArea = context.battle.pieces.filter(piece => { if (piece.ownerPlayerId === sourcePiece.ownerPlayerId) return false; if (piece.currentHp <= 0) return false; const distanceX = Math.abs(piece.x - centerX); const distanceY = Math.abs(piece.y - centerY); return distanceX <= radius && distanceY <= radius; }); enemiesInArea.forEach(enemy => { const damageResult = dealDamage(sourcePiece, enemy, damageValue, 'magical', context.battle, 'blizzard'); if (damageResult.success) { if (typeof addStatusEffectById === 'function') { const statusId = 'freeze-' + Date.now() + '-' + enemy.instanceId; addStatusEffectById(enemy.instanceId, { id: statusId, type: 'freeze', currentDuration: 1, intensity: 1, relatedRules: ['rule-freeze-prevent-move', 'rule-freeze-prevent-skill'] }); } if (typeof addRuleById === 'function') { addRuleById(enemy.instanceId, 'rule-freeze-prevent-move'); addRuleById(enemy.instanceId, 'rule-freeze-prevent-skill'); } if (typeof addSkillById === 'function') { addSkillById(enemy.instanceId, 'freeze-prevent'); } enemy.showFreezeEffect = true; totalDamage += damageResult.damage; totalEnemies++; enemyNames.push(enemy.name); } }); if (!context.battle.effects) { context.battle.effects = []; } for (let x = centerX - radius; x <= centerX + radius; x++) { for (let y = centerY - radius; y <= centerY + radius; y++) { context.battle.effects.push({ type: 'blizzard', position: { x, y }, duration: 1, zIndex: 999, showOnUI: true }); } } if (typeof removeStatusEffectById === 'function') { removeStatusEffectById(sourcePiece.instanceId, blizzardStatus.id); } if (typeof removeRuleById === 'function') { removeRuleById(sourcePiece.instanceId, 'rule-blizzard-active'); } if (typeof removeSkillById === 'function') { removeSkillById(sourcePiece.instanceId, 'blizzard-damage'); } let message = sourcePiece.name + '的暴风雪效果'; message += '（中心坐标：(' + centerX + ',' + centerY + ')）'; if (totalEnemies > 0) { message += '对' + enemyNames.join('、') + '造成了' + totalDamage + '点伤害并使其冰冻'; } else { message += '没有对任何敌人造成伤害'; } return { message: message, success: true, showUIEffects: true }; }",
+  "showInUI": false
+}
+```
+
+**要点说明**：
+- 检查 `context.playerId !== sourcePiece.ownerPlayerId` 确保只在对方回合触发
+- 从 `statusTags` 中读取暴风雪状态的中心坐标和伤害值
+- 对3×3范围内的敌人造成伤害并施加冰冻状态
+- 触发后清理自身的状态、规则和技能
+
+---
+
 ### 圣盾完整示例
 
 **步骤1：施加圣盾的技能**
@@ -978,7 +1062,7 @@ if (bleedTag) {
   "maxCharges": 0,
   "powerMultiplier": 1,
   "actionPointCost": 2,
-  "code": "function executeSkill(context) { const caster = context.piece; const target = selectTarget({ type: 'piece', range: 7, filter: 'ally' }); if (!target || target.needsTargetSelection) return target; addStatusEffectById(target.instanceId, { id: 'divine-shield', type: 'divine-shield', currentDuration: -1, currentUses: 1, intensity: 1, stacks: 1 }); addRuleById(target.instanceId, 'rule-divine-shield'); return { success: true, message: caster.name + '为' + target.name + '施加了圣盾' }; }"
+  "code": "function executeSkill(context) { const caster = context.piece; const target = selectTarget({ type: 'piece', range: 7, filter: 'ally' }); if (!target || target.needsTargetSelection) return target; addStatusEffectById(target.instanceId, { id: 'divine-shield', type: 'divine-shield', currentDuration: -1, currentUses: 1, intensity: 1, stacks: 1, relatedRules: ['rule-divine-shield'] }); addRuleById(target.instanceId, 'rule-divine-shield'); return { success: true, message: caster.name + '为' + target.name + '施加了圣盾' }; }"
 }
 ```
 
