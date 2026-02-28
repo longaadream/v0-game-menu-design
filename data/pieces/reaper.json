@@ -13,10 +13,6 @@
   },
   "skills": [
     {
-      "skillId": "basic-attack",
-      "level": 1
-    },
-    {
       "skillId": "hellfire-shotgun",
       "level": 1
     },

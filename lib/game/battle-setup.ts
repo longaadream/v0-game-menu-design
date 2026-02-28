@@ -6,6 +6,7 @@ import type { BattleState, PlayerId } from "./turn"
 import { loadJsonFilesServer } from "./file-loader"
 import { DEFAULT_PIECES } from "./piece-repository"
 import { globalTriggerSystem } from "./triggers"
+import { loadRuleById } from "./skills"
 
 // 确保地图数据在模块加载时就被加载
 loadMaps().catch(error => {
@@ -43,6 +44,26 @@ export function buildDefaultPieceStats(): Record<string, PieceStats> {
 interface PlayerSelectedPieces {
   playerId: string
   pieces: PieceTemplate[]
+}
+
+// 辅助函数：加载棋子的规则
+function loadPieceRules(pieceTemplate: PieceTemplate): any[] {
+  const rules: any[] = []
+  console.log(`[loadPieceRules] Loading rules for ${pieceTemplate.name}, rules:`, pieceTemplate.rules)
+  if (pieceTemplate.rules && Array.isArray(pieceTemplate.rules)) {
+    pieceTemplate.rules.forEach(ruleId => {
+      console.log(`[loadPieceRules] Loading rule: ${ruleId}`)
+      const rule = loadRuleById(ruleId)
+      if (rule) {
+        console.log(`[loadPieceRules] Rule loaded successfully: ${rule.id}`)
+        rules.push(rule)
+      } else {
+        console.error(`[loadPieceRules] Failed to load rule: ${ruleId}`)
+      }
+    })
+  }
+  console.log(`[loadPieceRules] Loaded ${rules.length} rules for ${pieceTemplate.name}`)
+  return rules
 }
 
 export function buildInitialPiecesForPlayers(
@@ -150,6 +171,11 @@ export function buildInitialPiecesForPlayers(
               usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
             } as SkillState;
           }),
+          rules: loadPieceRules(pieceTemplate),
+          buffs: [],
+          debuffs: [],
+          ruleTags: [],
+          statusTags: [],
         })
         pieceIndex++
         
@@ -201,6 +227,11 @@ export function buildInitialPiecesForPlayers(
               usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
             } as SkillState;
           }),
+          rules: loadPieceRules(pieceTemplate),
+          buffs: [],
+          debuffs: [],
+          ruleTags: [],
+          statusTags: [],
         })
         redPieceIndex++
       })
@@ -234,6 +265,11 @@ export function buildInitialPiecesForPlayers(
               usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
             } as SkillState;
           }),
+          rules: loadPieceRules(pieceTemplate),
+          buffs: [],
+          debuffs: [],
+          ruleTags: [],
+          statusTags: [],
         })
         bluePieceIndex++
       })
@@ -279,6 +315,11 @@ export function buildInitialPiecesForPlayers(
               usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
             } as SkillState;
           }),
+          rules: loadPieceRules(pieceTemplate),
+          buffs: [],
+          debuffs: [],
+          ruleTags: [],
+          statusTags: [],
         })
         
         if (isRedPlayer) {
@@ -332,6 +373,11 @@ export function buildInitialPiecesForPlayers(
           usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
         };
       }),
+      rules: [],
+      buffs: [],
+      debuffs: [],
+      ruleTags: [],
+      statusTags: [],
     })
     
     // 添加默认蓝方棋子
@@ -360,6 +406,11 @@ export function buildInitialPiecesForPlayers(
           usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
         };
       }),
+      rules: [],
+      buffs: [],
+      debuffs: [],
+      ruleTags: [],
+      statusTags: [],
     })
   } else {
     // 检查是否每个玩家至少有一个棋子
@@ -398,9 +449,14 @@ export function buildInitialPiecesForPlayers(
             usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
           };
         }),
+        rules: [],
+        buffs: [],
+        debuffs: [],
+        ruleTags: [],
+        statusTags: [],
       })
     }
-    
+
     // 如果蓝方玩家没有棋子，添加默认蓝方棋子
     if (bluePlayerPieces.length === 0) {
       console.log('Blue player has no pieces, adding default blue piece')
@@ -430,6 +486,11 @@ export function buildInitialPiecesForPlayers(
             usesRemaining: isUltimate ? 1 : -1, // 限定技1次，普通技能无限制
           };
         }),
+        rules: [],
+        buffs: [],
+        debuffs: [],
+        ruleTags: [],
+        statusTags: [],
       })
     }
   }

@@ -86,6 +86,7 @@ export async function POST(
     // 从磁盘加载后规则的 effect 函数会丢失，需要在执行动作前重新注入
     rehydrateBattleRules(room.battleState)
     const nextState = applyBattleAction(room.battleState, body)
+    console.log('[Battle API] Players chargePoints after action:', nextState.players.map(p => ({ playerId: p.playerId, chargePoints: p.chargePoints })))
     room.battleState = nextState
     rooms.updateBattleState(room.id, nextState)
 

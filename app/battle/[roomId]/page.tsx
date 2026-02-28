@@ -105,27 +105,21 @@ export default function BattlePage() {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        console.log('Response error data:', data);
         // 检查是否是需要目标选择的情况
         if (data.needsTargetSelection) {
-          console.log('Need target selection:', data);
           // 进入目标选择模式
           setIsSelectingSkillTarget(true);
           setSelectedSkillId(action.skillId!);
+          // 保存技能类型，以便在目标选择后使用正确的动作类型
+          const skillDef = battle?.skillsById[action.skillId!];
+          setSelectedSkillType(skillDef?.type as "normal" | "super" | null);
           setTargetSelectionType(data.targetType || 'piece');
           setTargetSelectionRange(data.range || 5);
           setTargetSelectionFilter(data.filter || 'enemy');
-          console.log('Entered target selection mode:', {
-            skillId: action.skillId!,
-            targetType: data.targetType || 'piece',
-            range: data.range || 5,
-            filter: data.filter || 'enemy'
-          });
           return;
         }
         // 检查是否是需要选项选择的情况
         if (data.needsOptionSelection) {
-          console.log('Need option selection:', data);
           setIsSelectingOption(true);
           setOptionSelectionTitle(data.title || '请选择');
           setOptionSelectionOptions(data.options || []);
@@ -251,14 +245,10 @@ export default function BattlePage() {
       .filter(([_, count]) => count === 0)
       .map(([playerId]) => playerId)
     
-    console.log('Eliminated players:', eliminatedPlayers)
-    
     if (eliminatedPlayers.length > 0) {
       // 确定获胜者
       const remainingPlayers = battleState.players
         .filter(player => !eliminatedPlayers.includes(player.playerId))
-      
-      console.log('Remaining players:', remainingPlayers)
       
       if (remainingPlayers.length === 1) {
         // 显示游戏结束消息
@@ -270,19 +260,16 @@ export default function BattlePage() {
         
         // 自动删除房间
         if (roomId) {
-          console.log('Auto-deleting room:', roomId)
           fetch(`/api/rooms/${encodeURIComponent(roomId)}`, {
             method: "DELETE",
           })
-            .then(response => {
-              console.log('Room deletion response:', { status: response.status, statusText: response.statusText })
+            .then(() => {
               // 确保删除请求完成后再重定向
               setTimeout(() => {
                 router.push('/play')
               }, 500)
             })
-            .catch(error => {
-              console.error('Error deleting room:', error)
+            .catch(() => {
               // 即使出错也要重定向
               setTimeout(() => {
                 router.push('/play')
@@ -315,6 +302,7 @@ export default function BattlePage() {
   const [isSelectingTeleportTarget, setIsSelectingTeleportTarget] = useState(false)
   const [isSelectingSkillTarget, setIsSelectingSkillTarget] = useState(false)
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null)
+  const [selectedSkillType, setSelectedSkillType] = useState<"normal" | "super" | null>(null)
   const [targetSelectionType, setTargetSelectionType] = useState<'piece' | 'grid'>('piece')
   const [targetSelectionRange, setTargetSelectionRange] = useState(5)
   const [targetSelectionFilter, setTargetSelectionFilter] = useState<'enemy' | 'ally' | 'all'>('enemy')
@@ -486,7 +474,7 @@ export default function BattlePage() {
                       } else if (isSelectingSkillTarget && selectedPiece && selectedSkillId) {
                         // 处理技能目标位置选择（如暴风雪的区域选择）
                         sendBattleAction({
-                          type: "useBasicSkill",
+                          type: selectedSkillType === "super" ? "useChargeSkill" : "useBasicSkill",
                           playerId: currentPlayerId!,
                           pieceId: selectedPiece.instanceId,
                           skillId: selectedSkillId,
@@ -495,13 +483,14 @@ export default function BattlePage() {
                         })
                         setIsSelectingSkillTarget(false)
                         setSelectedSkillId(null)
+                        setSelectedSkillType(null)
                       }
                     }}
                     onPieceClick={(pieceId) => {
                       if (isSelectingSkillTarget && selectedPiece && selectedSkillId) {
                         // 处理技能目标棋子选择
                         sendBattleAction({
-                          type: "useBasicSkill",
+                          type: selectedSkillType === "super" ? "useChargeSkill" : "useBasicSkill",
                           playerId: currentPlayerId!,
                           pieceId: selectedPiece.instanceId,
                           skillId: selectedSkillId,
@@ -509,6 +498,7 @@ export default function BattlePage() {
                         })
                         setIsSelectingSkillTarget(false)
                         setSelectedSkillId(null)
+                        setSelectedSkillType(null)
                       } else {
                         // 检查点击的是否是己方棋子
                         const clickedPiece = battle.pieces.find(p => p.instanceId === pieceId);
@@ -1354,13 +1344,8 @@ export default function BattlePage() {
                           const pieceTemplate = getPieceById(selectedPiece.templateId)
                           const pieceSkills = pieceTemplate?.skills || []
                           
-                          console.log('Selected piece:', selectedPiece.templateId)
-                          console.log('Piece skills:', pieceSkills)
-                          console.log('Battle skills:', Object.keys(battle.skillsById))
-                          
                           const availableSkills = pieceSkills.map(skill => {
                             const skillDef = battle.skillsById[skill.skillId]
-                            console.log('Skill', skill.skillId, 'found:', !!skillDef)
                             
                             // 确保技能对象总是有完整的属性
                             const mergedSkill = {
@@ -1374,31 +1359,38 @@ export default function BattlePage() {
                             return mergedSkill
                           }).filter(skill => skill && skill.kind !== "passive")
                           
-                          console.log('Available skills:', availableSkills)
-                          
-                          return availableSkills.map(skill => (
-                            <Button
-                              key={skill.id}
-                              className="w-full"
-                              variant="outline"
-                              size="sm"
-                              disabled={loading || isSelectingMoveTarget}
-                              onClick={() => {
-                                if (selectedPiece) {
-                                  // 直接调用sendBattleAction，让后端决定是否需要目标选择
-                                  sendBattleAction({
-                                    type: skill.type === "normal" ? "useBasicSkill" : "useChargeSkill",
-                                    playerId: currentPlayerId!,
-                                    pieceId: selectedPiece.instanceId,
-                                    skillId: skill.id,
-                                  })
-                                }
-                              }}
-                            >
-                              <Zap className="mr-2 h-4 w-4" />
-                              {skill.name} ({skill.type === "super" ? `充能 ${skill.chargeCost || 0}点` : "普通"}) - {skill.actionPointCost || 0}AP
-                            </Button>
-                          ))
+                          return availableSkills.map(skill => {
+                            const skillType = skill.type
+                            const skillId = skill.id
+                            const skillName = skill.name
+                            const chargeCost = skill.chargeCost
+                            const actionPointCost = skill.actionPointCost
+                            const isSuper = skillType === "super"
+                            const actionType = isSuper ? "useChargeSkill" : "useBasicSkill"
+                            
+                            return (
+                              <Button
+                                key={skillId}
+                                className="w-full"
+                                variant="outline"
+                                size="sm"
+                                disabled={loading || isSelectingMoveTarget}
+                                onClick={() => {
+                                  if (selectedPiece) {
+                                    sendBattleAction({
+                                      type: actionType,
+                                      playerId: currentPlayerId!,
+                                      pieceId: selectedPiece.instanceId,
+                                      skillId: skillId,
+                                    })
+                                  }
+                                }}
+                              >
+                                <Zap className="mr-2 h-4 w-4" />
+                                {skillName} ({isSuper ? `充能 ${chargeCost || 0}点` : "普通"}) - {actionPointCost || 0}AP
+                              </Button>
+                            )
+                          })
                         })()}
                       </div>
                     )}

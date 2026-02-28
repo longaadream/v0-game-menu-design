@@ -8,6 +8,7 @@ import { getAllPieces, getPieceById } from "@/lib/game/piece-repository"
 import { buildDefaultSkills } from "@/lib/game/battle-setup"
 import { globalTriggerSystem } from "@/lib/game/triggers"
 import { reloadSkills } from "@/lib/game/skill-repository"
+import { loadRuleById } from "@/lib/game/skills"
 
 // 确保地图数据在模块加载时就被加载
 loadMaps().catch(error => {
@@ -158,6 +159,17 @@ function createPieceInstance(
 ): PieceInstance {
   const isUltimate = (skillId: string) => skillId.includes('ultimate') || skillId.includes('ult')
 
+  // 加载棋子的规则
+  const rules: any[] = []
+  if ((template as any).rules && Array.isArray((template as any).rules)) {
+    (template as any).rules.forEach((ruleId: string) => {
+      const rule = loadRuleById(ruleId)
+      if (rule) {
+        rules.push(rule)
+      }
+    })
+  }
+
   return {
     instanceId: generateUniquePieceId(ownerPlayerId),
     templateId: template.id,
@@ -181,7 +193,7 @@ function createPieceInstance(
     debuffs: [],
     statusTags: [],
     ruleTags: [],
-    rules: [],
+    rules,
   }
 }
 

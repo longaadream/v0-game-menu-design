@@ -32,9 +32,7 @@ import { getSkillById } from "./skill-repository"
 
 // ─── 辅助函数：恢复棋子规则的 effect 函数（用于 API 传输后重新加载）────────────────
 function restorePieceRules(state: BattleState): void {
-  console.log(`[RestoreRules] Called with ${state.pieces.length} pieces`)
   state.pieces.forEach(piece => {
-    console.log(`[RestoreRules] Checking piece: ${piece.name}, statusTags: ${piece.statusTags?.length || 0}, rules: ${piece.rules?.length || 0}`)
     // 确保 rules 数组存在
     if (!piece.rules) {
       piece.rules = []
@@ -49,12 +47,9 @@ function restorePieceRules(state: BattleState): void {
             const reloadedRule = loadRuleById(rule.id)
             if (reloadedRule && typeof reloadedRule.effect === 'function') {
               rule.effect = reloadedRule.effect
-              console.log(`[RestoreRules] Restored effect for rule: ${rule.id}`)
-            } else {
-              console.warn(`[RestoreRules] Failed to restore effect for rule: ${rule.id}`)
             }
-          } catch (error) {
-            console.error(`[RestoreRules] Error reloading rule ${rule.id}:`, error)
+          } catch {
+            // 忽略规则重载错误
           }
         }
       })
@@ -74,10 +69,9 @@ function restorePieceRules(state: BattleState): void {
                 const reloadedRule = loadRuleById(ruleId)
                 if (reloadedRule && typeof reloadedRule.effect === 'function') {
                   piece.rules!.push(reloadedRule)
-                  console.log(`[RestoreRules] Re-added missing rule: ${ruleId} for status: ${statusTag.type}`)
                 }
-              } catch (error) {
-                console.error(`[RestoreRules] Error re-adding rule ${ruleId}:`, error)
+              } catch {
+                // 忽略规则重载错误
               }
             }
           })
@@ -309,7 +303,6 @@ export function applyBattleAction(
   state: BattleState,
   action: BattleAction,
 ): BattleState {
-  console.log(`[applyBattleAction] Called with action type: ${action.type}, pieces count: ${state.pieces.length}`)
   // 恢复棋子规则的 effect 函数（API 传输后函数会丢失）
   restorePieceRules(state)
 
@@ -319,23 +312,14 @@ export function applyBattleAction(
       if (next.turn.phase === "start") {
         // 获取当前玩家的所有棋子
         const currentPlayerPieces = next.pieces.filter(p => p.ownerPlayerId === next.turn.currentPlayerId && p.currentHp > 0);
-        console.log(`[ShadowStep] currentPlayerPieces: ${currentPlayerPieces.length}, pieces with rules: ${currentPlayerPieces.filter(p => p.rules && p.rules.length > 0).length}`);
-        
         // 触发回合开始效果，为每个存活的棋子都触发一次
         currentPlayerPieces.forEach(piece => {
-          console.log(`[ShadowStep] Checking piece ${piece.instanceId}, rules: ${piece.rules ? piece.rules.length : 0}`);
-          if (piece.rules) {
-            piece.rules.forEach((rule: any) => {
-              console.log(`[ShadowStep] Rule: ${rule.id}, trigger: ${rule.trigger?.type}, effect is function: ${typeof rule.effect === 'function'}`);
-            });
-          }
           const beginTurnResult = globalTriggerSystem.checkTriggers(next, {
             type: "beginTurn",
             sourcePiece: piece,
             turnNumber: next.turn.turnNumber,
             playerId: next.turn.currentPlayerId
           });
-          console.log(`[ShadowStep] beginTurnResult: success=${beginTurnResult.success}, messages=${beginTurnResult.messages.length}`);
 
           // 处理触发效果的消息
           if (beginTurnResult.success && beginTurnResult.messages.length > 0) {
@@ -372,7 +356,6 @@ export function applyBattleAction(
             piece.skills.forEach(skill => {
               if (skill.currentCooldown && skill.currentCooldown > 0) {
                 skill.currentCooldown--
-                console.log(`Reduced cooldown for skill ${skill.skillId} on piece ${piece.instanceId}: ${skill.currentCooldown} turns remaining`)
               }
             })
           }
@@ -475,28 +458,19 @@ export function applyBattleAction(
           }
           // 充满行动点
           nextPlayerMeta.actionPoints = nextPlayerMeta.maxActionPoints
-          console.log(`Player ${nextPlayerMeta.playerId} now has ${nextPlayerMeta.actionPoints}/${nextPlayerMeta.maxActionPoints} action points (turn ${next.turn.turnNumber})`)
         }
         
         // 获取当前玩家的所有棋子
         const currentPlayerPieces = next.pieces.filter(p => p.ownerPlayerId === next.turn.currentPlayerId && p.currentHp > 0);
-        console.log(`[ShadowStep] END phase - currentPlayerPieces: ${currentPlayerPieces.length}, pieces with rules: ${currentPlayerPieces.filter(p => p.rules && p.rules.length > 0).length}`);
         
         // 触发回合开始效果，为每个存活的棋子都触发一次
         currentPlayerPieces.forEach(piece => {
-          console.log(`[ShadowStep] END phase - Checking piece ${piece.instanceId}, rules: ${piece.rules ? piece.rules.length : 0}`);
-          if (piece.rules) {
-            piece.rules.forEach((rule: any) => {
-              console.log(`[ShadowStep] END phase - Rule: ${rule.id}, trigger: ${rule.trigger?.type}, effect is function: ${typeof rule.effect === 'function'}`);
-            });
-          }
           const beginTurnResult = globalTriggerSystem.checkTriggers(next, {
             type: "beginTurn",
             sourcePiece: piece,
             turnNumber: next.turn.turnNumber,
             playerId: next.turn.currentPlayerId
           });
-          console.log(`[ShadowStep] END phase - beginTurnResult: success=${beginTurnResult.success}, messages=${beginTurnResult.messages.length}`);
 
           // 处理触发效果的消息
           if (beginTurnResult.success && beginTurnResult.messages.length > 0) {
@@ -526,7 +500,6 @@ export function applyBattleAction(
             piece.skills.forEach(skill => {
               if (skill.currentCooldown && skill.currentCooldown > 0) {
                 skill.currentCooldown--
-                console.log(`Reduced cooldown for skill ${skill.skillId} on piece ${piece.instanceId}: ${skill.currentCooldown} turns remaining`)
               }
             })
           }
@@ -799,9 +772,6 @@ export function applyBattleAction(
         )
       }
 
-      console.log('Executing skill with ID:', action.skillId)
-      console.log('Available skills:', Object.keys(next.skillsById))
-      
       // 优先从服务器获取最新的技能定义（开发模式热重载）
       let skillDef = getSkillById(action.skillId) || next.skillsById[action.skillId]
       
@@ -825,8 +795,6 @@ export function applyBattleAction(
           throw new BattleRuleError(`Ultimate skill ${action.skillId} has already been used`)
         }
       }
-      
-      console.log('Skill definition used:', skillDef)
 
       // 触发即将使用技能前的规则（检查冰冻等状态）
       const beforeSkillUseResult = globalTriggerSystem.checkTriggers(next, {
@@ -931,11 +899,6 @@ export function applyBattleAction(
       
       if (result.success) {
         // 效果已经在技能执行时直接应用，这里只需要处理返回的消息
-        console.log('Skill executed:', result.message)
-        
-        // 检查技能执行后棋子的属性是否被正确修改
-        const updatedPiece = next.pieces.find(p => p.instanceId === piece.instanceId)
-        console.log('Updated piece after skill:', updatedPiece);
         
         // 消耗行动点
         const playerMeta = getPlayerMeta(next, action.playerId)
@@ -950,35 +913,31 @@ export function applyBattleAction(
               // 设置冷却
               if (skillDef.cooldownTurns > 0) {
                 piece.skills[skillIndex].currentCooldown = skillDef.cooldownTurns
-                console.log(`Set cooldown for skill ${action.skillId}: ${skillDef.cooldownTurns} turns`)
               }
-              
+
               // 减少限定技使用次数
               if (skillDef.type === "ultimate") {
                 piece.skills[skillIndex].usesRemaining -= 1
-                console.log(`Used ultimate skill ${action.skillId}, ${piece.skills[skillIndex].usesRemaining} uses remaining`)
               }
             } else {
               // 如果技能不在棋子的技能列表中，添加它
               const usesRemaining = skillDef.type === "ultimate" ? 0 : -1 // 限定技使用后剩余0次，其他技能无限制
-              piece.skills.push({ 
-                skillId: action.skillId, 
-                level: 1, 
-                currentCooldown: skillDef.cooldownTurns, 
+              piece.skills.push({
+                skillId: action.skillId,
+                level: 1,
+                currentCooldown: skillDef.cooldownTurns,
                 usesRemaining: usesRemaining
               })
-              console.log(`Added skill ${action.skillId} to piece with cooldown: ${skillDef.cooldownTurns} turns, uses remaining: ${usesRemaining}`)
             }
           } else {
             // 如果棋子没有skills属性，初始化它
             const usesRemaining = skillDef.type === "ultimate" ? 0 : -1 // 限定技使用后剩余0次，其他技能无限制
-            piece.skills = [{ 
-              skillId: action.skillId, 
-              level: 1, 
+            piece.skills = [{
+              skillId: action.skillId,
+              level: 1,
               currentCooldown: skillDef.cooldownTurns,
               usesRemaining: usesRemaining
             }]
-            console.log(`Initialized skills for piece and added cooldown for ${action.skillId}: ${skillDef.cooldownTurns} turns, uses remaining: ${usesRemaining}`)
           }
         }
       }
@@ -1073,14 +1032,10 @@ export function applyBattleAction(
         )
       }
 
-      console.log('Executing skill with ID:', action.skillId)
-      console.log('Available skills:', Object.keys(next.skillsById))
-      
       let skillDef = next.skillsById[action.skillId]
       
       // 如果技能定义找不到，使用默认技能定义
       if (!skillDef) {
-        console.warn(`Skill definition not found for ID: ${action.skillId}, using default skill`)
         skillDef = {
           id: action.skillId,
           name: action.skillId,
@@ -1118,8 +1073,6 @@ export function applyBattleAction(
           throw new BattleRuleError(`Ultimate skill ${action.skillId} has already been used`)
         }
       }
-      
-      console.log('Skill definition used:', skillDef)
 
       // 触发即将使用技能前的规则（检查冰冻等状态）
       const beforeSkillUseResult = globalTriggerSystem.checkTriggers(next, {
@@ -1153,13 +1106,17 @@ export function applyBattleAction(
       }
 
       const cost = skillDef.chargeCost ?? 0
-      if (cost > 0 && playerMeta.chargePoints < cost) {
+      // 从 next 状态获取 playerMeta，确保修改能正确保存
+      const nextPlayerMeta = getPlayerMeta(next, action.playerId)
+      console.log('[useChargeSkill] Before deduction:', { playerId: action.playerId, chargePoints: nextPlayerMeta.chargePoints, cost })
+      if (cost > 0 && nextPlayerMeta.chargePoints < cost) {
         throw new BattleRuleError("Not enough charge points to use this skill")
       }
 
       // 消耗充能点
       if (cost > 0) {
-        playerMeta.chargePoints -= cost
+        nextPlayerMeta.chargePoints -= cost
+        console.log('[useChargeSkill] After deduction:', { playerId: action.playerId, chargePoints: nextPlayerMeta.chargePoints })
       }
 
       // 执行技能
@@ -1234,12 +1191,11 @@ export function applyBattleAction(
       
       if (result.success) {
         // 效果已经在技能执行时直接应用，这里只需要处理返回的消息
-        console.log('Skill executed:', result.message)
-        
+
         // 消耗行动点
         const playerMeta = getPlayerMeta(next, action.playerId)
         playerMeta.actionPoints -= skillDef.actionPointCost
-        
+
         // 设置技能冷却
         if (skillDef.cooldownTurns > 0 || skillDef.type === "ultimate") {
           // 找到棋子的技能状态并设置冷却
@@ -1249,35 +1205,31 @@ export function applyBattleAction(
               // 设置冷却
               if (skillDef.cooldownTurns > 0) {
                 piece.skills[skillIndex].currentCooldown = skillDef.cooldownTurns
-                console.log(`Set cooldown for skill ${action.skillId}: ${skillDef.cooldownTurns} turns`)
               }
-              
+
               // 减少限定技使用次数
               if (skillDef.type === "ultimate") {
                 piece.skills[skillIndex].usesRemaining -= 1
-                console.log(`Used ultimate skill ${action.skillId}, ${piece.skills[skillIndex].usesRemaining} uses remaining`)
               }
             } else {
               // 如果技能不在棋子的技能列表中，添加它
               const usesRemaining = skillDef.type === "ultimate" ? 0 : -1 // 限定技使用后剩余0次，其他技能无限制
-              piece.skills.push({ 
-                skillId: action.skillId, 
-                level: 1, 
-                currentCooldown: skillDef.cooldownTurns, 
+              piece.skills.push({
+                skillId: action.skillId,
+                level: 1,
+                currentCooldown: skillDef.cooldownTurns,
                 usesRemaining: usesRemaining
               })
-              console.log(`Added skill ${action.skillId} to piece with cooldown: ${skillDef.cooldownTurns} turns, uses remaining: ${usesRemaining}`)
             }
           } else {
             // 如果棋子没有skills属性，初始化它
             const usesRemaining = skillDef.type === "ultimate" ? 0 : -1 // 限定技使用后剩余0次，其他技能无限制
-            piece.skills = [{ 
-              skillId: action.skillId, 
-              level: 1, 
+            piece.skills = [{
+              skillId: action.skillId,
+              level: 1,
               currentCooldown: skillDef.cooldownTurns,
               usesRemaining: usesRemaining
             }]
-            console.log(`Initialized skills for piece and added cooldown for ${action.skillId}: ${skillDef.cooldownTurns} turns, uses remaining: ${usesRemaining}`)
           }
         }
       }
@@ -1461,11 +1413,8 @@ export function applyBattleAction(
               } else {
                 statusTag.currentDuration = newDuration;
               }
-              console.log(`Reduced duration for status ${statusTag.type} on piece ${piece.instanceId}: ${newDuration} turns remaining`);
-
               // 如果持续时间为0，清除状态标签
               if (newDuration === 0) {
-                console.log(`Status ${statusTag.type} expired on piece ${piece.instanceId}, removing status tag`);
                 
                 // 检查并清理相关规则
                 if (statusTag.relatedRules && statusTag.relatedRules.length > 0) {
@@ -1485,7 +1434,6 @@ export function applyBattleAction(
                     if (!hasOtherRelatedStatus && piece.rules) {
                       const ruleIndex = piece.rules.findIndex(rule => rule.id === ruleId);
                       if (ruleIndex !== -1) {
-                        console.log(`Removing rule ${ruleId} because no other status tags are related to it`);
                         piece.rules.splice(ruleIndex, 1);
                       }
                     }

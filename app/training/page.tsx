@@ -52,6 +52,7 @@ export default function TrainingPage() {
   const [isSelectingMoveTarget, setIsSelectingMoveTarget] = useState(false)
   const [isSelectingSkillTarget, setIsSelectingSkillTarget] = useState(false)
   const [selectedSkillId, setSelectedSkillId] = useState<string | undefined>(undefined)
+  const [selectedSkillType, setSelectedSkillType] = useState<"normal" | "super" | undefined>(undefined)
   const [targetSelectionType, setTargetSelectionType] = useState<'piece' | 'grid'>('piece')
   const [targetSelectionRange, setTargetSelectionRange] = useState(5)
   const [targetSelectionFilter, setTargetSelectionFilter] = useState<'enemy' | 'ally' | 'all'>('enemy')
@@ -136,6 +137,9 @@ export default function TrainingPage() {
           // skillId only exists on useBasicSkill or useChargeSkill actions
           if ('skillId' in action) {
             setSelectedSkillId(action.skillId!)
+            // 保存技能类型，以便在目标选择后使用正确的动作类型
+            const skillDef = battle?.skillsById[action.skillId!]
+            setSelectedSkillType(skillDef?.type as "normal" | "super" | undefined)
           }
           setTargetSelectionType(data.targetType || 'piece')
           setTargetSelectionRange(data.range || 5)
@@ -547,28 +551,37 @@ export default function TrainingPage() {
                             }
                           }).filter(skill => skill && skill.kind !== "passive")
 
-                          return availableSkills.map(skill => (
-                            <Button
-                              key={skill.id}
-                              className="w-full"
-                              variant="outline"
-                              size="sm"
-                              disabled={isSelectingMoveTarget}
-                              onClick={() => {
-                                if (selectedPiece) {
+                          return availableSkills.map((skill) => {
+                            const skillType = skill.type
+                            const skillId = skill.id
+                            const skillName = skill.name
+                            const chargeCost = skill.chargeCost
+                            const actionPointCost = skill.actionPointCost
+                            const isSuper = skillType === "super"
+                            const actionType = isSuper ? "useChargeSkill" : "useBasicSkill"
+                            
+                            return (
+                              <Button
+                                key={skillId}
+                                className="w-full"
+                                variant="outline"
+                                size="sm"
+                                disabled={isSelectingMoveTarget}
+                                onClick={() => {
+                                  if (!selectedPiece) return
                                   sendBattleAction({
-                                    type: skill.type === "normal" ? "useBasicSkill" : "useChargeSkill",
+                                    type: actionType,
                                     playerId: currentPlayerId,
                                     pieceId: selectedPiece.instanceId,
-                                    skillId: skill.id,
+                                    skillId: skillId,
                                   })
-                                }
-                              }}
-                            >
-                              <Zap className="mr-2 h-4 w-4" />
-                              {skill.name} ({skill.actionPointCost || 0}AP)
-                            </Button>
-                          ))
+                                }}
+                              >
+                                <Zap className="mr-2 h-4 w-4" />
+                                {skillName} ({isSuper ? `充能 ${chargeCost || 0}点` : "普通"}) - {actionPointCost || 0}AP
+                              </Button>
+                            )
+                          })
                         })()}
                       </div>
                     )}
@@ -718,7 +731,7 @@ export default function TrainingPage() {
                       setIsSelectingMoveTarget(false)
                     } else if (isSelectingSkillTarget && selectedPiece && selectedSkillId) {
                       sendBattleAction({
-                        type: "useBasicSkill",
+                        type: selectedSkillType === "super" ? "useChargeSkill" : "useBasicSkill",
                         playerId: currentPlayerId,
                         pieceId: selectedPiece.instanceId,
                         skillId: selectedSkillId,
@@ -727,6 +740,7 @@ export default function TrainingPage() {
                       })
                       setIsSelectingSkillTarget(false)
                       setSelectedSkillId(undefined)
+                      setSelectedSkillType(undefined)
                     } else if (isPlacingPiece && newPieceTemplateId) {
                       void addPiece(newPieceFaction, newPieceTemplateId, x, y)
                     }
@@ -734,7 +748,7 @@ export default function TrainingPage() {
                   onPieceClick={(pieceId) => {
                     if (isSelectingSkillTarget && selectedPiece && selectedSkillId) {
                       sendBattleAction({
-                        type: "useBasicSkill",
+                        type: selectedSkillType === "super" ? "useChargeSkill" : "useBasicSkill",
                         playerId: currentPlayerId,
                         pieceId: selectedPiece.instanceId,
                         skillId: selectedSkillId,
@@ -742,6 +756,7 @@ export default function TrainingPage() {
                       })
                       setIsSelectingSkillTarget(false)
                       setSelectedSkillId(undefined)
+                      setSelectedSkillType(undefined)
                     } else {
                       setSelectedPieceId(pieceId)
                       setIsSelectingMoveTarget(false)

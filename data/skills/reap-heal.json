@@ -11,5 +11,5 @@
   "actionPointCost": 0,
   "range": "self",
   "requiresTarget": false,
-  "code": "function executeSkill(context) { const sourcePiece = context.piece; const damage = context.damage || 0; const healAmount = Math.floor(damage * 0.5); if (healAmount > 0 && sourcePiece.currentHp < sourcePiece.maxHp) { const healResult = healDamage(sourcePiece, sourcePiece, healAmount, battle, context.skill.id); return { message: sourcePiece.name + '通过收割恢复了' + healResult.heal + '点生命值', success: true }; } return { message: '', success: true }; }"
+  "code": "function executeSkill(context) { const sourcePiece = context.piece; const damage = context.damage || 0; const healAmount = Math.floor(damage * 0.5); if (healAmount > 0 && sourcePiece.currentHp < sourcePiece.maxHp) { const healResult = healDamage(sourcePiece, sourcePiece, healAmount, context.battle, context.skill.id); return { message: sourcePiece.name + '通过收割恢复了' + healResult.heal + '点生命值', success: true }; } return { message: '', success: true }; }"
 }

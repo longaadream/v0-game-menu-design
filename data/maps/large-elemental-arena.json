@@ -1,0 +1,70 @@
+{
+  "id": "large-elemental-arena",
+  "name": "大型元素竞技场",
+  "layout": [
+    "####################",
+    "#S.................S#",
+    "#.##..L..H..H..L..##.#",
+    "#.##..L..H..H..L..##.#",
+    "#......E......E......#",
+    "#..C....C....C....C..#",
+    "#L......L....L......L#",
+    "#.##..H..L..L..H..##.#",
+    "#.##..H..L..L..H..##.#",
+    "#L......L....L......L#",
+    "#..C....C....C....C..#",
+    "#......E......E......#",
+    "#.##..L..H..H..L..##.#",
+    "#.##..L..H..H..L..##.#",
+    "#S.................S#",
+    "####################"
+  ],
+  "legend": [
+    {
+      "char": "#",
+      "type": "wall",
+      "walkable": false,
+      "bulletPassable": false
+    },
+    {
+      "char": ".",
+      "type": "floor",
+      "walkable": true,
+      "bulletPassable": true
+    },
+    {
+      "char": "S",
+      "type": "spawn",
+      "walkable": true,
+      "bulletPassable": true
+    },
+    {
+      "char": "C",
+      "type": "cover",
+      "walkable": true,
+      "bulletPassable": false
+    },
+    {
+      "char": "L",
+      "type": "lava",
+      "walkable": true,
+      "bulletPassable": true,
+      "damagePerTurn": 1
+    },
+    {
+      "char": "H",
+      "type": "spring",
+      "walkable": true,
+      "bulletPassable": true,
+      "healPerTurn": 2
+    },
+    {
+      "char": "E",
+      "type": "chargepad",
+      "walkable": true,
+      "bulletPassable": true,
+      "chargePerTurn": 1
+    }
+  ],
+  "rules": []
+}

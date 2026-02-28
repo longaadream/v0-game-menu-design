@@ -30,6 +30,7 @@ export interface PieceTemplate {
   image?: string
   stats: PieceStats
   skills: PieceSkill[]
+  rules?: string[] // 存储对该棋子生效的规则ID
   isDefault?: boolean
 }
 
