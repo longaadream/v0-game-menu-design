@@ -7,6 +7,19 @@ import { loadJsonFilesServer } from "./file-loader"
 import { DEFAULT_PIECES } from "./piece-repository"
 import { globalTriggerSystem } from "./triggers"
 import { loadRuleById } from "./skills"
+import fs from 'fs'
+import path from 'path'
+
+// 简单的日志写入函数
+function writeLog(message: string) {
+  const logDir = path.join(process.cwd(), 'logs')
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true })
+  }
+  const logFile = path.join(logDir, 'game.log')
+  const timestamp = new Date().toISOString()
+  fs.appendFileSync(logFile, `[${timestamp}] ${message}\n`)
+}
 
 // 确保地图数据在模块加载时就被加载
 loadMaps().catch(error => {
@@ -511,14 +524,19 @@ export async function createInitialBattleForPlayers(
 
   const [p1, p2] = playerIds
   
+  writeLog('[createInitialBattleForPlayers] mapId: ' + mapId)
+  writeLog('[createInitialBattleForPlayers] DEFAULT_MAP_ID: ' + DEFAULT_MAP_ID)
+  
   // 尝试获取指定地图或默认地图
   let map = getMap(mapId || DEFAULT_MAP_ID)
+  writeLog('[createInitialBattleForPlayers] map from getMap: ' + (map ? map.name : 'NOT FOUND'))
   
   // 如果地图没有加载成功，尝试异步加载
   if (!map) {
-    console.warn(`Map ${mapId || DEFAULT_MAP_ID} not found in cache, trying to load...`)
+    writeLog('Map ' + (mapId || DEFAULT_MAP_ID) + ' not found in cache, trying to load...')
     await loadMaps()
     map = getMap(mapId || DEFAULT_MAP_ID)
+    writeLog('[createInitialBattleForPlayers] map after loadMaps: ' + (map ? map.name : 'NOT FOUND'))
   }
   
   // 如果地图仍然没有加载成功，使用默认地图

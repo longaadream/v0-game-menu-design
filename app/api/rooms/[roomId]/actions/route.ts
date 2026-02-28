@@ -1,4 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
+import fs from 'fs'
+import path from 'path'
+
+// 简单的日志写入函数
+function writeLog(message: string) {
+  const logDir = path.join(process.cwd(), 'logs')
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true })
+  }
+  const logFile = path.join(logDir, 'game.log')
+  const timestamp = new Date().toISOString()
+  fs.appendFileSync(logFile, `[${timestamp}] ${message}\n`)
+}
 import { createInitialBattleForPlayers } from "@/lib/game/battle-setup"
 import { getPieceById, getAllPieces } from "@/lib/game/piece-repository"
 import type { BattleState } from "@/lib/game/turn"
@@ -303,6 +316,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
       
       // 尝试获取地图 ID，如果没有则使用默认地图
       const mapId = latestRoom.mapId || "arena-8x6"
+      writeLog('[select-pieces] mapId from room: ' + mapId)
+      writeLog('[select-pieces] latestRoom.mapId: ' + latestRoom.mapId)
       
       try {
         const battle = await createInitialBattleForPlayers(playerIds, pieceTemplates, playerSelectedPieces, mapId)
@@ -329,6 +344,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
 
     // 强制返回成功响应，确保前端立即更新
     console.log('=== RETURNING SUCCESS RESPONSE ===')
+    
+    // 如果游戏已经自动启动，返回更新后的房间状态
+    const finalRoom = roomStore.getRoom(trimmedRoomId)
+    
     return NextResponse.json({ 
       success: true, 
       message: "Pieces selected successfully",
@@ -338,8 +357,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
         selectedPiecesCount: pieces.length
       },
       room: {
-        id: latestRoom.id,
-        players: latestRoom.players.map(p => ({
+        id: finalRoom?.id,
+        status: finalRoom?.status,
+        players: finalRoom?.players.map(p => ({
           id: p.id,
           name: p.name,
           hasSelectedPieces: p.hasSelectedPieces || false
@@ -473,6 +493,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ roo
     
     // 尝试获取地图 ID，如果没有则使用默认地图
     const mapId = latestRoom.mapId || "arena-8x6"
+    writeLog('[start-game] mapId from room: ' + mapId)
+    writeLog('[start-game] latestRoom.mapId: ' + latestRoom.mapId)
     
     const battle = await createInitialBattleForPlayers(playerIds, pieceTemplates, playerSelectedPieces, mapId)
 

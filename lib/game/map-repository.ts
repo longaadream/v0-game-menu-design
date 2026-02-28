@@ -1,7 +1,18 @@
-import { loadJsonFilesServer } from './file-loader'
 import { createMapFromAscii, type AsciiMapConfig, type BoardMap } from './map'
 import { readdirSync, readFileSync, existsSync } from 'fs'
 import { join } from 'path'
+import fs from 'fs'
+import path from 'path'
+
+function writeLog(message: string) {
+  const logDir = path.join(process.cwd(), 'logs')
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true })
+  }
+  const logFile = path.join(logDir, 'game.log')
+  const timestamp = new Date().toISOString()
+  fs.appendFileSync(logFile, `[${timestamp}] ${message}\n`)
+}
 
 let mapsCache: Record<string, BoardMap> = {}
 let isLoading = false
@@ -9,66 +20,61 @@ let isLoading = false
 // 加载地图数据
 export async function loadMaps() {
   if (isLoading) return
-  
+
   isLoading = true
   try {
-    // 直接从文件系统加载地图数据
+    // 使用process.cwd()来获取项目根目录
     const dirPath = join(process.cwd(), 'data/maps')
-    console.log('Current working directory:', process.cwd())
-    console.log('Loading maps from directory:', dirPath)
-    console.log('Directory exists:', existsSync(dirPath))
-    
+    writeLog('[loadMaps] dirPath: ' + dirPath)
+    writeLog('[loadMaps] cwd: ' + process.cwd())
+    writeLog('[loadMaps] Directory exists: ' + existsSync(dirPath))
+
     const maps: Record<string, BoardMap> = {}
-    
+
     if (existsSync(dirPath)) {
       const files = readdirSync(dirPath, { withFileTypes: true })
-      console.log('Found map files:', files.map(f => f.name))
-      
+      writeLog('[loadMaps] Found files: ' + files.map(f => f.name).join(', '))
+
       files.forEach((file) => {
         if (file.isFile() && file.name.endsWith('.json')) {
           const filePath = join(dirPath, file.name)
-          console.log('Loading map file:', filePath)
-          
+          // console.log('Loading map file:', filePath)
+
           try {
             const content = readFileSync(filePath, 'utf-8')
-            console.log('File content length:', content.length)
-            
+            // console.log('File content length:', content.length)
+
             try {
               const config = JSON.parse(content) as AsciiMapConfig
-              console.log('Parsed map config for', file.name, ':', config)
-              
+              // console.log('Parsed map config for', file.name, ':', config)
+
               if (config && typeof config === 'object' && 'id' in config) {
                 try {
                   const map = createMapFromAscii(config)
                   maps[map.id] = map
-                  console.log('Created map:', map)
-                  // 检查第一个格子的类型
-                  if (map.tiles.length > 0) {
-                    console.log('First tile type:', map.tiles[0].props.type)
-                  }
+                  writeLog('[loadMaps] Created map: ' + map.id + ', name: ' + map.name)
                 } catch (mapError) {
-                  console.error(`Error creating map from config ${config.id}:`, mapError)
+                  writeLog('[loadMaps] Error creating map from config ' + config.id + ': ' + mapError)
                 }
               } else {
-                console.warn('File', file.name, 'does not have an id field')
+                // console.warn('File', file.name, 'does not have an id field')
               }
             } catch (parseError) {
-              console.error(`Error parsing JSON file ${file.name}:`, parseError)
-              console.error('File content:', content)
+              // console.error(`Error parsing JSON file ${file.name}:`, parseError)
             }
           } catch (readError) {
-            console.error(`Error reading file ${file.name}:`, readError)
+            // console.error(`Error reading file ${file.name}:`, readError)
           }
         }
       })
     } else {
-      console.error('Directory', dirPath, 'does not exist')
+      // console.error('Directory', dirPath, 'does not exist')
     }
-    
-    console.log('Final maps:', maps)
+
+    // console.log('Final maps:', maps)
     mapsCache = maps
   } catch (error) {
-    console.error('Error loading maps:', error)
+    // console.error('Error loading maps:', error)
   } finally {
     isLoading = false
   }

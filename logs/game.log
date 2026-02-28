@@ -1,0 +1,660 @@
+[2026-02-28T13:02:54.077Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:54.079Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:54.079Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:54.080Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:54.080Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:54.081Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:54.081Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:54.081Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:02:54.085Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:54.085Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:54.085Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:54.086Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:54.086Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:54.087Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:54.087Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:54.087Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:02:57.225Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:57.227Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:57.227Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:57.228Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:57.228Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:57.229Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:57.229Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:57.229Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:02:57.231Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:57.232Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:57.232Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:57.233Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:57.233Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:57.234Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:57.234Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:57.235Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:02:58.796Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:58.798Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:58.798Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:58.799Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:58.801Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:58.802Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:58.803Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:58.803Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:02:58.805Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:58.806Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:58.806Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:58.806Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:58.807Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:58.807Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:58.805Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:58.807Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:58.808Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:58.808Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:58.809Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:02:58.808Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:58.809Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:58.809Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:58.810Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:58.810Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:02:58.812Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:58.813Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:58.813Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:58.814Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:58.814Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:58.814Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:58.815Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:58.815Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:02:59.819Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:59.820Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:59.820Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:59.820Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:59.821Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:59.821Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:59.822Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:59.822Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:02:59.824Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:02:59.824Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:02:59.825Z] [loadMaps] Directory exists: true
+[2026-02-28T13:02:59.825Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:02:59.825Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:02:59.826Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:02:59.826Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:02:59.827Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:00.829Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:00.830Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:00.831Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:00.831Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:00.832Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:00.832Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:00.833Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:00.834Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:00.836Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:00.836Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:00.837Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:00.837Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:00.837Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:00.838Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:00.838Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:00.838Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:00.926Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:00.927Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:00.927Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:00.927Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:00.928Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:00.928Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:00.929Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:00.929Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:00.931Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:00.931Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:00.932Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:00.932Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:00.932Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:00.933Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:00.933Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:00.933Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:01.814Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:01.815Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:01.815Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:01.816Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:01.816Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:01.817Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:01.817Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:01.818Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:01.820Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:01.820Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:01.820Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:01.821Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:01.821Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:01.821Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:01.822Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:01.822Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:03.180Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:03.181Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:03.181Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:03.182Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:03.183Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:03.183Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:03.184Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:03.184Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:03.186Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:03.186Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:03.187Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:03.187Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:03.187Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:03.188Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:03.188Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:03.188Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:03.992Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:03.993Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:03.994Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:03.994Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:03.995Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:03.995Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:03.996Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:03.996Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:03.998Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:03.999Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:03.999Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:03.999Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:04.000Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:04.000Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:04.000Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:04.001Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:05.186Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:05.187Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:05.187Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:05.187Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:05.188Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:05.189Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:05.189Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:05.189Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:05.191Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:05.192Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:05.192Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:05.192Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:05.193Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:05.193Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:05.194Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:05.194Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:05.804Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:05.805Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:05.806Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:05.806Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:05.807Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:05.807Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:05.807Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:05.808Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:05.810Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:05.810Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:05.810Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:05.811Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:05.811Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:05.812Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:05.812Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:05.812Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:05.865Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:05.866Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:05.867Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:05.867Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:05.868Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:05.868Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:05.869Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:05.869Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:05.871Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:05.871Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:05.872Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:05.872Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:05.873Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:05.873Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:05.873Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:05.874Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:06.886Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:06.887Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:06.888Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:06.888Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:06.889Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:06.889Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:06.890Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:06.890Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:06.892Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:06.892Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:06.893Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:06.893Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:06.893Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:06.894Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:06.894Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:06.894Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:07.899Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:07.900Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:07.901Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:07.901Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:07.902Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:07.902Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:07.902Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:07.903Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:07.905Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:07.905Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:07.905Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:07.906Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:07.906Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:07.906Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:07.907Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:07.907Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:08.458Z] [select-pieces] mapId from room: large-elemental-arena
+[2026-02-28T13:03:08.459Z] [select-pieces] latestRoom.mapId: large-elemental-arena
+[2026-02-28T13:03:08.459Z] [createInitialBattleForPlayers] mapId: large-elemental-arena
+[2026-02-28T13:03:08.459Z] [createInitialBattleForPlayers] DEFAULT_MAP_ID: arena-8x6
+[2026-02-28T13:03:08.460Z] [createInitialBattleForPlayers] map from getMap: NOT FOUND
+[2026-02-28T13:03:08.460Z] Map large-elemental-arena not found in cache, trying to load...
+[2026-02-28T13:03:08.461Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:08.461Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:08.461Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:08.462Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:08.463Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:08.463Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:08.464Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:08.464Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:08.465Z] [createInitialBattleForPlayers] map after loadMaps: 大型元素竞技场
+[2026-02-28T13:03:08.955Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:08.956Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:08.957Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:08.957Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:08.958Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:08.959Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:08.959Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:08.960Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:08.963Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:08.964Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:08.964Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:08.965Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:08.965Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:08.966Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:08.967Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:08.968Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:08.984Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:08.985Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:08.986Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:08.986Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:08.987Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:08.987Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:08.988Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:08.988Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:08.991Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:08.991Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:08.991Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:08.992Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:08.992Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:08.993Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:08.993Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:08.993Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:09.606Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:09.607Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:09.608Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:09.608Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:09.609Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:09.609Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:09.610Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:09.610Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:03:09.612Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:03:09.612Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:03:09.613Z] [loadMaps] Directory exists: true
+[2026-02-28T13:03:09.613Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:03:09.613Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:03:09.614Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:03:09.614Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:03:09.614Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:51.477Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:51.478Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:51.479Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:51.479Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:51.480Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:51.480Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:51.481Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:51.481Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:51.483Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:51.484Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:51.484Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:51.484Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:51.485Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:51.485Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:51.485Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:51.486Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:57.366Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:57.367Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:57.367Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:57.368Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:57.369Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:57.369Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:57.369Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:57.370Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:57.372Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:57.372Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:57.373Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:57.373Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:57.374Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:57.374Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:57.375Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:57.375Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:58.693Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:58.694Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:58.694Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:58.695Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:58.695Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:58.696Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:58.696Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:58.697Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:58.698Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:58.699Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:58.699Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:58.699Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:58.700Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:58.700Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:58.700Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:58.701Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:58.731Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:58.732Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:58.732Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:58.733Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:58.733Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:58.734Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:58.734Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:58.735Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:58.737Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:58.737Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:58.737Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:58.737Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:58.738Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:58.738Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:58.739Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:58.739Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:59.765Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:59.766Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:59.766Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:59.767Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:59.768Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:59.768Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:59.769Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:59.769Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:05:59.771Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:05:59.772Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:05:59.772Z] [loadMaps] Directory exists: true
+[2026-02-28T13:05:59.772Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:05:59.773Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:05:59.773Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:05:59.773Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:05:59.774Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:00.763Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:00.764Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:00.764Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:00.764Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:00.765Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:00.766Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:00.766Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:00.767Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:00.769Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:00.769Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:00.769Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:00.770Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:00.770Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:00.770Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:00.771Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:00.771Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:01.377Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:01.378Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:01.379Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:01.379Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:01.380Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:01.380Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:01.381Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:01.381Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:01.383Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:01.384Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:01.384Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:01.384Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:01.385Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:01.385Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:01.385Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:01.386Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:01.411Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:01.412Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:01.412Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:01.412Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:01.413Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:01.413Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:01.414Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:01.414Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:01.416Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:01.416Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:01.417Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:01.417Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:01.418Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:01.418Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:01.418Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:01.419Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:02.770Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:02.771Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:02.771Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:02.772Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:02.772Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:02.773Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:02.773Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:02.774Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:02.776Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:02.776Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:02.776Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:02.777Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:02.777Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:02.778Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:02.778Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:02.778Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:03.786Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:03.787Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:03.788Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:03.788Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:03.789Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:03.789Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:03.790Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:03.791Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:03.793Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:03.793Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:03.793Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:03.794Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:03.794Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:03.794Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:03.795Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:03.795Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:05.179Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:05.180Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:05.181Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:05.181Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:05.182Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:05.182Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:05.183Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:05.183Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:05.185Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:05.185Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:05.186Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:05.186Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:05.186Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:05.187Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:05.187Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:05.188Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:06.170Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:06.171Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:06.171Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:06.172Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:06.172Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:06.173Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:06.173Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:06.174Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:06.175Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:06.176Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:06.176Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:06.176Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:06.177Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:06.177Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:06.177Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:06.178Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:07.182Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:07.183Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:07.184Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:07.184Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:07.185Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:07.185Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:07.186Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:07.186Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:07.188Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:07.188Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:07.188Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:07.189Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:07.189Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:07.190Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:07.190Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:07.190Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:08.173Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:08.174Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:08.174Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:08.174Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:08.175Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:08.175Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:08.176Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:08.176Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:08.178Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:08.178Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:08.179Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:08.179Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:08.179Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:08.180Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:08.180Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:08.181Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:08.749Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:08.750Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:08.750Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:08.750Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:08.751Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:08.751Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:08.752Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:08.752Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:08.754Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:08.754Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:08.755Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:08.755Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:08.755Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:08.756Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:08.756Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:08.756Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:08.793Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:08.795Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:08.795Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:08.796Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:08.796Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:08.797Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:08.797Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:08.798Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:08.800Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:08.800Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:08.800Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:08.801Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:08.801Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:08.801Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:08.802Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:08.802Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:09.821Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:09.822Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:09.823Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:09.823Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:09.824Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:09.824Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:09.825Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:09.825Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:09.827Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:09.828Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:09.828Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:09.829Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:09.829Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:09.829Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:09.830Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:09.830Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:10.829Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:10.830Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:10.830Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:10.830Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:10.831Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:10.831Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:10.832Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:10.832Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:10.835Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:10.835Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:10.835Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:10.836Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:10.836Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:10.837Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:10.837Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:10.837Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:11.385Z] [select-pieces] mapId from room: large-battlefield
+[2026-02-28T13:06:11.385Z] [select-pieces] latestRoom.mapId: large-battlefield
+[2026-02-28T13:06:11.386Z] [createInitialBattleForPlayers] mapId: large-battlefield
+[2026-02-28T13:06:11.386Z] [createInitialBattleForPlayers] DEFAULT_MAP_ID: arena-8x6
+[2026-02-28T13:06:11.387Z] [createInitialBattleForPlayers] map from getMap: 大型战场
+[2026-02-28T13:06:11.872Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:11.873Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:11.874Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:11.874Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:11.876Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:11.876Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:11.877Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:11.878Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:11.883Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:11.883Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:11.884Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:11.884Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:11.884Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:11.885Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:11.886Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:11.886Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:11.906Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:11.908Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:11.908Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:11.908Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:11.909Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:11.910Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:11.910Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:11.911Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:11.913Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:11.913Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:11.913Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:11.914Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:11.914Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:11.915Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:11.916Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:11.917Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:12.531Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:12.532Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:12.532Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:12.533Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:12.533Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:12.534Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:12.534Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:12.535Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:12.537Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:12.537Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:12.537Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:12.538Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:12.538Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:12.539Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:12.539Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:12.539Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:19.070Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:19.071Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:19.072Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:19.072Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:19.073Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:19.073Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:19.073Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:19.074Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
+[2026-02-28T13:06:19.076Z] [loadMaps] dirPath: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design\data\maps
+[2026-02-28T13:06:19.076Z] [loadMaps] cwd: C:\Users\lngsc\Documents\GitHub\v0-game-menu-design\v0-game-menu-design
+[2026-02-28T13:06:19.076Z] [loadMaps] Directory exists: true
+[2026-02-28T13:06:19.077Z] [loadMaps] Found files: arena-8x6.json, large-battlefield.json, large-elemental-arena.json, medium-lava-temple.json
+[2026-02-28T13:06:19.077Z] [loadMaps] Created map: arena-8x6, name: 小型竞技场
+[2026-02-28T13:06:19.078Z] [loadMaps] Created map: large-battlefield, name: 大型战场
+[2026-02-28T13:06:19.078Z] [loadMaps] Created map: large-elemental-arena, name: 大型元素竞技场
+[2026-02-28T13:06:19.078Z] [loadMaps] Created map: medium-lava-temple, name: 熔岩神殿
