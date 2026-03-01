@@ -819,12 +819,12 @@ export default function TrainingPage() {
               <CardTitle className="text-sm">所有棋子</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {battle.pieces.filter(p => p.currentHp > 0).map((piece) => {
+              {battle.pieces.filter(p => p.currentHp > 0).map((piece, index) => {
                 const isRed = piece.faction === "red"
                 const isSelected = selectedPieceId === piece.instanceId
                 return (
                   <div
-                    key={piece.instanceId}
+                    key={`${piece.instanceId}-${index}`}
                     className={`group relative flex items-center gap-4 cursor-pointer rounded-md p-2 transition-colors ${
                       isSelected
                         ? 'bg-zinc-800/80 border-l-4 border-green-500'
@@ -996,6 +996,64 @@ export default function TrainingPage() {
               })}
             </CardContent>
           </Card>
+
+          {/* 墓地 */}
+          {battle.graveyard && battle.graveyard.length > 0 && (
+            <Card className="bg-zinc-900/50 lg:col-span-2">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">墓地</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {battle.graveyard.map((piece, index) => {
+                  const pieceTemplate = getPieceById(piece.templateId)
+                  const image = pieceTemplate?.image
+                  return (
+                    <div 
+                      key={`graveyard-${piece.instanceId}-${index}`}
+                      className="group relative flex items-center gap-4 cursor-pointer rounded-md p-2 transition-colors bg-zinc-900/50 opacity-70"
+                    >
+                      <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${piece.faction === "red" ? "bg-red-600" : "bg-blue-600"} opacity-50 grayscale`}>
+                        {image && image.startsWith("http") ? (
+                          <img src={image} alt={pieceTemplate?.name || "Piece"} className="h-full w-full object-contain" />
+                        ) : image && (image.length <= 3 || image.includes("️")) ? (
+                          <span className="text-3xl font-bold text-white">{image}</span>
+                        ) : image ? (
+                          <img src={`/${image}`} alt={pieceTemplate?.name || "Piece"} className="h-full w-full object-contain" />
+                        ) : (
+                          <Swords className="h-6 w-6 text-white" />
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-zinc-200">
+                            {pieceTemplate?.name || piece.templateId}
+                            <span className="ml-2 text-xs font-bold text-red-500">[阵亡]</span>
+                          </span>
+                          <span className={`text-sm ${piece.faction === "red" ? "text-red-400" : "text-blue-400"}`}>
+                            {piece.faction === "red" ? "红方" : "蓝方"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-zinc-400">
+                          <span className="flex items-center gap-1">
+                            <Shield className="h-3 w-3" />
+                            HP: 0/{piece.maxHp}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Swords className="h-3 w-3" />
+                            攻击: {piece.attack}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Footprints className="h-3 w-3" />
+                            移动: {piece.moveRange}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 

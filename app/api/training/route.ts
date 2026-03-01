@@ -230,8 +230,22 @@ export async function PUT(req: NextRequest) {
     // 重新加载技能文件（开发模式热重载）
     reloadSkills()
 
+    console.log('[PUT] Before applyBattleAction, pieces:', battleState.pieces.map(p => `${p.templateId}(${p.instanceId})`))
     // 使用原版的 applyBattleAction 处理战斗逻辑
     const newState = applyBattleAction(battleState, action)
+    console.log('[PUT] After applyBattleAction, pieces count:', newState.pieces.length)
+    console.log('[PUT] After applyBattleAction, pieces:', newState.pieces.map(p => `${p.templateId}(${p.instanceId})`))
+    console.log('[PUT] Graveyard:', newState.graveyard?.map(p => `${p.templateId}(${p.instanceId})`))
+    
+    // 临时修复：去除重复的棋子
+    const uniquePieces = newState.pieces.filter((piece, index, self) => 
+      index === self.findIndex((p) => p.instanceId === piece.instanceId)
+    )
+    if (uniquePieces.length !== newState.pieces.length) {
+      console.log('[PUT] Found duplicate pieces, deduplicating...')
+      newState.pieces = uniquePieces
+    }
+    
     return NextResponse.json(newState)
   } catch (error) {
     console.error("Error executing battle action:", error)
@@ -271,6 +285,9 @@ export async function PATCH(req: NextRequest) {
       )
     }
 
+    // 重新加载技能文件（开发模式热重载）
+    reloadSkills()
+
     let newState = { ...battleState }
 
     switch (type) {
@@ -282,7 +299,10 @@ export async function PATCH(req: NextRequest) {
           y: number
         }
 
+        console.log('[addPiece] faction:', faction, 'templateId:', templateId, 'x:', x, 'y:', y)
+
         const template = getPieceById(templateId)
+        console.log('[addPiece] template:', template)
         if (!template) {
           return NextResponse.json(
             { error: `Piece template not found: ${templateId}` },

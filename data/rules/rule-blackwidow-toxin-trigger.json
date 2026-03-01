@@ -1,0 +1,13 @@
+{
+  "id": "rule-blackwidow-toxin-trigger",
+  "name": "毒素触发",
+  "description": "回合开始时检测敌人是否踩到毒素",
+  "trigger": {
+    "type": "beginTurn"
+  },
+  "effect": {
+    "type": "triggerSkill",
+    "skillId": "blackwidow-toxin-damage",
+    "message": ""
+  }
+}

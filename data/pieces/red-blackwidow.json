@@ -1,0 +1,29 @@
+{
+  "id": "red-blackwidow",
+  "name": "黑百合",
+  "faction": "red",
+  "description": "致命的暗杀者，擅长远程狙击和毒素攻击",
+  "rarity": "epic",
+  "image": "blackwidow.jpg",
+  "stats": {
+    "maxHp": 10,
+    "attack": 6,
+    "defense": 0,
+    "moveRange": 4
+  },
+  "skills": [
+    {
+      "skillId": "blackwidow-lethal-strike",
+      "level": 1
+    },
+    {
+      "skillId": "blackwidow-lethal-toxin",
+      "level": 1
+    },
+    {
+      "skillId": "blackwidow-deadly-gaze",
+      "level": 1
+    }
+  ],
+  "isDefault": false
+}

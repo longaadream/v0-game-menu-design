@@ -339,13 +339,8 @@ export function GameBoard({ map, pieces = [], onTileClick, onPieceClick, selecte
                 }
                 
                 const faction = getFaction()
-                console.log('Final faction:', faction)
-                console.log('Piece object:', piece)
-                console.log('Piece template:', pieceTemplate)
                 const borderColor = faction === "red" ? "border-red-500" : "border-blue-500"
-                console.log('Border color class:', borderColor)
                 const hoverBorderClass = `hover:border-2 ${borderColor} hover:border-4`
-                console.log('Hover border class:', hoverBorderClass)
                 
                 // 检查棋子是否死亡
                 const isDead = piece.currentHp <= 0;

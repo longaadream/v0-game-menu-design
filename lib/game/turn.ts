@@ -103,7 +103,7 @@ function safeCloneBattleState(state: BattleState): BattleState {
 
   // 克隆状态
   const cloned = structuredClone(state) as BattleState
-
+   
   // 恢复函数到原始状态
   state.pieces.forEach((piece, index) => {
     if (piece.rules && piece.rules.length > 0) {
@@ -1108,7 +1108,6 @@ export function applyBattleAction(
       const cost = skillDef.chargeCost ?? 0
       // 从 next 状态获取 playerMeta，确保修改能正确保存
       const nextPlayerMeta = getPlayerMeta(next, action.playerId)
-      console.log('[useChargeSkill] Before deduction:', { playerId: action.playerId, chargePoints: nextPlayerMeta.chargePoints, cost })
       if (cost > 0 && nextPlayerMeta.chargePoints < cost) {
         throw new BattleRuleError("Not enough charge points to use this skill")
       }
@@ -1116,7 +1115,6 @@ export function applyBattleAction(
       // 消耗充能点
       if (cost > 0) {
         nextPlayerMeta.chargePoints -= cost
-        console.log('[useChargeSkill] After deduction:', { playerId: action.playerId, chargePoints: nextPlayerMeta.chargePoints })
       }
 
       // 执行技能
